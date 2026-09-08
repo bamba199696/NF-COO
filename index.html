@@ -1,0 +1,1184 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>Assistant Notice Financière — Société Générale Sénégal</title>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/tesseract.js/5.1.0/tesseract.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.8.0/mammoth.browser.min.js"></script>
+
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap');
+
+  :root{
+    --ink:#181414; --ink-soft:#4A4544;
+    --paper:#F4F3F2; --paper-line:#E2DEDD;
+    --accent:#E9041E; --accent-deep:#B4021A;
+    --amber:#C98A12; --amber-deep:#A66F0C;
+    --ok:#3F7A57; --ok-bg:#E4F2E9;
+    --err:#B3453A; --err-bg:#FBEAE8;
+    --info:#3A3A3A; --info-bg:#ECEAEA;
+    --muted:#8A8583; --card:#ffffff;
+  }
+  *{box-sizing:border-box;}
+  body{ margin:0; background:var(--paper); color:var(--ink); font-family:'Inter',sans-serif; border-top:4px solid var(--accent); }
+  .wrap{ max-width:980px; margin:0 auto; padding:50px 24px 100px; }
+
+  .topbar{
+    display:flex; align-items:center; justify-content:space-between;
+    padding:10px 0; margin-bottom:22px; border-bottom:1px solid var(--paper-line);
+  }
+  .brand{ display:flex; align-items:center; gap:10px; }
+  .brand .mark{
+    width:32px; height:32px; border-radius:6px; background:var(--accent); color:#fff;
+    display:flex; align-items:center; justify-content:center;
+    font-family:'IBM Plex Mono',monospace; font-weight:600; font-size:0.85rem; flex-shrink:0;
+  }
+  .brand .name{ font-size:0.86rem; font-weight:600; color:var(--ink); }
+  .brand .name span{ color:var(--ink-soft); font-weight:400; }
+  .brand .org-line{
+    font-family:'IBM Plex Mono',monospace; font-size:0.62rem; letter-spacing:0.03em; text-transform:uppercase;
+    color:var(--accent-deep); margin-top:2px;
+  }
+  .pill-secure{
+    font-family:'IBM Plex Mono',monospace; font-size:0.66rem; letter-spacing:0.04em; text-transform:uppercase;
+    background:var(--ok-bg); color:var(--ok); padding:4px 10px; border-radius:12px;
+  }
+
+  header{ margin-bottom:30px; }
+  .eyebrow{ font-family:'IBM Plex Mono',monospace; font-size:0.7rem; letter-spacing:0.12em; text-transform:uppercase; color:var(--accent-deep); margin-bottom:9px; }
+  h1{ font-family:'Inter',sans-serif; font-weight:600; font-size:1.95rem; line-height:1.18; margin:0 0 10px; }
+  h1 em{ font-style:normal; color:var(--accent); font-weight:700; }
+  .lede{ font-size:0.98rem; color:var(--ink-soft); max-width:68ch; line-height:1.6; }
+  .disclaimer{
+    margin-top:14px; display:flex; gap:10px; align-items:flex-start;
+    background:#fff; border:1px solid var(--paper-line); border-left:3px solid var(--amber);
+    border-radius:4px; padding:12px 16px; font-size:0.83rem; color:var(--ink-soft); line-height:1.5; max-width:68ch;
+  }
+
+  .step{
+    background:linear-gradient(180deg,#fff,#faf9f9); border:1px solid var(--paper-line); border-radius:6px;
+    margin-top:22px; overflow:hidden; box-shadow:0 1px 0 rgba(16,35,59,0.04), 0 12px 26px -18px rgba(16,35,59,0.25);
+  }
+  .step-head{
+    display:flex; align-items:center; gap:12px; padding:16px 22px; border-bottom:1px solid var(--paper-line);
+  }
+  .step-num{
+    width:26px; height:26px; border-radius:50%; background:var(--ink); color:var(--paper);
+    font-family:'IBM Plex Mono',monospace; font-size:0.78rem; display:flex; align-items:center; justify-content:center; flex-shrink:0;
+  }
+  .step-num.done{ background:var(--ok); }
+  .step-title{ font-weight:600; font-size:0.98rem; }
+  .step-sub{ font-size:0.82rem; color:var(--muted); margin-left:auto; }
+  .step-body{ padding:20px 22px; }
+
+  .drop{
+    position:relative; border:1.5px dashed var(--paper-line); border-radius:5px;
+    padding:26px 18px; text-align:center; cursor:pointer; transition:background 0.2s, border-color 0.2s;
+  }
+  .drop.dragover{ background:rgba(233,4,30,0.06); border-color:var(--accent); }
+  .drop .glyph{ font-size:1.4rem; margin-bottom:4px; color:var(--ink-soft); }
+  .drop .instr{ font-size:0.88rem; color:var(--ink-soft); }
+  .drop .instr b{ color:var(--ink); }
+  .drop .meta{ font-family:'IBM Plex Mono',monospace; font-size:0.63rem; color:var(--muted); margin-top:6px; }
+  input[type=file]{ display:none; }
+
+  .file-chip{
+    display:inline-flex; align-items:center; gap:8px; background:#fff; border:1px solid var(--paper-line);
+    border-radius:20px; padding:6px 12px 6px 14px; font-size:0.82rem; margin:4px 6px 0 0;
+  }
+  .file-chip button{ border:none; background:none; color:var(--muted); cursor:pointer; font-size:1rem; line-height:1; padding:0; }
+  .file-chip button:hover{ color:var(--err); }
+
+  .queue-row{ display:flex; align-items:center; gap:10px; padding:8px 0; font-size:0.85rem; border-bottom:1px solid var(--paper-line); }
+  .queue-row:last-child{ border-bottom:none; }
+  .status-badge{
+    font-family:'IBM Plex Mono',monospace; font-size:0.62rem; text-transform:uppercase; letter-spacing:0.04em;
+    padding:3px 8px; border-radius:3px; background:#ECE9E8; color:var(--muted); white-space:nowrap; margin-left:auto;
+  }
+  .status-badge.cours{ background:rgba(232,163,61,0.18); color:var(--amber-deep); }
+  .status-badge.termine{ background:var(--ok-bg); color:var(--ok); }
+  .status-badge.erreur{ background:var(--err-bg); color:var(--err); }
+
+  button.action{
+    font-family:'Inter',sans-serif; font-weight:600; font-size:0.9rem; padding:11px 20px;
+    border-radius:4px; border:none; cursor:pointer; transition:background 0.15s, transform 0.08s;
+  }
+  button.action:active{ transform:translateY(1px); }
+  button.primary{ background:var(--ink); color:var(--paper); }
+  button.primary:hover{ background:var(--ink-soft); }
+  button.primary:disabled{ background:#b8bfc9; cursor:not-allowed; }
+  button.amber{ background:var(--accent); color:#fff; }
+  button.amber:hover{ background:var(--accent-deep); }
+  button.amber:disabled{ background:#B7C6DC; color:#fff; cursor:not-allowed; }
+
+  #log-box{
+    display:none; margin-top:16px; background:var(--ink); color:#D9E4F0; border-radius:5px; padding:14px 16px;
+    font-family:'IBM Plex Mono',monospace; font-size:0.76rem; line-height:1.7; max-height:190px; overflow-y:auto;
+  }
+  #log-box .line{ opacity:0; animation:fadein 0.2s forwards; }
+  #log-box .tag-native{ color:#7FD9A8; }
+  #log-box .tag-ocr{ color:var(--amber); }
+  #log-box .tag-err{ color:#F19B92; }
+  @keyframes fadein{ to{ opacity:1; } }
+
+  .kpi-row{ display:flex; gap:10px; flex-wrap:wrap; margin-top:18px; }
+  .kpi{ flex:1; min-width:120px; background:var(--card); border:1px solid var(--paper-line); border-radius:5px; padding:13px 16px; }
+  .kpi .n{ font-family:'Inter',sans-serif; font-size:1.5rem; }
+  .kpi .l{ font-family:'IBM Plex Mono',monospace; font-size:0.6rem; letter-spacing:0.05em; text-transform:uppercase; color:var(--muted); margin-top:2px; }
+
+  .section-block{ margin-top:26px; }
+  .section-block h3{
+    font-family:'Inter',sans-serif; font-size:1.05rem; margin:0 0 10px;
+    display:flex; align-items:center; gap:8px;
+  }
+  .section-block h3 .count{
+    font-family:'IBM Plex Mono',monospace; font-size:0.62rem; background:#EEF2F6; color:var(--ink-soft);
+    padding:2px 8px; border-radius:10px;
+  }
+  table.review{ width:100%; border-collapse:collapse; font-size:0.83rem; background:#fff; border:1px solid var(--paper-line); border-radius:5px; overflow:hidden; }
+  table.review th{
+    text-align:left; font-family:'IBM Plex Mono',monospace; font-size:0.6rem; letter-spacing:0.05em; text-transform:uppercase;
+    color:var(--muted); padding:8px 10px; background:#faf9f9; border-bottom:1px solid var(--paper-line);
+  }
+  table.review td{ padding:7px 10px; border-bottom:1px solid var(--paper-line); vertical-align:middle; }
+  table.review tr:last-child td{ border-bottom:none; }
+  table.review input{
+    width:100%; border:1px solid var(--paper-line); border-radius:3px; padding:4px 6px; font-family:'IBM Plex Mono',monospace;
+    font-size:0.8rem; text-align:right;
+  }
+  table.review input:focus{ outline:1.5px solid var(--accent); border-color:var(--accent); }
+  .code-pill{ font-family:'IBM Plex Mono',monospace; font-size:0.68rem; background:#EEF2F6; color:var(--ink-soft); padding:2px 6px; border-radius:3px; }
+  .tag{
+    font-family:'IBM Plex Mono',monospace; font-size:0.6rem; text-transform:uppercase; letter-spacing:0.03em;
+    padding:2px 7px; border-radius:3px; white-space:nowrap;
+  }
+  .tag.auto{ background:var(--ok-bg); color:var(--ok); }
+  .tag.aggregate{ background:#FBEEDA; color:var(--amber-deep); }
+  .tag.kept{ background:var(--info-bg); color:var(--info); }
+  .raw-line{ font-family:'IBM Plex Mono',monospace; font-size:0.68rem; color:var(--muted); max-width:230px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  details.uncovered{ margin-top:10px; font-size:0.85rem; color:var(--ink-soft); }
+  details.uncovered summary{ cursor:pointer; font-weight:600; color:var(--ink); }
+  .uncovered-list{ columns:2; margin-top:10px; font-size:0.8rem; line-height:1.9; }
+  @media (max-width:640px){ .uncovered-list{ columns:1; } }
+
+  footer{ margin-top:44px; font-size:0.8rem; color:var(--muted); line-height:1.65; }
+  footer code{ background:#ECE9E8; padding:1px 5px; border-radius:3px; font-family:'IBM Plex Mono',monospace; }
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <div class="topbar">
+    <div class="brand">
+      <div class="mark">SG</div>
+      <div>
+        <div class="name">Assistant Notice Financière <span>· outil interne</span></div>
+        <div class="org-line">Société Générale Sénégal — Direction DCE / COO</div>
+      </div>
+    </div>
+    <span class="pill-secure">🔒 Traitement local, aucune donnée transmise</span>
+  </div>
+
+  <header>
+    <h1>Assistant Notice Financière</h1>
+  </header>
+
+  <!-- ÉTAPE 1 : modèle -->
+  <div class="step">
+    <div class="step-head">
+      <div class="step-num" id="num-1">1</div>
+      <div class="step-title">Charger le modèle Notice Financière</div>
+      <div class="step-sub" id="sub-1">.xlsm ou .xlsx</div>
+    </div>
+    <div class="step-body">
+      <label class="drop" id="drop-template" for="input-template">
+        <div class="glyph">⬆</div>
+        <div class="instr"><b>Cliquez</b> ou glissez le fichier</div>
+        <div class="meta">NOTICE_FINANCIERE.XLSM</div>
+      </label>
+      <input type="file" id="input-template" accept=".xlsm,.xlsx">
+      <div id="template-chip"></div>
+    </div>
+  </div>
+
+  <!-- ÉTAPE 2 : documents client -->
+  <div class="step">
+    <div class="step-head">
+      <div class="step-num" id="num-2">2</div>
+      <div class="step-title">Charger les états financiers du client</div>
+      <div class="step-sub">PDF · Word · images</div>
+    </div>
+    <div class="step-body">
+      <label class="drop" id="drop-docs" for="input-docs">
+        <div class="glyph">⬆</div>
+        <div class="instr"><b>Cliquez</b> ou glissez le(s) fichier(s)</div>
+        <div class="meta">PDF · WORD · IMAGES</div>
+      </label>
+      <input type="file" id="input-docs" accept=".pdf,.docx,.png,.jpg,.jpeg,.webp,.bmp,.gif" multiple>
+      <div id="docs-queue"></div>
+    </div>
+  </div>
+
+  <!-- ÉTAPE 3 : extraction -->
+  <div class="step">
+    <div class="step-head">
+      <div class="step-num" id="num-3">3</div>
+      <div class="step-title">Lancer l'extraction</div>
+    </div>
+    <div class="step-body">
+      <button class="action primary" id="btn-extract" disabled>Analyser les documents</button>
+      <div id="log-box"></div>
+      <div class="kpi-row" id="kpis" style="display:none;">
+        <div class="kpi"><div class="n" id="k-codes">0</div><div class="l">Codes détectés</div></div>
+        <div class="kpi"><div class="n" id="k-auto">0</div><div class="l">Auto-mappés</div></div>
+        <div class="kpi"><div class="n" id="k-review">0</div><div class="l">À vérifier</div></div>
+        <div class="kpi"><div class="n" id="k-ocr">0</div><div class="l">Pages OCR</div></div>
+        <div class="kpi"><div class="n" id="k-suspect">0</div><div class="l">Lignes suspectes</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ÉTAPE 4 : revue -->
+  <div class="step" id="step-review" style="display:none;">
+    <div class="step-head">
+      <div class="step-num" id="num-4">4</div>
+      <div class="step-title">Relecture avant export</div>
+      <div class="step-sub">chaque valeur reste modifiable</div>
+    </div>
+    <div class="step-body" id="review-body"></div>
+  </div>
+
+  <!-- ÉTAPE 5 : export -->
+  <div class="step" id="step-export" style="display:none;">
+    <div class="step-head">
+      <div class="step-num" id="num-5">5</div>
+      <div class="step-title">Générer le fichier</div>
+    </div>
+    <div class="step-body">
+      <button class="action amber" id="btn-export">⬇ Télécharger la Notice Financière complétée</button>
+      <p style="font-size:0.8rem;color:var(--muted);margin-top:10px;">
+        Ajoute un onglet « Journal OCR » (traçabilité) — vérifiez l'ouverture du fichier dans Excel.
+      </p>
+    </div>
+  </div>
+
+  <footer>
+    Lignes marquées « regroupé » : à ventiler manuellement si besoin.
+    <div style="margin-top:10px; padding-top:10px; border-top:1px solid var(--paper-line); font-family:'IBM Plex Mono',monospace; font-size:0.68rem; letter-spacing:0.02em; color:var(--muted);">
+      © DMEC — Pôle Business Intelligence et Stratégie Client · Société Générale Sénégal
+    </div>
+  </footer>
+</div>
+
+<script>
+/* ============================================================
+   1. DICTIONNAIRE DES CODES SYSCOHADA (Système Normal)
+   ============================================================ */
+const CODES = {
+  AD:{label:"Immobilisations incorporelles",section:'actif'}, AE:{label:"Frais de développement et de prospection",section:'actif'},
+  AF:{label:"Brevets, licences, logiciels et droits similaires",section:'actif'}, AG:{label:"Fonds commercial et droit au bail",section:'actif'},
+  AH:{label:"Autres immobilisations incorporelles",section:'actif'}, AI:{label:"Immobilisations corporelles",section:'actif'},
+  AJ:{label:"Terrains",section:'actif'}, AK:{label:"Bâtiments",section:'actif'},
+  AL:{label:"Aménagements, agencements et installations",section:'actif'}, AM:{label:"Matériel, mobilier et actifs biologiques",section:'actif'},
+  AN:{label:"Matériel de transport",section:'actif'}, AP:{label:"Avances et acomptes versés sur immobilisations",section:'actif'},
+  AQ:{label:"Immobilisations financières",section:'actif'}, AR:{label:"Titres de participation",section:'actif'},
+  AS:{label:"Autres immobilisations financières",section:'actif'}, AZ:{label:"Total actif immobilisé",section:'actif'},
+  BA:{label:"Actif circulant H.A.O.",section:'actif'}, BB:{label:"Stocks et en-cours",section:'actif'},
+  BG:{label:"Créances et emplois assimilés",section:'actif'}, BH:{label:"Fournisseurs, avances versées",section:'actif'},
+  BI:{label:"Clients",section:'actif'}, BJ:{label:"Autres créances",section:'actif'}, BK:{label:"Total actif circulant",section:'actif'},
+  BQ:{label:"Titres de placement",section:'actif'}, BR:{label:"Valeurs à encaisser",section:'actif'},
+  BS:{label:"Banques, chèques postaux, caisse",section:'actif'}, BT:{label:"Total trésorerie actif",section:'actif'},
+  BU:{label:"Écarts de conversion actif",section:'actif'}, BZ:{label:"Total général actif",section:'actif'},
+
+  CA:{label:"Capital",section:'passif'}, CB:{label:"Actionnaires, capital non appelé",section:'passif'},
+  CD:{label:"Primes liées au capital social",section:'passif'}, CE:{label:"Écarts de réévaluation",section:'passif'},
+  CF:{label:"Réserves indisponibles",section:'passif'}, CG:{label:"Réserves libres",section:'passif'},
+  CH:{label:"Report à nouveau",section:'passif'}, CJ:{label:"Résultat net de l'exercice",section:'passif'},
+  CL:{label:"Subventions d'investissement",section:'passif'}, CM:{label:"Provisions réglementées et fonds assimilés",section:'passif'},
+  CP:{label:"Total capitaux propres et ressources assimilées",section:'passif'}, DA:{label:"Emprunts et dettes financières diverses",section:'passif'},
+  DB:{label:"Dettes de location acquisition",section:'passif'}, DC:{label:"Provisions pour risques et charges",section:'passif'},
+  DD:{label:"Total dettes financières et ressources assimilées",section:'passif'}, DF:{label:"Total ressources stables",section:'passif'},
+  DH:{label:"Dettes circulantes H.A.O.",section:'passif'}, DI:{label:"Clients, avances reçues",section:'passif'},
+  DJ:{label:"Fournisseurs d'exploitation",section:'passif'}, DK:{label:"Dettes fiscales et sociales",section:'passif'},
+  DM:{label:"Autres dettes",section:'passif'}, DN:{label:"Provisions pour risques à court terme",section:'passif'},
+  DP:{label:"Total passif circulant",section:'passif'}, DQ:{label:"Banques, crédits d'escompte",section:'passif'},
+  DR:{label:"Banques, établissements financiers et crédits de trésorerie",section:'passif'}, DT:{label:"Total trésorerie passif",section:'passif'},
+  DV:{label:"Écarts de conversion passif",section:'passif'}, DZ:{label:"Total général passif",section:'passif'},
+
+  TA:{label:"Ventes de marchandises",section:'resultat'}, RA:{label:"Achats de marchandises",section:'resultat'},
+  RB:{label:"Variation de stocks de marchandises",section:'resultat'}, XA:{label:"Marge brute sur marchandises",section:'resultat'},
+  TB:{label:"Ventes de produits fabriqués",section:'resultat'}, TC:{label:"Travaux, services vendus",section:'resultat'},
+  TD:{label:"Produits accessoires",section:'resultat'}, XB:{label:"Chiffre d'affaires",section:'resultat'},
+  TE:{label:"Production stockée",section:'resultat'}, TF:{label:"Production immobilisée",section:'resultat'},
+  TG:{label:"Subventions d'exploitation",section:'resultat'}, TH:{label:"Autres produits",section:'resultat'},
+  TI:{label:"Transferts de charges d'exploitation",section:'resultat'}, RC:{label:"Achats de matières premières et fournitures liées",section:'resultat'},
+  RD:{label:"Variation de stocks de matières premières",section:'resultat'}, RE:{label:"Autres achats",section:'resultat'},
+  RF:{label:"Variation de stocks d'autres approvisionnements",section:'resultat'}, RG:{label:"Transports",section:'resultat'},
+  RH:{label:"Services extérieurs",section:'resultat'}, RI:{label:"Impôts et taxes",section:'resultat'},
+  RJ:{label:"Autres charges",section:'resultat'}, XC:{label:"Valeur ajoutée",section:'resultat'},
+  RK:{label:"Charges de personnel",section:'resultat'}, XD:{label:"Excédent brut d'exploitation",section:'resultat'},
+  TJ:{label:"Reprises d'amortissements, provisions et dépréciations",section:'resultat'},
+  RL:{label:"Dotations aux amortissements, provisions et dépréciations",section:'resultat'}, XE:{label:"Résultat d'exploitation",section:'resultat'},
+  TK:{label:"Revenus financiers et assimilés",section:'resultat'}, TL:{label:"Reprises de provisions et dépréciations financières",section:'resultat'},
+  TM:{label:"Transferts de charges financières",section:'resultat'}, RM:{label:"Frais financiers et charges assimilées",section:'resultat'},
+  RN:{label:"Dotations aux provisions et dépréciations financières",section:'resultat'}, XF:{label:"Résultat financier",section:'resultat'},
+  XG:{label:"Résultat des activités ordinaires",section:'resultat'}, TN:{label:"Produits des cessions d'immobilisations",section:'resultat'},
+  TO:{label:"Autres produits H.A.O.",section:'resultat'}, RO:{label:"Valeurs comptables des cessions d'immobilisations",section:'resultat'},
+  RP:{label:"Autres charges H.A.O.",section:'resultat'}, XH:{label:"Résultat hors activités ordinaires",section:'resultat'},
+  RQ:{label:"Participation des travailleurs",section:'resultat'}, RS:{label:"Impôts sur le résultat",section:'resultat'},
+  XI:{label:"Résultat net",section:'resultat'},
+
+  ZA:{label:"Trésorerie nette au 1er janvier",section:'flux'}, FA:{label:"Capacité d'autofinancement globale (CAFG)",section:'flux'},
+  ZB:{label:"Flux — activités opérationnelles",section:'flux'}, ZC:{label:"Flux — activités d'investissement",section:'flux'},
+  ZD:{label:"Flux — capitaux propres",section:'flux'}, ZE:{label:"Flux — capitaux étrangers",section:'flux'},
+  ZF:{label:"Flux — activités de financement",section:'flux'}, ZG:{label:"Variation de la trésorerie nette",section:'flux'},
+  ZH:{label:"Trésorerie nette au 31 décembre",section:'flux'},
+};
+const ACTIF_CODES = new Set(Object.keys(CODES).filter(c => CODES[c].section === 'actif'));
+const PASSIF_CODES = new Set(Object.keys(CODES).filter(c => CODES[c].section === 'passif'));
+
+/* ============================================================
+   2. CORRESPONDANCE CODE -> LIGNE DE LA « FEUILLE DE SAISIE »
+   ============================================================ */
+const MAPPING = {
+  AE:{kind:'actif',row:24}, AF:{kind:'actif',row:21,aggregate:"regroupe aussi « Logiciels »"},
+  AG:{kind:'actif',row:23}, AH:{kind:'actif',row:26},
+  AJ:{kind:'actif',row:28}, AK:{kind:'actif',row:29}, AL:{kind:'actif',row:30},
+  AM:{kind:'actif',row:32,aggregate:"regroupe Outillage/Mobilier/Informatique"}, AN:{kind:'actif',row:31},
+  AP:{kind:'actif',row:40}, AR:{kind:'actif',row:38}, AS:{kind:'actif',row:39},
+  AZ:{kind:'crosscheck',row:41}, BA:{kind:'actif-net',row:51},
+  BB:{kind:'actif',row:43,aggregate:"total stocks non détaillé (voir Note 6)"},
+  BH:{kind:'actif-net',row:48}, BI:{kind:'actif-net',row:49}, BJ:{kind:'actif-net',row:50},
+  BK:{kind:'crosscheck',row:52},
+  BQ:{kind:'actif-net',row:54}, BR:{kind:'actif-net',row:56}, BS:{kind:'actif-net',row:55},
+  BT:{kind:'crosscheck',row:57}, BU:{kind:'actif-net',row:58}, BZ:{kind:'crosscheck',row:62},
+
+  CA:{kind:'passif',row:67}, CB:{kind:'passif',row:68}, CD:{kind:'passif',row:69}, CE:{kind:'passif',row:70},
+  CF:{kind:'passif',row:71}, CG:{kind:'passif',row:72}, CH:{kind:'passif',row:75}, CJ:{kind:'passif',row:76},
+  CL:{kind:'passif',row:77}, CM:{kind:'passif',row:78}, CP:{kind:'crosscheck',row:80},
+  DA:{kind:'passif',row:83}, DB:{kind:'passif',row:85}, DC:{kind:'passif',row:82,aggregate:"provisions à plus d'un an (estimation)"},
+  DD:{kind:'crosscheck',row:87},
+  DH:{kind:'passif',row:88}, DI:{kind:'passif',row:89}, DJ:{kind:'passif',row:90}, DK:{kind:'passif',row:91},
+  DM:{kind:'passif',row:92}, DN:{kind:'passif',row:93}, DP:{kind:'crosscheck',row:94},
+  DQ:{kind:'combo',row:96,comboKey:'tresorerie-passif'}, DR:{kind:'combo',row:96,comboKey:'tresorerie-passif'},
+  DT:{kind:'crosscheck',row:98}, DV:{kind:'passif',row:100}, DZ:{kind:'crosscheck',row:103},
+
+  TA:{kind:'resultat',row:107}, RA:{kind:'resultat',row:108}, RB:{kind:'resultat',row:109}, XA:{kind:'crosscheck',row:110},
+  TB:{kind:'resultat',row:111}, TC:{kind:'resultat',row:112}, TD:{kind:'resultat',row:113}, XB:{kind:'crosscheck',row:114},
+  RC:{kind:'resultat',row:115}, RD:{kind:'resultat',row:116}, RE:{kind:'resultat',row:117}, RF:{kind:'resultat',row:118},
+  TG:{kind:'resultat',row:119}, TH:{kind:'resultat',row:120}, TE:{kind:'resultat',row:121}, TF:{kind:'resultat',row:122},
+  RG:{kind:'resultat',row:123}, RH:{kind:'resultat',row:124}, RI:{kind:'resultat',row:125}, RJ:{kind:'resultat',row:126},
+  XC:{kind:'crosscheck',row:127}, RK:{kind:'resultat',row:128}, TI:{kind:'resultat',row:129}, XD:{kind:'crosscheck',row:130},
+  TJ:{kind:'resultat',row:131}, RL:{kind:'resultat',row:132,aggregate:"regroupe amortissements et provisions"},
+  XE:{kind:'crosscheck',row:134},
+  TK:{kind:'resultat',row:135}, RM:{kind:'resultat',row:136}, TM:{kind:'resultat',row:137},
+  TL:{kind:'resultat',row:140}, RN:{kind:'resultat',row:141}, XF:{kind:'crosscheck',row:142},
+  TN:{kind:'resultat',row:143}, XH:{kind:'crosscheck',row:146},
+  RQ:{kind:'resultat',row:154}, RS:{kind:'resultat',row:155}, XI:{kind:'crosscheck',row:156},
+
+  ZA:{kind:'skip'}, FA:{kind:'skip'}, ZB:{kind:'skip'}, ZC:{kind:'skip'}, ZD:{kind:'skip'},
+  ZE:{kind:'skip'}, ZF:{kind:'skip'}, ZG:{kind:'skip'}, ZH:{kind:'skip'},
+};
+
+const ROW_LABELS = {
+  20:"Écarts d'acquisition",21:"Brevets, Licences",22:"Frais d'établissement",23:"Fonds commercial et droit au bail",
+  24:"Frais de recherche et développement",25:"Logiciels",26:"Autres immobilisations incorporelles",
+  28:"Terrains",29:"Bâtiments et constructions",30:"Installations et Aménagements",31:"Matériel de transport",
+  32:"Matériel et Outillage",33:"Matériel, Mobilier de bureau",34:"Matériel informatique",
+  35:"Immobilisations Corporelles en cours",36:"Autres Immobilisations Corporelles",
+  38:"Titres de participation et autres titres immobilisés",39:"Prêts et Autres Immobilisations Financières",
+  40:"Avances et acomptes versés sur immobilisation",43:"Matières premières",44:"Produits et travaux en cours",
+  45:"Produits finis",46:"Autres marchandises",48:"Fournisseurs avances versées",49:"Clients et comptes rattachés",
+  50:"Autres Créances",51:"Actif H.A.O.",54:"Titres de placement",55:"Disponibilités",56:"Valeurs à encaisser",
+  58:"Écart de conversion actif",59:"Charges constatées d'avance",60:"Compte de régul actif",
+  61:"Actif non courant destiné à être cédé",
+  67:"Capital",68:"Actionnaires Capital Non Appelé",69:"Primes d'Apport, d'Émission, de Fusion",
+  70:"Écarts de Réévaluation",71:"Réserves Indisponibles",72:"Réserves Libres",
+  73:"Autres réserves (statutaires, légale, réglementées)",74:"Autres Capitaux Propres",75:"Report à Nouveau",
+  76:"Résultat net de l'exercice",77:"Subventions d'investissement",78:"Provisions Réglementées",
+  79:"Intérêts minoritaires",81:"Impôts différés",82:"Provisions financières pour risques et charges (>1 an)",
+  83:"Emprunts et dettes financières (>1 an)",84:"Sociétés apparentées & CCA bloqués",
+  85:"Dettes de Crédit Bail et contrats assimilés",86:"Autres Dettes subordonnées",
+  88:"Dettes circulantes H.A.O.",89:"Clients, Avances Reçues",90:"Fournisseurs d'exploitation",
+  91:"Dettes Fiscales et sociales",92:"Autres Dettes",93:"Provisions à moins d'un an",
+  95:"Part à moins d'un an des crédits MLT",96:"Banques : Crédits de Trésorerie et découvert",
+  97:"Sociétés apparentées & CCA non bloqués",99:"Produits constatés d'avance",100:"Écart de conversion passif",
+  101:"Compte de régul passif",102:"Passif non courant destiné à être cédé",
+  107:"Ventes de marchandises",108:"Achats de marchandises",109:"Variation de stocks de marchandises",
+  111:"Ventes de produits fabriqués",112:"Travaux, services vendus",113:"Produits accessoires",
+  115:"Achat matières premières et fournitures liées",116:"Variation de stocks de matières premières",
+  117:"Autres achats",118:"Variation autres stocks",119:"Subventions exploitation",
+  120:"Autres produits d'exploitation",121:"Production stockée",122:"Production immobilisée",
+  123:"Transports",124:"Services extérieurs",125:"Impôts et taxes",126:"Autres charges d'exploitation",
+  128:"Charges personnel",129:"Transfert de charges d'exploitation",131:"Reprises de provisions",
+  132:"Dotations aux amortissements - Reprises",133:"Dotations aux provisions",135:"Produits financiers et revenus assimilés",
+  136:"Frais financiers et charges assimilées",137:"Transfert de charges financières",138:"Gains de change",
+  139:"Pertes de changes",140:"Reprises de provisions (financières)",141:"Dotations aux provisions (financières)",
+  143:"Produits des cessions d'immobilisations",144:"+/- charges/produits nets H.A.O.",
+  145:"Valeurs comptables des cessions d'immobilisations",148:"Produits exceptionnels",149:"Charges exceptionnelles",
+  150:"Dotations aux provisions exceptionnelles",152:"+/- Produits net sur opération de capital",
+  153:"+/- Produits net sur opération de gestion",154:"Participation des travailleurs",155:"Impôt sur le résultat",
+  162:"Loyers de crédit-bail mobilier",163:"Loyers de crédit-bail immobilier",164:"Garanties diverses données",
+  165:"Autres engagements donnés dont EENE",166:"Crédit-bail (montant de l'engagement)",
+};
+const DIRECTLY_MAPPED_ROWS = new Set(Object.values(MAPPING).filter(m=>m.kind!=='skip'&&m.kind!=='crosscheck').map(m=>m.row));
+const UNCOVERED_ROWS = Object.keys(ROW_LABELS).map(Number).filter(r => !DIRECTLY_MAPPED_ROWS.has(r));
+
+/* ============================================================
+   2bis. REGROUPEMENTS POUR LA VALIDATION CROISÉE DES TOTAUX
+   (bilan uniquement — les soldes du compte de résultat impliquent
+   des additions/soustractions en cascade trop incertaines pour être
+   validées automatiquement sans risque de faux positifs)
+   ============================================================ */
+const CROSSCHECK_GROUPS = {
+  AZ: { members:['AE','AF','AG','AH','AJ','AK','AL','AM','AN','AP','AR','AS'], periods:['N'] },
+  BK: { members:['BA','BB','BH','BI','BJ'], periods:['N'] },
+  BT: { members:['BQ','BR','BS'], periods:['N'] },
+  BZ: { members:['AZ','BK','BT','BU'], periods:['N'] },
+  CP: { members:['CA','CB','CD','CE','CF','CG','CH','CJ','CL','CM'], periods:['N','N1'] },
+  DD: { members:['DA','DB','DC'], periods:['N','N1'] },
+  DP: { members:['DH','DI','DJ','DK','DM','DN'], periods:['N','N1'] },
+  DT: { members:['DQ+DR'], periods:['N','N1'] },
+  DZ: { members:['CP','DD','DP','DT','DV'], periods:['N','N1'] },
+};
+
+/* ============================================================
+   3. RECONSTITUTION DES LIGNES À PARTIR DES POSITIONS X/Y
+   ============================================================ */
+function clusterRows(tokens, tol){
+  const rows = [];
+  for (const t of tokens){
+    let row = rows.find(r => Math.abs(r.y - t.y) <= tol);
+    if (!row){ row = { y:t.y, tokens:[] }; rows.push(row); }
+    row.tokens.push(t);
+  }
+  for (const r of rows) r.tokens.sort((a,b)=>a.x-b.x);
+  return rows;
+}
+
+// Assemble les tokens d'une ligne en texte, en distinguant un espace "interne"
+// (probable séparateur de milliers au sein d'un même nombre) d'un espace "de colonne"
+// (rupture entre deux cellules du tableau) grâce à la largeur réelle des tokens.
+// Un grand espace devient une TABULATION, qui sert de frontière dure pour le
+// regex d'extraction des montants — cela évite de fusionner deux nombres
+// juxtaposés (ex: "1 200 000 300 000") en un seul montant aberrant.
+function joinRowTokens(tokens){
+  if (tokens.length === 0) return '';
+  const withWidth = tokens.filter(t => t.str && t.str.trim().length>0 && t.width);
+  const avgCharWidth = withWidth.length
+    ? withWidth.reduce((s,t)=>s+(t.width/t.str.length),0)/withWidth.length
+    : 5;
+  const gapThreshold = Math.max(avgCharWidth*2.5, 6);
+
+  let out = tokens[0].str;
+  for (let i=1;i<tokens.length;i++){
+    const prev = tokens[i-1], cur = tokens[i];
+    const prevWidth = prev.width || (avgCharWidth*(prev.str?prev.str.length:1));
+    const gap = cur.x - (prev.x + prevWidth);
+    out += (gap > gapThreshold ? '\t' : ' ') + cur.str;
+  }
+  return out;
+}
+
+function buildLogicalLines(tokens, sortDescendingY){
+  const sorted = [...tokens].sort((a,b)=> sortDescendingY ? b.y-a.y : a.y-b.y);
+  const rows = clusterRows(sorted, 4.5);
+
+  let splitX = null;
+  for (const row of rows){
+    let actifX = null, passifX = null;
+    for (const t of row.tokens){
+      if (ACTIF_CODES.has(t.str) && actifX === null) actifX = t.x;
+      if (PASSIF_CODES.has(t.str) && passifX === null) passifX = t.x;
+    }
+    if (actifX !== null && passifX !== null && passifX > actifX){
+      splitX = (actifX + passifX) / 2;
+      break;
+    }
+  }
+
+  const lines = [];
+  if (splitX !== null){
+    for (const row of rows){
+      const left = joinRowTokens(row.tokens.filter(t => t.x < splitX)).trim();
+      const right = joinRowTokens(row.tokens.filter(t => t.x >= splitX)).trim();
+      if (left) lines.push(left);
+      if (right) lines.push(right);
+    }
+  } else {
+    for (const row of rows){
+      const text = joinRowTokens(row.tokens).trim();
+      if (text) lines.push(text);
+    }
+  }
+  return lines;
+}
+
+/* ============================================================
+   4. EXTRACTION DES MONTANTS D'UNE LIGNE
+   ============================================================ */
+// Jetons monétaires : entiers/décimaux avec séparateur espace OU point comme milliers,
+// parenthèses pour les négatifs, et placeholders textuels (-, N/A, néant, nil).
+// Le {1,3} plafonne à 4 groupes de milliers (~999 999 999 999) : garde-fou en complément
+// de joinRowTokens, au cas où une frontière de colonne n'aurait pas été détectée.
+const MONEY_RE = /\(?-?\d{1,3}(?:[ \u00A0.,]\d{3}){1,3}(?:[.,]\d{1,2})?\)?|\(?-?\d+(?:[.,]\d{1,2})?\)?|-|—|N\/A|n\/a|[Nn][ée]ant|[Nn]il/g;
+
+const PLACEHOLDER_RE = /^(-|—|N\/A|n\/a|[Nn][ée]ant|[Nn]il)$/;
+
+// Corrige les confusions OCR fréquentes dans un code à 2 lettres (0->O, 1->I, 5->S, 8->B, 6->G).
+const OCR_CODE_FIXES = { '0':'O','1':'I','5':'S','8':'B','6':'G' };
+function normalizeCodeCandidate(code){
+  return code.split('').map(ch => OCR_CODE_FIXES[ch] || ch).join('').toUpperCase();
+}
+
+// Interprète un jeton brut ("(1 234)", "12.345,67", "-", "N/A"...) en nombre (ou null si illisible).
+function parseAmount(raw){
+  if (raw == null) return null;
+  let s = String(raw).trim();
+  if (s === '') return null;
+  if (PLACEHOLDER_RE.test(s)) return 0;
+
+  let negative = false;
+  if (/^\(.*\)$/.test(s)){ negative = true; s = s.slice(1, -1); }
+  if (s.startsWith('-')){ negative = true; s = s.slice(1); }
+  s = s.replace(/[ \u00A0]/g, '');
+  if (s === '') return null;
+
+  const dotCount = (s.match(/\./g) || []).length;
+  const commaCount = (s.match(/,/g) || []).length;
+  let decimalChar = null;
+
+  if (dotCount && commaCount){
+    // Le séparateur qui apparaît en dernier est le séparateur décimal.
+    decimalChar = s.lastIndexOf(',') > s.lastIndexOf('.') ? ',' : '.';
+  } else if (commaCount === 1){
+    const after = s.split(',').pop();
+    decimalChar = after.length <= 2 ? ',' : null;
+  } else if (dotCount === 1){
+    const after = s.split('.').pop();
+    decimalChar = after.length <= 2 ? '.' : null;
+  }
+  // dotCount>1 ou commaCount>1 sans mélange => uniquement des séparateurs de milliers.
+
+  if (decimalChar){
+    const otherChar = decimalChar === ',' ? '.' : ',';
+    s = s.split(otherChar).join('');
+    s = s.replace(decimalChar, '.');
+  } else {
+    s = s.replace(/[.,]/g, '');
+  }
+  const num = parseFloat(s);
+  if (isNaN(num)) return null;
+  return negative ? -num : num;
+}
+
+// Décide si une ligne au préfixe non reconnu ressemble vraiment à une ligne de code
+// SYSCOHADA mal lue par l'OCR, plutôt qu'à du texte ordinaire contenant un nombre
+// (date, numéro de page, référence de note...). Trois garde-fous cumulatifs :
+//  1) le préfixe doit redevenir un code à 2 LETTRES plausible après correction OCR
+//     (donc "31", "20", "N1"… avec un chiffre non corrigeable sont exclus d'office) ;
+//  2) au moins un montant "substantiel" (avec séparateur de milliers, ou ≥4 chiffres) ;
+//  3) le libellé avant ce montant reste court (exclut les paragraphes de texte).
+function isPlausibleCodeLine(rawCode, rest){
+  const normalized = normalizeCodeCandidate(rawCode);
+  if (!/^[A-Z]{2}$/.test(normalized)) return false;
+
+  const tokens = rest.match(MONEY_RE) || [];
+  if (tokens.length === 0) return false;
+
+  const hasSubstantialAmount = tokens.some(t => {
+    const digitsOnly = t.replace(/[^\d]/g, '');
+    return /[ \u00A0.,]/.test(t) || digitsOnly.length >= 4;
+  });
+  if (!hasSubstantialAmount) return false;
+
+  const idx = rest.indexOf(tokens[0]);
+  const label = idx >= 0 ? rest.slice(0, idx).trim() : rest.trim();
+  if (label.length > 60 || label.split(/\s+/).filter(Boolean).length > 8) return false;
+
+  return true;
+}
+
+function parseLine(line){
+  const m = line.match(/^([A-Z0-9]{2})\b\s*(.*)$/);
+  if (!m) return null;
+  let code = m[1].toUpperCase();
+  const rest = m[2];
+
+  if (!CODES[code]){
+    const fixed = normalizeCodeCandidate(code);
+    if (CODES[fixed]) code = fixed;
+  }
+  if (!CODES[code]){
+    // Code non reconnu : on ne remonte la ligne comme "suspecte" que si elle ressemble
+    // vraiment à une ligne de données mal lue (voir isPlausibleCodeLine) — sinon on
+    // l'ignore silencieusement, comme n'importe quelle ligne de texte non pertinente.
+    if (isPlausibleCodeLine(m[1], rest)){
+      return { unrecognized: true, rawCode: m[1] };
+    }
+    return null;
+  }
+
+  let tokens = rest.match(MONEY_RE) || [];
+  if (tokens.length === 0) return { code, nums: [] };
+
+  const section = CODES[code].section;
+  const maxExpected = section === 'actif' ? 4 : 2;
+  if (tokens.length > maxExpected){
+    const first = tokens[0];
+    const isShortBare = !/[ \u00A0.,]/.test(first) && first.replace('-', '').length <= 2;
+    if (isShortBare) tokens = tokens.slice(1);
+  }
+  const values = tokens.map(t => parseAmount(t));
+  return { code, nums: values };
+}
+
+function toAmounts(code, values){
+  const section = CODES[code].section;
+  if (section === 'actif'){
+    if (values.length >= 4) return { brutN:values[0], amortN:values[1], netN:values[2], netN1:values[3] };
+    if (values.length === 3) return { brutN:values[0], amortN:values[1], netN:values[2], netN1:null };
+    if (values.length === 2) return { brutN:null, amortN:null, netN:values[0], netN1:values[1] };
+    if (values.length === 1) return { brutN:null, amortN:null, netN:values[0], netN1:null };
+    return { brutN:null, amortN:null, netN:null, netN1:null };
+  }
+  if (values.length >= 2) return { valueN:values[0], valueN1:values[1] };
+  if (values.length === 1) return { valueN:values[0], valueN1:null };
+  return { valueN:null, valueN1:null };
+}
+
+/* ============================================================
+   5. PIPELINE PDF / OCR / WORD
+   ============================================================ */
+pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+const OCR_LANGS = 'fra+eng';
+const TESSERACT_LANG_PATH = 'https://tessdata.projectnaptha.com/4.0.0_best';
+const MIN_NATIVE_CHARS = 15;
+const RENDER_SCALE = 3.5;
+
+let ocrWorker = null;
+async function getOcrWorker(){
+  if (!ocrWorker){
+    log('ocr', "Chargement du modèle de reconnaissance (précision)…");
+    ocrWorker = await Tesseract.createWorker(OCR_LANGS, 1, { langPath: TESSERACT_LANG_PATH });
+    await ocrWorker.setParameters({ tessedit_pageseg_mode:'3', preserve_interword_spaces:'1' });
+  }
+  return ocrWorker;
+}
+function preprocessForOCR(canvas){
+  const ctx = canvas.getContext('2d');
+  const w = canvas.width, h = canvas.height;
+  const img = ctx.getImageData(0,0,w,h);
+  const data = img.data;
+  const n = w*h;
+  const gray = new Uint8ClampedArray(n);
+  const hist = new Array(256).fill(0);
+  for (let i=0,j=0;i<data.length;i+=4,j++){
+    const g = Math.round(0.299*data[i]+0.587*data[i+1]+0.114*data[i+2]);
+    gray[j]=g; hist[g]++;
+  }
+  let sumTotal=0; for (let t=0;t<256;t++) sumTotal += t*hist[t];
+  let sumB=0, wB=0, maxVar=0, thr=140;
+  for (let t=0;t<256;t++){
+    wB += hist[t]; if (wB===0) continue;
+    const wF = n-wB; if (wF===0) break;
+    sumB += t*hist[t];
+    const mB = sumB/wB, mF=(sumTotal-sumB)/wF;
+    const v = wB*wF*(mB-mF)*(mB-mF);
+    if (v>maxVar){ maxVar=v; thr=t; }
+  }
+  for (let i=0,j=0;i<data.length;i+=4,j++){
+    const v = gray[j] > thr ? 255 : 0;
+    data[i]=data[i+1]=data[i+2]=v;
+  }
+  ctx.putImageData(img,0,0);
+  return canvas;
+}
+async function renderPageToCanvas(page, scale){
+  const viewport = page.getViewport({ scale });
+  const canvas = document.createElement('canvas');
+  canvas.width = viewport.width; canvas.height = viewport.height;
+  const ctx = canvas.getContext('2d');
+  ctx.fillStyle = '#FFFFFF'; ctx.fillRect(0,0,canvas.width,canvas.height);
+  await page.render({ canvasContext: ctx, viewport }).promise;
+  return canvas;
+}
+async function ocrCanvasWithWords(canvas){
+  const worker = await getOcrWorker();
+  const clean = preprocessForOCR(canvas);
+  const { data } = await worker.recognize(clean);
+  const tokens = (data.words || []).map(w => ({ x: w.bbox.x0, y: (w.bbox.y0+w.bbox.y1)/2, str: w.text, width: w.bbox.x1-w.bbox.x0 }));
+  return { text:(data.text||'').trim(), tokens };
+}
+async function imageFileToCanvas(file){
+  const dataUrl = await new Promise((res,rej)=>{ const r=new FileReader(); r.onload=()=>res(r.result); r.onerror=()=>rej(new Error("Lecture image impossible.")); r.readAsDataURL(file); });
+  const img = await new Promise((res,rej)=>{ const el=new Image(); el.onload=()=>res(el); el.onerror=()=>rej(new Error("Image illisible.")); el.src=dataUrl; });
+  const scale = img.width < 1600 ? 2 : 1;
+  const canvas = document.createElement('canvas');
+  canvas.width = img.width*scale; canvas.height = img.height*scale;
+  const ctx = canvas.getContext('2d');
+  ctx.fillStyle='#FFFFFF'; ctx.fillRect(0,0,canvas.width,canvas.height);
+  ctx.drawImage(img,0,0,canvas.width,canvas.height);
+  return canvas;
+}
+async function extractDocxText(buf){ const { value } = await mammoth.extractRawText({ arrayBuffer: buf }); return value.trim(); }
+
+async function extractLinesFromPdfPage(page){
+  const content = await page.getTextContent();
+  const tokens = content.items.map(it => ({ x: it.transform[4], y: it.transform[5], str: it.str, width: it.width }))
+                              .filter(t => t.str && t.str.trim().length>0);
+  const nativeLen = tokens.reduce((s,t)=>s+t.str.length,0);
+  if (nativeLen >= MIN_NATIVE_CHARS){
+    return { lines: buildLogicalLines(tokens, true), method:'native' };
+  }
+  const canvas = await renderPageToCanvas(page, RENDER_SCALE);
+  const { tokens: ocrTokens } = await ocrCanvasWithWords(canvas);
+  return { lines: buildLogicalLines(ocrTokens, false), method:'ocr' };
+}
+
+/* ============================================================
+   6. ÉTAT DE L'APPLICATION ET UI
+   ============================================================ */
+let templateFile = null, templateWb = null;
+let docsQueue = [];
+let nextId = 0;
+let extraction = null;
+let suspiciousLines = [];
+
+const dropTemplate = document.getElementById('drop-template');
+const inputTemplate = document.getElementById('input-template');
+const templateChip = document.getElementById('template-chip');
+const dropDocs = document.getElementById('drop-docs');
+const inputDocs = document.getElementById('input-docs');
+const docsQueueEl = document.getElementById('docs-queue');
+const btnExtract = document.getElementById('btn-extract');
+const logBox = document.getElementById('log-box');
+const kpis = document.getElementById('kpis');
+const stepReview = document.getElementById('step-review');
+const reviewBody = document.getElementById('review-body');
+const stepExport = document.getElementById('step-export');
+const btnExportEl = document.getElementById('btn-export');
+
+function log(tag, text){
+  logBox.style.display='block';
+  const line = document.createElement('div');
+  line.className='line';
+  const label = tag==='ocr'?'OCR':tag==='native'?'TEXTE':tag==='err'?'ERREUR':'';
+  line.innerHTML = (tag?`<span class="tag-${tag}">${label}</span> `:'') + escapeHtml(text);
+  logBox.appendChild(line); logBox.scrollTop = logBox.scrollHeight;
+}
+function escapeHtml(s){ const d=document.createElement('div'); d.textContent=s; return d.innerHTML; }
+
+['dragover','dragleave','drop'].forEach(evt => dropTemplate.addEventListener(evt, e=>e.preventDefault()));
+dropTemplate.addEventListener('dragover', ()=>dropTemplate.classList.add('dragover'));
+dropTemplate.addEventListener('dragleave', ()=>dropTemplate.classList.remove('dragover'));
+dropTemplate.addEventListener('drop', e=>{ dropTemplate.classList.remove('dragover'); if (e.dataTransfer.files.length) setTemplate(e.dataTransfer.files[0]); });
+inputTemplate.addEventListener('change', ()=>{ if (inputTemplate.files.length) setTemplate(inputTemplate.files[0]); });
+
+async function setTemplate(file){
+  templateFile = file;
+  templateChip.innerHTML = `<span class="file-chip">${escapeHtml(file.name)} <button onclick="clearTemplate()">×</button></span>`;
+  document.getElementById('num-1').classList.add('done');
+  document.getElementById('sub-1').textContent = '✓ chargé';
+  checkReadyToExtract();
+}
+function clearTemplate(){ templateFile=null; templateWb=null; templateChip.innerHTML=''; document.getElementById('num-1').classList.remove('done'); document.getElementById('sub-1').textContent='.xlsm ou .xlsx'; checkReadyToExtract(); }
+
+['dragover','dragleave','drop'].forEach(evt => dropDocs.addEventListener(evt, e=>e.preventDefault()));
+dropDocs.addEventListener('dragover', ()=>dropDocs.classList.add('dragover'));
+dropDocs.addEventListener('dragleave', ()=>dropDocs.classList.remove('dragover'));
+dropDocs.addEventListener('drop', e=>{ dropDocs.classList.remove('dragover'); if (e.dataTransfer.files.length) addDocs(e.dataTransfer.files); });
+inputDocs.addEventListener('change', ()=>{ if (inputDocs.files.length) addDocs(inputDocs.files); inputDocs.value=''; });
+
+function addDocs(fileList){
+  for (const file of fileList) docsQueue.push({ id: nextId++, file, status:'en attente' });
+  renderDocsQueue();
+  checkReadyToExtract();
+}
+function removeDoc(id){ docsQueue = docsQueue.filter(d=>d.id!==id); renderDocsQueue(); checkReadyToExtract(); }
+function renderDocsQueue(){
+  docsQueueEl.innerHTML = docsQueue.map(d => `
+    <div class="queue-row">
+      <span>${escapeHtml(d.file.name)}</span>
+      <span class="status-badge ${d.status==='en cours'?'cours':d.status==='terminé'?'termine':d.status==='erreur'?'erreur':''}">${d.status}</span>
+      <button onclick="removeDoc(${d.id})" style="border:none;background:none;color:var(--muted);cursor:pointer;font-size:1.1rem;">×</button>
+    </div>`).join('');
+  document.getElementById('num-2').classList.toggle('done', docsQueue.length>0);
+}
+function checkReadyToExtract(){ btnExtract.disabled = !(templateFile && docsQueue.length>0); }
+
+btnExtract.addEventListener('click', async () => {
+  btnExtract.disabled = true; btnExtract.textContent = 'Analyse en cours…';
+  logBox.innerHTML=''; logBox.style.display='block';
+
+  const byCode = new Map();
+  let nbOcrPages = 0;
+  suspiciousLines = [];
+
+  for (const d of docsQueue){
+    d.status='en cours'; renderDocsQueue();
+    try {
+      const ext = d.file.name.split('.').pop().toLowerCase();
+      let allLines = [];
+      if (ext === 'pdf'){
+        const buf = await d.file.arrayBuffer();
+        const pdf = await pdfjsLib.getDocument({ data: buf }).promise;
+        log(null, `${d.file.name} — ${pdf.numPages} page(s)`);
+        for (let i=1;i<=pdf.numPages;i++){
+          const page = await pdf.getPage(i);
+          const { lines, method } = await extractLinesFromPdfPage(page);
+          if (method==='ocr'){ nbOcrPages++; log('ocr', `${d.file.name} — page ${i} : image détectée, OCR…`); }
+          else { log('native', `${d.file.name} — page ${i} : texte natif`); }
+          allLines.push(...lines);
+        }
+      } else if (ext === 'docx'){
+        log('native', `${d.file.name} — lecture du document Word…`);
+        const buf = await d.file.arrayBuffer();
+        const text = await extractDocxText(buf);
+        allLines.push(...text.split('\n'));
+      } else {
+        log('ocr', `${d.file.name} — OCR de l'image…`);
+        const canvas = await imageFileToCanvas(d.file);
+        const { tokens } = await ocrCanvasWithWords(canvas);
+        nbOcrPages++;
+        allLines.push(...buildLogicalLines(tokens, false));
+      }
+
+      for (const line of allLines){
+        const parsed = parseLine(line);
+        if (!parsed) continue;
+        if (parsed.unrecognized){
+          suspiciousLines.push({ rawCode: parsed.rawCode, rawLine: line, source: d.file.name });
+          continue;
+        }
+        if (parsed.nums.length===0) continue;
+        if (parsed.nums.every(v => v===null)) continue;
+        if (!byCode.has(parsed.code)){
+          byCode.set(parsed.code, { values: parsed.nums, rawLine: line, source: d.file.name });
+        }
+      }
+      d.status='terminé';
+    } catch(err){
+      console.error(err);
+      log('err', `${d.file.name} — échec : ${err.message||err}`);
+      d.status='erreur';
+    }
+    renderDocsQueue();
+  }
+
+  if (ocrWorker){ await ocrWorker.terminate(); ocrWorker=null; }
+  log(null, `✓ Analyse terminée — ${byCode.size} code(s) reconnu(s).`);
+  if (suspiciousLines.length){
+    log('err', `⚠ ${suspiciousLines.length} ligne(s) avec un code non reconnu (OCR douteux) — voir la section « à vérifier ».`);
+  }
+
+  extraction = { byCode, nbOcrPages, suspiciousLines: suspiciousLines.slice() };
+  btnExtract.textContent = "Analyser les documents";
+  btnExtract.disabled = false;
+
+  await loadTemplateWorkbook();
+  buildReview();
+});
+
+async function loadTemplateWorkbook(){
+  const buf = await templateFile.arrayBuffer();
+  templateWb = XLSX.read(buf, { type:'array', bookVBA:true, cellStyles:true, cellFormula:true });
+}
+
+function cellAddr(col, row){ return col+row; }
+function getExisting(ws, addr){
+  const c = ws[addr];
+  if (!c) return null;
+  if (c.v === undefined || c.v === null || c.v === '') return null;
+  return c.v;
+}
+
+function buildReview(){
+  const ws = templateWb.Sheets['Feuille de saisie'];
+  const items = [];
+
+  for (const [code, det] of extraction.byCode.entries()){
+    const map = MAPPING[code];
+    const meta = CODES[code];
+    if (!map || map.kind==='skip') { items.push({code,label:meta.label,section:meta.section,kind:'skip',raw:det.rawLine,source:det.source}); continue; }
+
+    if (map.kind==='crosscheck'){
+      const amounts = toAmounts(code, det.values);
+      items.push({code,label:meta.label,section:meta.section,kind:'crosscheck',row:map.row,rowLabel:ROW_LABELS[map.row]||'(total calculé)',
+        detectedN:amounts.netN!==undefined?amounts.netN:amounts.valueN, detectedN1:amounts.netN1!==undefined?amounts.netN1:amounts.valueN1,
+        raw:det.rawLine, source:det.source});
+      continue;
+    }
+
+    if (map.kind==='actif'){
+      const a = toAmounts(code, det.values);
+      const addrBrut = cellAddr('I', map.row), addrAmort = cellAddr('J', map.row);
+      items.push({code,label:meta.label,section:'actif',kind:'actif',row:map.row,rowLabel:ROW_LABELS[map.row],
+        aggregate: map.aggregate||null,
+        fields:[
+          {key:'brutN',label:'Brut (N)',addr:addrBrut,detected:a.brutN,existing:getExisting(ws,addrBrut)},
+          {key:'amortN',label:'Amort. (N)',addr:addrAmort,detected:a.amortN,existing:getExisting(ws,addrAmort)},
+        ],
+        infoNetN1: a.netN1,
+        raw:det.rawLine, source:det.source});
+      continue;
+    }
+
+    if (map.kind==='actif-net'){
+      const a = toAmounts(code, det.values);
+      const addrN = cellAddr('I', map.row);
+      items.push({code,label:meta.label,section:'actif',kind:'actif-net',row:map.row,rowLabel:ROW_LABELS[map.row],
+        fields:[{key:'netN',label:'Net (N)',addr:addrN,detected:a.netN,existing:getExisting(ws,addrN)}],
+        raw:det.rawLine, source:det.source});
+      continue;
+    }
+
+    if (map.kind==='passif' || map.kind==='resultat'){
+      const a = toAmounts(code, det.values);
+      const addrN = cellAddr('E', map.row), addrN1 = cellAddr('D', map.row);
+      items.push({code,label:meta.label,section:meta.section,kind:map.kind,row:map.row,rowLabel:ROW_LABELS[map.row],
+        aggregate: map.aggregate||null,
+        fields:[
+          {key:'valueN',label:'N (2024)',addr:addrN,detected:a.valueN,existing:getExisting(ws,addrN)},
+          {key:'valueN1',label:'N-1 (2023)',addr:addrN1,detected:a.valueN1,existing:getExisting(ws,addrN1)},
+        ],
+        raw:det.rawLine, source:det.source});
+      continue;
+    }
+  }
+
+  const dq = extraction.byCode.get('DQ'), dr = extraction.byCode.get('DR');
+  if (dq || dr){
+    const aq = dq ? toAmounts('DQ', dq.values) : {valueN:0,valueN1:0};
+    const ar = dr ? toAmounts('DR', dr.values) : {valueN:0,valueN1:0};
+    const addrN = cellAddr('E',96), addrN1 = cellAddr('D',96);
+    items.push({code:'DQ+DR',label:"Banques, crédits d'escompte et de trésorerie (cumul)",section:'passif',kind:'passif',row:96,rowLabel:ROW_LABELS[96],
+      fields:[
+        {key:'valueN',label:'N (2024)',addr:addrN,detected:(aq.valueN||0)+(ar.valueN||0),existing:getExisting(ws,addrN)},
+        {key:'valueN1',label:'N-1 (2023)',addr:addrN1,detected:(aq.valueN1||0)+(ar.valueN1||0),existing:getExisting(ws,addrN1)},
+      ],
+      raw:[dq?dq.rawLine:'',dr?dr.rawLine:''].filter(Boolean).join(' | '), source:'combiné DQ+DR'});
+  }
+
+  applyCrosscheckValidation(items);
+  renderReview(items);
+  window._reviewItems = items;
+}
+
+/* ============================================================
+   3bis. VALIDATION CROISÉE : total détecté vs somme des lignes détaillées
+   ============================================================ */
+function applyCrosscheckValidation(items){
+  const byCode = new Map(items.map(it => [it.code, it]));
+
+  function netOf(code, period){
+    const it = byCode.get(code);
+    if (!it) return { value:0, present:false };
+    if (it.kind === 'actif'){
+      if (period !== 'N') return { value:0, present:false };
+      const brut = it.fields.find(f=>f.key==='brutN')?.detected;
+      const amort = it.fields.find(f=>f.key==='amortN')?.detected;
+      if (brut==null || amort==null) return { value:null, present:true };
+      return { value: brut-amort, present:true };
+    }
+    if (it.kind === 'actif-net'){
+      if (period !== 'N') return { value:0, present:false };
+      const v = it.fields.find(f=>f.key==='netN')?.detected;
+      return { value: v==null?null:v, present:true };
+    }
+    if (it.kind === 'passif' || it.kind === 'resultat'){
+      const key = period==='N' ? 'valueN' : 'valueN1';
+      const v = it.fields.find(f=>f.key===key)?.detected;
+      return { value: v==null?null:v, present:true };
+    }
+    if (it.kind === 'crosscheck'){
+      const v = period==='N' ? it.detectedN : it.detectedN1;
+      return { value: v==null?null:v, present:true };
+    }
+    return { value:0, present:false };
+  }
+
+  for (const [code, group] of Object.entries(CROSSCHECK_GROUPS)){
+    const it = byCode.get(code);
+    if (!it || it.kind !== 'crosscheck') continue;
+    it.validation = {};
+    for (const period of group.periods){
+      const detected = period==='N' ? it.detectedN : it.detectedN1;
+      if (detected===null || detected===undefined){ it.validation[period] = {status:'insufficient'}; continue; }
+      let sum = 0, hasNull = false, anyPresent = false;
+      for (const m of group.members){
+        const { value, present } = netOf(m, period);
+        if (present) anyPresent = true;
+        if (value === null) { hasNull = true; continue; }
+        sum += value;
+      }
+      if (!anyPresent){ it.validation[period] = {status:'insufficient'}; continue; }
+      if (hasNull){ it.validation[period] = {status:'partial', sum}; continue; }
+      const diff = Math.round((detected - sum)*100)/100;
+      const tolerance = Math.max(1, Math.abs(detected)*0.001);
+      it.validation[period] = Math.abs(diff) <= tolerance
+        ? {status:'ok', sum, diff}
+        : {status:'mismatch', sum, diff};
+    }
+  }
+}
+
+function fmt(n){ if (n===null||n===undefined||isNaN(n)) return ''; return n.toLocaleString('fr-FR'); }
+
+function validationBadge(v){
+  if (!v || v.status==='insufficient') return `<span class="tag" style="background:#EEF2F6;color:var(--muted);">n/a</span>`;
+  if (v.status==='partial') return `<span class="tag aggregate" title="Certaines lignes détaillées n'ont pas pu être lues, la somme peut être incomplète (${fmt(v.sum)}).">données incomplètes</span>`;
+  if (v.status==='ok') return `<span class="tag auto" title="Somme des lignes détaillées : ${fmt(v.sum)}">✓ cohérent</span>`;
+  return `<span class="tag" style="background:var(--err-bg);color:var(--err);" title="Somme des lignes détaillées : ${fmt(v.sum)}">⚠ écart ${v.diff>0?'+':''}${fmt(v.diff)}</span>`;
+}
+
+function renderReview(items){
+  const bySection = { actif:[], passif:[], resultat:[], crosscheck:[], skip:[] };
+  for (const it of items){ (bySection[it.kind==='crosscheck'?'crosscheck':it.kind==='skip'?'skip':it.section]||bySection.actif).push(it); }
+
+  let html = '';
+  const sectionTitles = { actif:'Bilan — Actif', passif:'Bilan — Passif', resultat:'Compte de résultat', crosscheck:'Totaux (calculés par le classeur — pour contrôle uniquement)' };
+  let autoCount=0, reviewCount=0;
+
+  for (const key of ['actif','passif','resultat']){
+    const list = bySection[key];
+    if (list.length===0) continue;
+    html += `<div class="section-block"><h3>${sectionTitles[key]} <span class="count">${list.length}</span></h3>
+      <table class="review"><thead><tr><th>Code</th><th>Libellé cible</th><th colspan="2">Valeur détectée</th><th>Statut</th><th>Ligne source</th></tr></thead><tbody>`;
+    for (const it of list){
+      const fieldsHtml = it.fields.map(f => {
+        const isPrevYear = f.key === 'valueN1';
+        if (isPrevYear){
+          // Colonne année précédente : affichée pour information/comparaison uniquement.
+          // Jamais écrite ni comptabilisée dans les compteurs auto/à vérifier.
+          return `<td>
+            <div style="font-size:0.62rem;color:var(--muted);font-family:'IBM Plex Mono',monospace;">${f.label} <span title="Les données des années précédentes ne sont jamais modifiées par l'outil.">🔒</span></div>
+            <div style="font-family:'IBM Plex Mono',monospace;font-size:0.8rem;text-align:right;padding:4px 6px;color:var(--ink-soft);background:#F7F6F5;border:1px solid var(--paper-line);border-radius:3px;">
+              ${f.detected!==null&&f.detected!==undefined?fmt(f.detected):'—'}
+            </div>
+          </td>`;
+        }
+        const isConflict = f.existing !== null;
+        if (isConflict) reviewCount++; else autoCount++;
+        return `<td>
+          <div style="font-size:0.62rem;color:var(--muted);font-family:'IBM Plex Mono',monospace;">${f.label}</div>
+          <input type="text" data-code="${it.code}" data-key="${f.key}" value="${f.detected!==null&&f.detected!==undefined?f.detected:''}">
+        </td>`;
+      }).join('');
+      const writableFields = it.fields.filter(f => f.key !== 'valueN1');
+      const status = writableFields.some(f=>f.existing!==null)
+        ? `<span class="tag kept">valeur existante conservée</span>`
+        : (it.aggregate ? `<span class="tag aggregate">regroupé</span>` : `<span class="tag auto">auto</span>`);
+      html += `<tr>
+        <td><span class="code-pill">${it.code}</span></td>
+        <td>${escapeHtml(it.rowLabel||it.label)}${it.aggregate?`<div style="font-size:0.68rem;color:var(--muted);">${escapeHtml(it.aggregate)}</div>`:''}</td>
+        ${fieldsHtml}
+        <td>${status}</td>
+        <td class="raw-line" title="${escapeHtml(it.raw)}">${escapeHtml(it.raw)}</td>
+      </tr>`;
+    }
+    html += `</tbody></table></div>`;
+  }
+
+  if (bySection.crosscheck.length){
+    html += `<div class="section-block"><h3>${sectionTitles.crosscheck} <span class="count">${bySection.crosscheck.length}</span></h3>
+      <table class="review"><thead><tr><th>Code</th><th>Libellé</th><th>Détecté N</th><th>Détecté N-1</th><th>Contrôle (N)</th><th>Contrôle (N-1)</th></tr></thead><tbody>`;
+    for (const it of bySection.crosscheck){
+      const vN = it.validation ? it.validation.N : null;
+      const vN1 = it.validation ? it.validation.N1 : null;
+      html += `<tr><td><span class="code-pill">${it.code}</span></td><td>${escapeHtml(it.rowLabel)}</td><td>${fmt(it.detectedN)}</td><td>${fmt(it.detectedN1)}</td><td>${validationBadge(vN)}</td><td>${validationBadge(vN1)}</td></tr>`;
+    }
+    html += `</tbody></table>
+      <p style="font-size:0.76rem;color:var(--muted);margin-top:8px;">Contrôle = comparaison entre le total détecté dans le document et la somme des lignes détaillées détectées pour ce total. Non disponible pour le compte de résultat (soldes intermédiaires trop complexes à vérifier automatiquement).</p>
+      </div>`;
+  }
+
+  if (extraction && extraction.suspiciousLines && extraction.suspiciousLines.length){
+    const rows = extraction.suspiciousLines.map(s => `<tr><td><span class="code-pill" style="background:var(--err-bg);color:var(--err);">${escapeHtml(s.rawCode)}</span></td><td class="raw-line" style="max-width:420px;" title="${escapeHtml(s.rawLine)}">${escapeHtml(s.rawLine)}</td><td>${escapeHtml(s.source)}</td></tr>`).join('');
+    html += `<div class="section-block"><h3>Lignes suspectes — code non reconnu <span class="count">${extraction.suspiciousLines.length}</span></h3>
+      <table class="review"><thead><tr><th>Code lu</th><th>Ligne source</th><th>Document</th></tr></thead><tbody>${rows}</tbody></table>
+      <p style="font-size:0.76rem;color:var(--muted);margin-top:8px;">Ces lignes contiennent un montant mais un code à 2 lettres non reconnu (probable erreur d'OCR) — à vérifier et saisir manuellement si nécessaire.</p>
+      </div>`;
+  }
+
+  const uncoveredHtml = UNCOVERED_ROWS.sort((a,b)=>a-b).map(r => `<div>Ligne ${r} — ${escapeHtml(ROW_LABELS[r])}</div>`).join('');
+  html += `<details class="uncovered"><summary>Lignes non couvertes (${UNCOVERED_ROWS.length}) — à compléter à la main</summary>
+    <div class="uncovered-list">${uncoveredHtml}</div></details>`;
+
+  reviewBody.innerHTML = html;
+  stepReview.style.display='block';
+  stepExport.style.display='block';
+  document.getElementById('num-4').classList.add('done');
+
+  document.getElementById('k-codes').textContent = extraction.byCode.size;
+  document.getElementById('k-auto').textContent = autoCount;
+  document.getElementById('k-review').textContent = reviewCount;
+  document.getElementById('k-ocr').textContent = extraction.nbOcrPages;
+  document.getElementById('k-suspect').textContent = (extraction.suspiciousLines||[]).length;
+  kpis.style.display='flex';
+}
+
+btnExportEl.addEventListener('click', () => {
+  const ws = templateWb.Sheets['Feuille de saisie'];
+  const journalRows = [['Code','Ligne cible','Champ','Valeur écrite','Cellule','Statut','Ligne source du document']];
+
+  document.querySelectorAll('table.review input').forEach(input => {
+    const code = input.dataset.code, key = input.dataset.key;
+    if (key === 'valueN1') return; // garde-fou : les années précédentes ne sont jamais écrites (aucun <input> n'existe normalement pour ce champ)
+    const item = window._reviewItems.find(it => it.code===code);
+    if (!item) return;
+    const field = item.fields.find(f=>f.key===key);
+    if (!field) return;
+    const raw = input.value.replace(/[ \u00A0]/g,'').replace(',', '.');
+    const num = raw === '' ? null : parseFloat(raw);
+    let statusLabel = 'ignoré (vide)';
+    if (num !== null){
+      if (field.existing !== null){
+        statusLabel = 'conservé (déjà renseigné) — valeur détectée non écrite';
+      } else {
+        ws[field.addr] = { t:'n', v: num };
+        statusLabel = 'écrit automatiquement';
+      }
+    }
+    journalRows.push([item.code, item.rowLabel||item.label, field.label, num, field.addr, statusLabel, item.raw]);
+  });
+
+  // Traçabilité des valeurs "année précédente" détectées : jamais écrites dans le classeur,
+  // mais consignées ici pour montrer qu'elles ont bien été lues et volontairement protégées.
+  for (const item of (window._reviewItems||[])){
+    if (!item.fields) continue;
+    const f = item.fields.find(fl => fl.key === 'valueN1');
+    if (!f) continue;
+    const detected = (f.detected!==null && f.detected!==undefined) ? f.detected : '';
+    journalRows.push([item.code, item.rowLabel||item.label, f.label, detected, f.addr,
+      'non modifié — donnée année précédente protégée', item.raw]);
+  }
+
+  const wsJournal = XLSX.utils.aoa_to_sheet(journalRows);
+  wsJournal['!cols'] = [{wch:8},{wch:32},{wch:14},{wch:16},{wch:8},{wch:34},{wch:60}];
+  if (templateWb.SheetNames.includes('Journal OCR')) {
+    templateWb.Sheets['Journal OCR'] = wsJournal;
+  } else {
+    XLSX.utils.book_append_sheet(templateWb, wsJournal, 'Journal OCR');
+  }
+
+  const isXlsm = /\.xlsm$/i.test(templateFile.name);
+  const bookType = isXlsm ? 'xlsm' : 'xlsx';
+  const wbout = XLSX.write(templateWb, { bookType, type:'array', bookVBA:isXlsm });
+  const blob = new Blob([wbout], { type:'application/octet-stream' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = templateFile.name.replace(/(\.xlsm|\.xlsx)$/i, `_complete$1`);
+  document.body.appendChild(a); a.click(); document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+});
+</script>
+
+</body>
+</html>
