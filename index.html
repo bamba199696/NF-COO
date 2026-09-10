@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="robots" content="noindex, nofollow">
-<title>Assistant Notice Financière — Société Générale Sénégal</title>
+<title>Assistant Notice Financière - Société Générale Sénégal</title>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/tesseract.js/5.1.0/tesseract.min.js"></script>
@@ -12,7 +12,7 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.8.0/mammoth.browser.min.js"></script>
 
 <style>
-  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap');
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap');
 
   :root{
     --ink:#181414; --ink-soft:#4A4544;
@@ -26,32 +26,27 @@
   }
   *{box-sizing:border-box;}
   body{ margin:0; background:var(--paper); color:var(--ink); font-family:'Inter',sans-serif; border-top:4px solid var(--accent); }
-  .wrap{ max-width:980px; margin:0 auto; padding:50px 24px 100px; }
+  .wrap{ max-width:1100px; margin:0; padding:32px 40px 100px; }
 
-  .topbar{
-    display:flex; align-items:center; justify-content:space-between;
-    padding:10px 0; margin-bottom:22px; border-bottom:1px solid var(--paper-line);
+  .brand{ display:flex; align-items:center; gap:10px; min-width:0; }
+  .brand .logo{
+    height:34px; width:auto; flex-shrink:0; display:block;
   }
-  .brand{ display:flex; align-items:center; gap:10px; }
-  .brand .mark{
-    width:32px; height:32px; border-radius:6px; background:var(--accent); color:#fff;
-    display:flex; align-items:center; justify-content:center;
-    font-family:'IBM Plex Mono',monospace; font-weight:600; font-size:0.85rem; flex-shrink:0;
-  }
-  .brand .name{ font-size:0.86rem; font-weight:600; color:var(--ink); }
+  .brand-text{ min-width:0; overflow:hidden; }
+  .brand .name{ font-size:0.86rem; font-weight:600; color:var(--ink); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
   .brand .name span{ color:var(--ink-soft); font-weight:400; }
   .brand .org-line{
-    font-family:'IBM Plex Mono',monospace; font-size:0.62rem; letter-spacing:0.03em; text-transform:uppercase;
-    color:var(--accent-deep); margin-top:2px;
+    font-family:'JetBrains Mono',monospace; font-size:0.62rem; letter-spacing:0.03em; text-transform:uppercase;
+    color:var(--accent-deep); margin-top:2px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
   }
   .pill-secure{
-    font-family:'IBM Plex Mono',monospace; font-size:0.66rem; letter-spacing:0.04em; text-transform:uppercase;
+    font-family:'JetBrains Mono',monospace; font-size:0.66rem; letter-spacing:0.04em; text-transform:uppercase;
     background:var(--ok-bg); color:var(--ok); padding:4px 10px; border-radius:12px;
   }
 
   header{ margin-bottom:30px; }
-  .eyebrow{ font-family:'IBM Plex Mono',monospace; font-size:0.7rem; letter-spacing:0.12em; text-transform:uppercase; color:var(--accent-deep); margin-bottom:9px; }
-  h1{ font-family:'Inter',sans-serif; font-weight:600; font-size:1.95rem; line-height:1.18; margin:0 0 10px; }
+  .eyebrow{ font-family:'JetBrains Mono',monospace; font-size:0.7rem; letter-spacing:0.12em; text-transform:uppercase; color:var(--accent-deep); margin-bottom:9px; }
+  h1{ font-family:'Inter',sans-serif; font-weight:800; font-size:2rem; line-height:1.15; letter-spacing:-0.02em; margin:0 0 10px; }
   h1 em{ font-style:normal; color:var(--accent); font-weight:700; }
   .lede{ font-size:0.98rem; color:var(--ink-soft); max-width:68ch; line-height:1.6; }
   .disclaimer{
@@ -61,7 +56,7 @@
   }
 
   .step{
-    background:linear-gradient(180deg,#fff,#faf9f9); border:1px solid var(--paper-line); border-radius:6px;
+    background:linear-gradient(180deg,#fff,#faf9f9); border:1px solid var(--paper-line); border-radius:12px;
     margin-top:22px; overflow:hidden; box-shadow:0 1px 0 rgba(16,35,59,0.04), 0 12px 26px -18px rgba(16,35,59,0.25);
   }
   .step-head{
@@ -69,7 +64,7 @@
   }
   .step-num{
     width:26px; height:26px; border-radius:50%; background:var(--ink); color:var(--paper);
-    font-family:'IBM Plex Mono',monospace; font-size:0.78rem; display:flex; align-items:center; justify-content:center; flex-shrink:0;
+    font-family:'JetBrains Mono',monospace; font-size:0.78rem; display:flex; align-items:center; justify-content:center; flex-shrink:0;
   }
   .step-num.done{ background:var(--ok); }
   .step-title{ font-weight:600; font-size:0.98rem; }
@@ -77,14 +72,14 @@
   .step-body{ padding:20px 22px; }
 
   .drop{
-    position:relative; border:1.5px dashed var(--paper-line); border-radius:5px;
+    position:relative; border:1.5px dashed var(--paper-line); border-radius:10px;
     padding:26px 18px; text-align:center; cursor:pointer; transition:background 0.2s, border-color 0.2s;
   }
   .drop.dragover{ background:rgba(233,4,30,0.06); border-color:var(--accent); }
   .drop .glyph{ font-size:1.4rem; margin-bottom:4px; color:var(--ink-soft); }
   .drop .instr{ font-size:0.88rem; color:var(--ink-soft); }
   .drop .instr b{ color:var(--ink); }
-  .drop .meta{ font-family:'IBM Plex Mono',monospace; font-size:0.63rem; color:var(--muted); margin-top:6px; }
+  .drop .meta{ font-family:'JetBrains Mono',monospace; font-size:0.63rem; color:var(--muted); margin-top:6px; }
   input[type=file]{ display:none; }
 
   .file-chip{
@@ -97,7 +92,7 @@
   .queue-row{ display:flex; align-items:center; gap:10px; padding:8px 0; font-size:0.85rem; border-bottom:1px solid var(--paper-line); }
   .queue-row:last-child{ border-bottom:none; }
   .status-badge{
-    font-family:'IBM Plex Mono',monospace; font-size:0.62rem; text-transform:uppercase; letter-spacing:0.04em;
+    font-family:'JetBrains Mono',monospace; font-size:0.62rem; text-transform:uppercase; letter-spacing:0.04em;
     padding:3px 8px; border-radius:3px; background:#ECE9E8; color:var(--muted); white-space:nowrap; margin-left:auto;
   }
   .status-badge.cours{ background:rgba(232,163,61,0.18); color:var(--amber-deep); }
@@ -105,20 +100,22 @@
   .status-badge.erreur{ background:var(--err-bg); color:var(--err); }
 
   button.action{
-    font-family:'Inter',sans-serif; font-weight:600; font-size:0.9rem; padding:11px 20px;
-    border-radius:4px; border:none; cursor:pointer; transition:background 0.15s, transform 0.08s;
+    font-family:'Inter',sans-serif; font-weight:600; font-size:0.9rem; padding:11px 22px;
+    border-radius:9px; border:none; cursor:pointer; transition:background 0.15s, transform 0.12s, box-shadow 0.15s;
+    box-shadow:0 1px 2px rgba(0,0,0,0.06);
   }
-  button.action:active{ transform:translateY(1px); }
+  button.action:hover:not(:disabled){ transform:translateY(-1px); box-shadow:0 6px 16px -6px rgba(0,0,0,0.3); }
+  button.action:active{ transform:translateY(1px); box-shadow:none; }
   button.primary{ background:var(--ink); color:var(--paper); }
   button.primary:hover{ background:var(--ink-soft); }
   button.primary:disabled{ background:#b8bfc9; cursor:not-allowed; }
-  button.amber{ background:var(--accent); color:#fff; }
-  button.amber:hover{ background:var(--accent-deep); }
+  button.amber{ background:linear-gradient(135deg, var(--accent), var(--accent-deep)); color:#fff; }
+  button.amber:hover{ filter:brightness(1.08); }
   button.amber:disabled{ background:#B7C6DC; color:#fff; cursor:not-allowed; }
 
   #log-box{
     display:none; margin-top:16px; background:var(--ink); color:#D9E4F0; border-radius:5px; padding:14px 16px;
-    font-family:'IBM Plex Mono',monospace; font-size:0.76rem; line-height:1.7; max-height:190px; overflow-y:auto;
+    font-family:'JetBrains Mono',monospace; font-size:0.76rem; line-height:1.7; max-height:190px; overflow-y:auto;
   }
   #log-box .line{ opacity:0; animation:fadein 0.2s forwards; }
   #log-box .tag-native{ color:#7FD9A8; }
@@ -127,9 +124,10 @@
   @keyframes fadein{ to{ opacity:1; } }
 
   .kpi-row{ display:flex; gap:10px; flex-wrap:wrap; margin-top:18px; }
-  .kpi{ flex:1; min-width:120px; background:var(--card); border:1px solid var(--paper-line); border-radius:5px; padding:13px 16px; }
+  .kpi{ flex:1; min-width:120px; background:var(--card); border:1px solid var(--paper-line); border-radius:10px; padding:14px 16px; box-shadow:0 1px 2px rgba(0,0,0,0.03); transition:transform 0.15s ease, box-shadow 0.15s ease; }
+  .kpi:hover{ transform:translateY(-2px); box-shadow:0 8px 20px -12px rgba(0,0,0,0.25); }
   .kpi .n{ font-family:'Inter',sans-serif; font-size:1.5rem; }
-  .kpi .l{ font-family:'IBM Plex Mono',monospace; font-size:0.6rem; letter-spacing:0.05em; text-transform:uppercase; color:var(--muted); margin-top:2px; }
+  .kpi .l{ font-family:'JetBrains Mono',monospace; font-size:0.6rem; letter-spacing:0.05em; text-transform:uppercase; color:var(--muted); margin-top:2px; }
 
   .section-block{ margin-top:26px; }
   .section-block h3{
@@ -137,52 +135,341 @@
     display:flex; align-items:center; gap:8px;
   }
   .section-block h3 .count{
-    font-family:'IBM Plex Mono',monospace; font-size:0.62rem; background:#EEF2F6; color:var(--ink-soft);
+    font-family:'JetBrains Mono',monospace; font-size:0.62rem; background:#EEF2F6; color:var(--ink-soft);
     padding:2px 8px; border-radius:10px;
   }
   table.review{ width:100%; border-collapse:collapse; font-size:0.83rem; background:#fff; border:1px solid var(--paper-line); border-radius:5px; overflow:hidden; }
   table.review th{
-    text-align:left; font-family:'IBM Plex Mono',monospace; font-size:0.6rem; letter-spacing:0.05em; text-transform:uppercase;
+    text-align:left; font-family:'JetBrains Mono',monospace; font-size:0.6rem; letter-spacing:0.05em; text-transform:uppercase;
     color:var(--muted); padding:8px 10px; background:#faf9f9; border-bottom:1px solid var(--paper-line);
   }
   table.review td{ padding:7px 10px; border-bottom:1px solid var(--paper-line); vertical-align:middle; }
   table.review tr:last-child td{ border-bottom:none; }
   table.review input{
-    width:100%; border:1px solid var(--paper-line); border-radius:3px; padding:4px 6px; font-family:'IBM Plex Mono',monospace;
+    width:100%; border:1px solid var(--paper-line); border-radius:3px; padding:4px 6px; font-family:'JetBrains Mono',monospace;
     font-size:0.8rem; text-align:right;
   }
   table.review input:focus{ outline:1.5px solid var(--accent); border-color:var(--accent); }
-  .code-pill{ font-family:'IBM Plex Mono',monospace; font-size:0.68rem; background:#EEF2F6; color:var(--ink-soft); padding:2px 6px; border-radius:3px; }
+  .code-pill{ font-family:'JetBrains Mono',monospace; font-size:0.68rem; background:#EEF2F6; color:var(--ink-soft); padding:2px 6px; border-radius:3px; }
   .tag{
-    font-family:'IBM Plex Mono',monospace; font-size:0.6rem; text-transform:uppercase; letter-spacing:0.03em;
+    font-family:'JetBrains Mono',monospace; font-size:0.6rem; text-transform:uppercase; letter-spacing:0.03em;
     padding:2px 7px; border-radius:3px; white-space:nowrap;
   }
   .tag.auto{ background:var(--ok-bg); color:var(--ok); }
   .tag.aggregate{ background:#FBEEDA; color:var(--amber-deep); }
   .tag.kept{ background:var(--info-bg); color:var(--info); }
-  .raw-line{ font-family:'IBM Plex Mono',monospace; font-size:0.68rem; color:var(--muted); max-width:230px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  .raw-line{ font-family:'JetBrains Mono',monospace; font-size:0.68rem; color:var(--muted); max-width:230px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
   details.uncovered{ margin-top:10px; font-size:0.85rem; color:var(--ink-soft); }
   details.uncovered summary{ cursor:pointer; font-weight:600; color:var(--ink); }
   .uncovered-list{ columns:2; margin-top:10px; font-size:0.8rem; line-height:1.9; }
   @media (max-width:640px){ .uncovered-list{ columns:1; } }
 
   footer{ margin-top:44px; font-size:0.8rem; color:var(--muted); line-height:1.65; }
-  footer code{ background:#ECE9E8; padding:1px 5px; border-radius:3px; font-family:'IBM Plex Mono',monospace; }
+  footer code{ background:#ECE9E8; padding:1px 5px; border-radius:3px; font-family:'JetBrains Mono',monospace; }
+
+  /* ---- Contenu des modules ---- */
+  .module{ display:none; }
+  .module.active{ display:block; }
+  .module-intro{
+    background:#fff; border:1px solid var(--paper-line); border-radius:10px;
+    padding:14px 18px; font-size:0.83rem; color:var(--ink-soft); line-height:1.55; margin-bottom:18px;
+    box-shadow:0 1px 2px rgba(0,0,0,0.03);
+  }
+  .indicative-note{
+    font-family:'JetBrains Mono',monospace; font-size:0.62rem; letter-spacing:0.02em; text-transform:uppercase;
+    color:var(--amber-deep); background:#FBEEDA; display:inline-block; padding:2px 8px; border-radius:3px; margin-bottom:10px;
+  }
+
+  /* ---- Cartes de ratios ---- */
+  .ratio-grid{ display:grid; grid-template-columns:repeat(auto-fill,minmax(220px,1fr)); gap:12px; margin-top:14px; }
+  .ratio-card{ background:#fff; border:1px solid var(--paper-line); border-radius:10px; padding:14px 16px; box-shadow:0 1px 2px rgba(0,0,0,0.03); transition:transform 0.15s ease, box-shadow 0.15s ease; }
+  .ratio-card:hover{ transform:translateY(-2px); box-shadow:0 8px 20px -12px rgba(0,0,0,0.25); }
+  .ratio-card .rl{ font-size:0.74rem; color:var(--ink-soft); margin-bottom:6px; }
+  .ratio-card .rv{ font-family:'JetBrains Mono',monospace; font-size:1.5rem; font-weight:600; }
+  .ratio-card .rv.g{ color:var(--ok); } .ratio-card .rv.o{ color:var(--amber-deep); } .ratio-card .rv.r{ color:var(--err); } .ratio-card .rv.n{ color:var(--muted); }
+  .ratio-card .rf{ font-family:'JetBrains Mono',monospace; font-size:0.62rem; color:var(--muted); margin-top:6px; }
+
+  /* ---- Scoring ---- */
+  .score-row{ display:flex; align-items:center; gap:14px; padding:10px 0; border-bottom:1px solid var(--paper-line); }
+  .score-row:last-child{ border-bottom:none; }
+  .score-row .sl{ flex:1; font-size:0.86rem; }
+  .score-row .sl .sub{ font-size:0.72rem; color:var(--muted); margin-top:2px; }
+  .score-row select{ font-family:'Inter',sans-serif; font-size:0.83rem; padding:7px 10px; border:1px solid var(--paper-line); border-radius:4px; background:#fff; min-width:190px; }
+  .score-row .spts{ font-family:'JetBrains Mono',monospace; font-size:0.8rem; color:var(--ink-soft); min-width:52px; text-align:right; }
+  .score-total{
+    margin-top:16px; padding:18px 20px; border-radius:12px; display:flex; align-items:center; justify-content:space-between;
+    background:linear-gradient(135deg, var(--ink), #0f0c0c); color:#fff; box-shadow:0 8px 24px -10px rgba(0,0,0,0.4);
+  }
+  .score-total .stn{ font-family:'JetBrains Mono',monospace; font-size:2rem; font-weight:600; }
+  .score-total .stl{ font-size:0.78rem; opacity:0.85; }
+  .rating-pill{
+    font-family:'JetBrains Mono',monospace; font-weight:700; font-size:0.95rem; padding:6px 14px; border-radius:20px; margin-left:12px;
+  }
+
+  /* ---- Garanties ---- */
+  .field-grid{ display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); gap:12px; margin-top:12px; }
+  .field-grid label{ font-size:0.76rem; color:var(--ink-soft); display:block; margin-bottom:4px; }
+  .field-grid input, .field-grid select{
+    width:100%; font-family:'JetBrains Mono',monospace; font-size:0.86rem; padding:8px 10px;
+    border:1px solid var(--paper-line); border-radius:4px;
+  }
+  table.garanties{ width:100%; border-collapse:collapse; font-size:0.83rem; background:#fff; border:1px solid var(--paper-line); border-radius:5px; overflow:hidden; margin-top:14px; }
+  table.garanties th{ text-align:left; font-family:'JetBrains Mono',monospace; font-size:0.6rem; letter-spacing:0.05em; text-transform:uppercase; color:var(--muted); padding:8px 10px; background:#fbfaf6; border-bottom:1px solid var(--paper-line); }
+  table.garanties td{ padding:6px 8px; border-bottom:1px solid var(--paper-line); vertical-align:middle; }
+  table.garanties input, table.garanties select{ width:100%; font-family:'JetBrains Mono',monospace; font-size:0.8rem; padding:5px 7px; border:1px solid var(--paper-line); border-radius:3px; }
+  .btn-add-row{ font-family:'Inter',sans-serif; font-size:0.8rem; font-weight:600; color:var(--accent); background:none; border:1px dashed var(--accent); border-radius:4px; padding:8px 14px; cursor:pointer; margin-top:10px; }
+  .btn-add-row:hover{ background:rgba(233,4,30,0.06); }
+
+  /* ---- Décision finale ---- */
+  .synthese-grid{ display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:12px; margin-top:6px; }
+  .synthese-card{ background:#fff; border:1px solid var(--paper-line); border-radius:10px; padding:14px 16px; box-shadow:0 1px 2px rgba(0,0,0,0.03); }
+  .synthese-card .sl{ font-size:0.7rem; text-transform:uppercase; letter-spacing:0.04em; font-family:'JetBrains Mono',monospace; color:var(--muted); margin-bottom:6px; }
+  .synthese-card .sv{ font-size:1.05rem; font-weight:600; }
+  .decision-banner{ margin-top:18px; padding:18px 20px; border-radius:12px; box-shadow:0 4px 16px -8px rgba(0,0,0,0.15); }
+  .decision-banner.fav{ background:var(--ok-bg); border:1px solid var(--ok); }
+  .decision-banner.cond{ background:#FBEEDA; border:1px solid var(--amber-deep); }
+  .decision-banner.def{ background:var(--err-bg); border:1px solid var(--err); }
+  .decision-banner .dt{ font-weight:700; font-size:1.05rem; margin-bottom:4px; }
+  .decision-banner .dd{ font-size:0.83rem; color:var(--ink-soft); }
+
+  /* ---- Coquille applicative : barre supérieure + barre latérale professionnelle ---- */
+  html, body{ height:100%; }
+  .app-topbar{
+    background:#fff; padding:13px 28px; box-shadow:0 1px 0 rgba(0,0,0,0.06), 0 2px 10px rgba(0,0,0,0.03);
+    display:flex; align-items:center; justify-content:space-between; gap:20px;
+    position:fixed; top:0; left:0; right:0; height:61px; box-sizing:border-box; z-index:30;
+  }
+  .app-shell{ display:flex; align-items:stretch; min-height:calc(100vh - 61px); margin-top:61px; }
+  .app-sidebar{
+    width:264px; flex-shrink:0; display:flex; flex-direction:column;
+    background:linear-gradient(180deg, #1d1717 0%, #141010 100%);
+    position:sticky; top:61px; height:calc(100vh - 61px); overflow-y:auto;
+  }
+  .sidebar-section-label{
+    font-family:'JetBrains Mono',monospace; font-size:0.6rem; letter-spacing:0.1em; text-transform:uppercase;
+    color:rgba(255,255,255,0.32); padding:22px 24px 10px;
+  }
+  .sidebar-item{
+    display:flex; align-items:center; gap:12px; padding:11px 16px; margin:2px 12px; cursor:pointer; text-align:left;
+    color:rgba(255,255,255,0.58); font-size:0.85rem; font-weight:500; font-family:'Inter',sans-serif;
+    border:none; background:none; border-radius:10px; width:calc(100% - 24px);
+    transition:background 0.18s ease, color 0.18s ease, transform 0.15s ease;
+  }
+  .sidebar-item .si-icon{
+    width:18px; height:18px; flex-shrink:0; display:flex; align-items:center; justify-content:center;
+    opacity:0.75; transition:opacity 0.18s ease;
+  }
+  .sidebar-item .si-icon svg{ width:100%; height:100%; stroke:currentColor; fill:none; stroke-width:1.7; }
+  .sidebar-item .si-num{
+    width:20px; height:20px; border-radius:50%; background:rgba(255,255,255,0.1); flex-shrink:0;
+    display:flex; align-items:center; justify-content:center; font-size:0.64rem; font-family:'JetBrains Mono',monospace; color:#fff;
+    margin-left:auto; transition:background 0.18s ease;
+  }
+  .sidebar-item:hover:not(:disabled){ background:rgba(255,255,255,0.07); color:#fff; }
+  .sidebar-item:hover:not(:disabled) .si-icon{ opacity:1; }
+  .sidebar-item.active{
+    background:linear-gradient(135deg, var(--accent), var(--accent-deep)); color:#fff; font-weight:600;
+    box-shadow:0 4px 14px rgba(233,4,30,0.35); transform:translateX(1px);
+  }
+  .sidebar-item.active .si-icon{ opacity:1; }
+  .sidebar-item.active .si-num{ background:rgba(255,255,255,0.25); }
+  .sidebar-item.done .si-num{ background:var(--ok); }
+  .sidebar-item:disabled{ opacity:0.3; cursor:not-allowed; }
+  .sidebar-progress{ margin-top:auto; padding:18px 24px 22px; }
+  .sidebar-progress .spl{ font-size:0.66rem; color:rgba(255,255,255,0.4); font-family:'JetBrains Mono',monospace; margin-bottom:9px; }
+  .sidebar-steps{ display:flex; gap:5px; }
+  .sidebar-steps .sdot{ flex:1; height:4px; border-radius:2px; background:rgba(255,255,255,0.12); transition:background 0.25s ease; }
+  .sidebar-steps .sdot.done{ background:var(--accent); }
+  .app-main{ flex:1; min-width:0; background:var(--paper); }
+
+  /* ---- Checklist de pré-analyse documentaire ---- */
+  .doc-category{ margin-bottom:22px; }
+  .doc-category-title{
+    font-size:0.82rem; font-weight:700; color:var(--ink); margin-bottom:2px; display:flex; align-items:center; gap:8px;
+  }
+  .doc-category-sub{ font-size:0.72rem; color:var(--muted); margin-bottom:10px; }
+  table.checklist{ width:100%; border-collapse:collapse; background:#fff; border:1px solid var(--paper-line); border-radius:10px; overflow:hidden; box-shadow:0 1px 2px rgba(0,0,0,0.03); }
+  table.checklist td{ padding:9px 10px; border-bottom:1px solid var(--paper-line); vertical-align:middle; font-size:0.83rem; }
+  table.checklist tr:last-child td{ border-bottom:none; }
+  table.checklist .doc-label{ font-weight:500; }
+  table.checklist .doc-mandatory{ font-size:0.62rem; font-family:'JetBrains Mono',monospace; text-transform:uppercase; color:var(--accent-deep); margin-left:6px; }
+  table.checklist select{ font-family:'Inter',sans-serif; font-size:0.8rem; padding:5px 8px; border:1px solid var(--paper-line); border-radius:4px; background:#fff; }
+  table.checklist input[type="date"]{ font-family:'JetBrains Mono',monospace; font-size:0.76rem; padding:5px 6px; border:1px solid var(--paper-line); border-radius:4px; width:130px; }
+  table.checklist input[type="file"]{ font-size:0.72rem; max-width:150px; }
+  .doc-status-badge{ font-size:0.66rem; font-family:'JetBrains Mono',monospace; padding:2px 8px; border-radius:10px; text-transform:uppercase; letter-spacing:0.03em; }
+  .doc-status-badge.provided{ background:var(--ok-bg); color:var(--ok); }
+  .doc-status-badge.missing{ background:var(--err-bg); color:var(--err); }
+  .doc-status-badge.na{ background:#EEF2F6; color:var(--muted); }
+  .doc-status-badge.stale{ background:#FBEEDA; color:var(--amber-deep); }
+  .preanalyse-summary{ display:flex; gap:12px; flex-wrap:wrap; margin-bottom:20px; }
+  .preanalyse-summary .ps-card{ flex:1; min-width:160px; background:#fff; border:1px solid var(--paper-line); border-radius:10px; padding:14px 16px; box-shadow:0 1px 2px rgba(0,0,0,0.03); }
+  .preanalyse-summary .ps-card .psl{ font-size:0.68rem; text-transform:uppercase; color:var(--muted); font-family:'JetBrains Mono',monospace; }
+  .preanalyse-summary .ps-card .psv{ font-size:1.4rem; font-weight:700; margin-top:4px; }
+
+  /* ---- Assistant local (chat) ---- */
+  #chat-toggle{
+    position:fixed; right:26px; bottom:26px; width:56px; height:56px; border-radius:50%; border:none;
+    background:linear-gradient(135deg, var(--accent), var(--accent-deep)); color:#fff; cursor:pointer;
+    display:flex; align-items:center; justify-content:center; box-shadow:0 8px 24px -6px rgba(233,4,30,0.55);
+    z-index:40; transition:transform 0.18s ease, box-shadow 0.18s ease;
+  }
+  #chat-toggle:hover{ transform:translateY(-2px) scale(1.04); box-shadow:0 12px 28px -6px rgba(233,4,30,0.6); }
+  #chat-toggle.open{ background:var(--ink); }
+  #chat-panel{
+    position:fixed; right:26px; bottom:94px; width:380px; max-width:calc(100vw - 40px); height:520px; max-height:calc(100vh - 130px);
+    background:#fff; border-radius:16px; box-shadow:0 20px 50px -12px rgba(0,0,0,0.35); border:1px solid var(--paper-line);
+    display:none; flex-direction:column; overflow:hidden; z-index:40;
+  }
+  #chat-panel.open{ display:flex; }
+  .chat-head{
+    background:var(--ink); color:#fff; padding:14px 16px; display:flex; align-items:center; justify-content:space-between; flex-shrink:0;
+  }
+  .chat-title{ font-weight:700; font-size:0.9rem; }
+  .chat-sub{ font-size:0.64rem; color:rgba(255,255,255,0.55); font-family:'JetBrains Mono',monospace; margin-top:2px; }
+  #chat-close{ background:none; border:none; color:rgba(255,255,255,0.6); font-size:1.3rem; cursor:pointer; line-height:1; padding:2px 4px; }
+  #chat-close:hover{ color:#fff; }
+  .chat-messages{ flex:1; overflow-y:auto; padding:16px; display:flex; flex-direction:column; gap:10px; background:var(--paper); }
+  .chat-msg{ max-width:85%; padding:9px 13px; border-radius:14px; font-size:0.83rem; line-height:1.5; white-space:pre-wrap; }
+  .chat-msg.user{ align-self:flex-end; background:var(--ink); color:#fff; border-bottom-right-radius:4px; }
+  .chat-msg.bot{ align-self:flex-start; background:#fff; border:1px solid var(--paper-line); color:var(--ink); border-bottom-left-radius:4px; box-shadow:0 1px 2px rgba(0,0,0,0.04); }
+  .chat-msg.bot .cm-source{ font-family:'JetBrains Mono',monospace; font-size:0.62rem; color:var(--muted); margin-top:6px; display:block; }
+  .chat-suggestions{ display:flex; gap:6px; flex-wrap:wrap; padding:0 14px 10px; flex-shrink:0; }
+  .chat-suggestions button{
+    font-family:'Inter',sans-serif; font-size:0.7rem; background:#EEF2F6; color:var(--ink-soft); border:none;
+    border-radius:12px; padding:5px 10px; cursor:pointer; transition:background 0.15s;
+  }
+  .chat-suggestions button:hover{ background:#E2E8F0; }
+  .chat-input-row{ display:flex; gap:8px; padding:12px 14px; border-top:1px solid var(--paper-line); flex-shrink:0; background:#fff; }
+  #chat-input{
+    flex:1; font-family:'Inter',sans-serif; font-size:0.84rem; padding:9px 13px; border:1px solid var(--paper-line);
+    border-radius:20px; outline:none;
+  }
+  #chat-input:focus{ border-color:var(--accent); }
+  #chat-send{
+    width:36px; height:36px; border-radius:50%; border:none; background:var(--accent); color:#fff; cursor:pointer;
+    display:flex; align-items:center; justify-content:center; flex-shrink:0; transition:background 0.15s;
+  }
+  #chat-send:hover{ background:var(--accent-deep); }
+
+  /* ---- Bouton menu (mobile) + fond d'overlay ---- */
+  .menu-toggle{
+    display:none; width:34px; height:34px; border-radius:8px; border:1px solid var(--paper-line); background:#fff;
+    color:var(--ink); align-items:center; justify-content:center; cursor:pointer; flex-shrink:0;
+  }
+  .sidebar-backdrop{
+    display:none; position:fixed; inset:0; background:rgba(0,0,0,0.45); z-index:25;
+  }
+  .sidebar-backdrop.open{ display:block; }
+
+  /* ============================================================
+     RESPONSIVE — tablette et mobile
+     ============================================================ */
+  @media (max-width: 1000px){
+    .wrap{ padding:24px 20px 90px; }
+  }
+
+  @media (max-width: 880px){
+    .menu-toggle{ display:flex; }
+    .app-topbar{ padding:10px 14px; gap:10px; }
+    .brand .logo{ height:28px; }
+    .brand .org-line{ display:none; } /* libellé secondaire masqué, gain de place */
+    .pill-secure{ display:none; } /* rappel confidentialité toujours visible dans le panneau chat */
+
+    .app-sidebar{
+      position:fixed; top:53px; left:0; height:calc(100vh - 53px); z-index:30;
+      transform:translateX(-100%); transition:transform 0.22s ease; box-shadow:0 0 0 rgba(0,0,0,0);
+    }
+    .app-sidebar.open{ transform:translateX(0); box-shadow:8px 0 30px -10px rgba(0,0,0,0.4); }
+    .app-shell{ margin-top:53px; min-height:calc(100vh - 53px); }
+    .app-topbar{ height:53px; }
+
+    .wrap{ padding:18px 14px 90px; max-width:100%; }
+    h1{ font-size:1.5rem; }
+
+    /* Tableaux larges : scroll horizontal individuel plutôt que de casser la mise en page.
+       On ne touche qu'à l'élément table lui-même — thead/tbody/tr gardent leur affichage
+       natif pour préserver l'alignement des colonnes. */
+    table.review, table.garanties, table.checklist{ display:block; overflow-x:auto; }
+
+    /* .field-grid / .ratio-grid / .synthese-grid utilisent déjà repeat(auto-fit,minmax(...)) :
+       elles se réorganisent nativement sans média requête supplémentaire, de même que .kpi-row. */
+
+    /* Chat : panneau plein écran (moins la topbar) au lieu d'une fenêtre flottante étroite */
+    #chat-panel{
+      right:10px; left:10px; bottom:80px; width:auto; max-width:none; height:min(520px, calc(100vh - 150px));
+    }
+    #chat-toggle{ right:16px; bottom:16px; width:50px; height:50px; }
+  }
+
+  @media (max-width: 520px){
+    .brand .name{ font-size:0.78rem; }
+    .brand .logo{ height:26px; }
+    button.action{ width:100%; }
+    .step-body{ padding:16px; }
+    .step-head{ padding:14px 16px; flex-wrap:wrap; }
+    .kpi{ min-width:100%; }
+    .score-total{ flex-direction:column; align-items:flex-start; gap:10px; }
+  }
 </style>
 </head>
 <body>
 
-<div class="wrap">
-  <div class="topbar">
-    <div class="brand">
-      <div class="mark">SG</div>
-      <div>
-        <div class="name">Assistant Notice Financière <span>· outil interne</span></div>
-        <div class="org-line">Société Générale Sénégal — Direction DCE / COO</div>
+<div class="app-topbar">
+  <div class="brand">
+    <button class="menu-toggle" id="menu-toggle" aria-label="Ouvrir le menu">
+      <svg viewBox="0 0 24 24" width="20" height="20"><path d="M3 6h18M3 12h18M3 18h18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+    </button>
+    <img class="logo" src="data:image/png;base64,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" alt="Société Générale Sénégal">
+    <div class="brand-text">
+      <div class="name">Assistant Notice Financière <span>· outil interne</span></div>
+      <div class="org-line">Société Générale Sénégal - Direction DCE / COO</div>
+    </div>
+  </div>
+  <span class="pill-secure">🔒 Traitement local, aucune donnée transmise</span>
+</div>
+
+<div class="sidebar-backdrop" id="sidebar-backdrop"></div>
+
+<div class="app-shell">
+  <nav class="app-sidebar" id="app-sidebar">
+    <div class="sidebar-section-label">Dossier crédit</div>
+    <button class="sidebar-item active" data-module="nf">
+      <span class="si-icon"><svg viewBox="0 0 24 24"><path d="M6 2h9l5 5v15a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1V3a1 1 0 0 1 1-1z"/><path d="M14 2v6h6"/><path d="M9 13h6M9 17h6M9 9h2"/></svg></span>
+      <span>Notice Financière</span><span class="si-num">1</span>
+    </button>
+    <button class="sidebar-item" data-module="preanalyse" disabled>
+      <span class="si-icon"><svg viewBox="0 0 24 24"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg></span>
+      <span>Pré-analyse documentaire</span><span class="si-num">2</span>
+    </button>
+    <button class="sidebar-item" data-module="ratios" disabled>
+      <span class="si-icon"><svg viewBox="0 0 24 24"><path d="M3 3v18h18"/><path d="M7 15l4-5 3 3 5-7"/></svg></span>
+      <span>Analyse financière</span><span class="si-num">3</span>
+    </button>
+    <button class="sidebar-item" data-module="scoring" disabled>
+      <span class="si-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="4.5"/><circle cx="12" cy="12" r="0.6" fill="currentColor"/></svg></span>
+      <span>Scoring crédit</span><span class="si-num">4</span>
+    </button>
+    <button class="sidebar-item" data-module="garanties" disabled>
+      <span class="si-icon"><svg viewBox="0 0 24 24"><path d="M12 2l8 4v6c0 5-3.5 8.5-8 10-4.5-1.5-8-5-8-10V6l8-4z"/></svg></span>
+      <span>Garanties &amp; Exposition</span><span class="si-num">5</span>
+    </button>
+    <button class="sidebar-item" data-module="decision" disabled>
+      <span class="si-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M8.5 12.5l2.5 2.5 4.5-5"/></svg></span>
+      <span>Décision finale</span><span class="si-num">6</span>
+    </button>
+    <div class="sidebar-progress">
+      <div class="spl" id="sidebar-progress-label">0 / 6 étapes</div>
+      <div class="sidebar-steps" id="sidebar-steps">
+        <div class="sdot"></div><div class="sdot"></div><div class="sdot"></div>
+        <div class="sdot"></div><div class="sdot"></div><div class="sdot"></div>
       </div>
     </div>
-    <span class="pill-secure">🔒 Traitement local, aucune donnée transmise</span>
-  </div>
+  </nav>
+
+  <main class="app-main">
+  <div class="wrap">
+
+  <section class="module active" id="module-nf">
 
   <header>
     <h1>Assistant Notice Financière</h1>
@@ -260,19 +547,245 @@
       <div class="step-title">Générer le fichier</div>
     </div>
     <div class="step-body">
+      <label style="display:flex;align-items:flex-start;gap:9px;font-size:0.85rem;cursor:pointer;margin-bottom:16px;padding:12px 14px;background:#FBEEDA;border:1px solid var(--amber-deep);border-radius:10px;">
+        <input type="checkbox" id="force-overwrite" style="width:16px;height:16px;margin-top:2px;flex-shrink:0;">
+        <span>
+          <b>Écraser les valeurs déjà présentes dans le modèle</b><br>
+          <span style="color:var(--ink-soft);font-size:0.8rem;">Par défaut, l'outil ne touche jamais à une cellule (année N) déjà remplie dans le fichier Excel chargé. Cochez cette case pour que <b>toutes</b> les valeurs détectées ci-dessus soient écrites, y compris à la place d'une valeur existante. La colonne N-1 (année précédente) reste protégée dans tous les cas.</span>
+        </span>
+      </label>
       <button class="action amber" id="btn-export">⬇ Télécharger la Notice Financière complétée</button>
       <p style="font-size:0.8rem;color:var(--muted);margin-top:10px;">
-        Ajoute un onglet « Journal OCR » (traçabilité) — vérifiez l'ouverture du fichier dans Excel.
+        Ajoute un onglet « Journal OCR » (traçabilité) - vérifiez l'ouverture du fichier dans Excel.
       </p>
     </div>
   </div>
 
+  </section>
+  <!-- ============ FIN MODULE 1 : NOTICE FINANCIÈRE ============ -->
+
+  <!-- ============ MODULE 2 : PRÉ-ANALYSE DOCUMENTAIRE ============ -->
+  <section class="module" id="module-preanalyse">
+    <header><h1>Pré-analyse documentaire</h1></header>
+    <div class="module-intro">
+      Vérification de la complétude du dossier avant l'analyse financière - pièces juridiques, fiscales et sociales, bancaires, KYC et, le cas échéant, dossier de projet. Cochez le statut de chaque pièce ; les pièces à date de validité sont automatiquement signalées si elles sont périmées.
+    </div>
+
+    <div class="preanalyse-summary" id="preanalyse-summary"></div>
+
+    <div class="step">
+      <div class="step-head"><div class="step-title">Ce dossier concerne-t-il un financement d'investissement ?</div></div>
+      <div class="step-body">
+        <label style="display:flex;align-items:center;gap:8px;font-size:0.86rem;cursor:pointer;">
+          <input type="checkbox" id="pa-is-investment" style="width:16px;height:16px;">
+          Oui - rendre obligatoires les pièces du dossier de projet (business plan, devis, plan de financement)
+        </label>
+      </div>
+    </div>
+
+    <div id="preanalyse-body"></div>
+  </section>
+
+  <!-- ============ MODULE 3 : ANALYSE FINANCIÈRE (RATIOS) ============ -->
+  <section class="module" id="module-ratios">
+    <header><h1>Analyse financière</h1></header>
+    <div class="module-intro">
+      <span class="indicative-note">⚠ grille indicative</span><br>
+      Ratios calculés automatiquement à partir des valeurs de la Notice Financière (colonne N, telles que corrigées dans l'étape de revue). Les seuils de couleur sont génériques et doivent être recalibrés selon la méthodologie interne DCE.
+    </div>
+    <div id="ratios-body"></div>
+  </section>
+
+  <!-- ============ MODULE 4 : SCORING CRÉDIT ============ -->
+  <section class="module" id="module-scoring">
+    <header><h1>Scoring crédit</h1></header>
+    <div class="module-intro">
+      <span class="indicative-note">⚠ grille indicative</span><br>
+      Notation structurée selon les <b>5C du crédit</b> - cadre standard de l'analyse crédit corporate : Capacité (aptitude à générer les flux nécessaires au remboursement), Capital (solidité de la structure financière), Caractère (qualité du management et de la relation), Garanties (sûretés disponibles), Conditions (contexte sectoriel et macroéconomique). Chaque pilier compte pour 20 points. Pondérations et seuils à remplacer par la grille officielle de notation de la banque.
+    </div>
+    <div class="step">
+      <div class="step-head"><div class="step-title">1. Capacité <span style="font-weight:400;color:var(--muted);">- aptitude au remboursement (automatique)</span></div><div class="step-sub" id="pillar-capacite-sub">- / 20</div></div>
+      <div class="step-body" id="pillar-capacite-body"></div>
+    </div>
+    <div class="step">
+      <div class="step-head"><div class="step-title">2. Capital <span style="font-weight:400;color:var(--muted);">- structure financière (automatique)</span></div><div class="step-sub" id="pillar-capital-sub">- / 20</div></div>
+      <div class="step-body" id="pillar-capital-body"></div>
+    </div>
+    <div class="step">
+      <div class="step-head"><div class="step-title">3. Caractère <span style="font-weight:400;color:var(--muted);">- management &amp; relation bancaire (à évaluer)</span></div><div class="step-sub" id="pillar-caractere-sub">- / 20</div></div>
+      <div class="step-body" id="pillar-caractere-body"></div>
+    </div>
+    <div class="step">
+      <div class="step-head"><div class="step-title">4. Garanties <span style="font-weight:400;color:var(--muted);">- sûretés disponibles (automatique, Module 4)</span></div><div class="step-sub" id="pillar-garanties-sub">- / 20</div></div>
+      <div class="step-body" id="pillar-garanties-body"></div>
+    </div>
+    <div class="step">
+      <div class="step-head"><div class="step-title">5. Conditions <span style="font-weight:400;color:var(--muted);">- secteur &amp; contexte (à évaluer)</span></div><div class="step-sub" id="pillar-conditions-sub">- / 20</div></div>
+      <div class="step-body" id="pillar-conditions-body"></div>
+    </div>
+    <div class="score-total">
+      <div><div class="stl">NOTE GLOBALE - 5C DU CRÉDIT</div><div class="stn" id="total-score">-</div></div>
+      <div><span class="rating-pill" id="rating-pill">-</span></div>
+    </div>
+  </section>
+
+  <!-- ============ MODULE 5 : GARANTIES & EXPOSITION ============ -->
+  <section class="module" id="module-garanties">
+    <header><h1>Garanties &amp; Exposition</h1></header>
+    <div class="module-intro">
+      <span class="indicative-note">⚠ saisie manuelle</span><br>
+      Structurez le concours proposé, renseignez le montant sollicité, l'encours existant, la limite interne autorisée, et les garanties proposées. Le taux de couverture, l'indicateur de service de la dette et le dépassement de limite sont calculés automatiquement.
+    </div>
+    <div class="step">
+      <div class="step-head"><div class="step-title">Structuration du concours</div></div>
+      <div class="step-body">
+        <div class="field-grid">
+          <div>
+            <label>Type de concours</label>
+            <select id="g-type-concours">
+              <option>Découvert / Crédit de trésorerie</option>
+              <option>Crédit de campagne</option>
+              <option>Escompte / Mobilisation de créances</option>
+              <option>Crédit à moyen terme (2-7 ans)</option>
+              <option>Crédit à long terme (&gt; 7 ans)</option>
+              <option>Caution / Aval / Garantie bancaire</option>
+              <option>Crédit-bail</option>
+              <option>Autre</option>
+            </select>
+          </div>
+          <div><label>Objet du financement</label><input type="text" id="g-objet" placeholder="ex: financement BFR, extension capacité de production..."></div>
+          <div><label>Durée sollicitée (mois)</label><input type="text" id="g-duree" placeholder="ex: 36"></div>
+          <div><label>Taux d'intérêt indicatif (%)</label><input type="text" id="g-taux" placeholder="ex: 8.5"></div>
+          <div>
+            <label>Périodicité de remboursement</label>
+            <select id="g-periodicite">
+              <option>Mensuelle</option>
+              <option>Trimestrielle</option>
+              <option>Semestrielle</option>
+              <option>Annuelle</option>
+              <option>In fine</option>
+            </select>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-head"><div class="step-title">Exposition</div></div>
+      <div class="step-body">
+        <div class="field-grid">
+          <div><label>Montant du crédit sollicité (FCFA)</label><input type="text" id="g-montant" placeholder="ex: 50 000 000"></div>
+          <div><label>Encours crédit existant (FCFA)</label><input type="text" id="g-encours" placeholder="ex: 20 000 000"></div>
+          <div><label>Limite interne autorisée (FCFA)</label><input type="text" id="g-limite" placeholder="ex: 80 000 000"></div>
+        </div>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-head"><div class="step-title">Garanties proposées</div></div>
+      <div class="step-body">
+        <table class="garanties" id="garanties-table">
+          <thead><tr><th>Désignation</th><th>Type</th><th>Valeur estimée</th><th>Quotité retenue (%)</th><th>Valeur retenue</th><th></th></tr></thead>
+          <tbody id="garanties-tbody"></tbody>
+        </table>
+        <button class="btn-add-row" id="btn-add-garantie">+ Ajouter une garantie</button>
+      </div>
+    </div>
+    <div class="ratio-grid" id="exposition-kpis"></div>
+  </section>
+
+  <!-- ============ MODULE 6 : DÉCISION FINALE ============ -->
+  <section class="module" id="module-decision">
+    <header><h1>Décision finale</h1></header>
+    <div class="module-intro">
+      <span class="indicative-note">⚠ recommandation indicative</span><br>
+      Cette synthèse combine l'identification du dossier, l'analyse financière (équilibre financier, CAFG, cycle d'exploitation), le scoring 5C et l'exposition/garanties pour proposer une orientation. La décision finale reste de la responsabilité de l'analyste/du comité de crédit.
+    </div>
+
+    <div class="step">
+      <div class="step-head"><div class="step-title">Identification du dossier</div></div>
+      <div class="step-body">
+        <div class="field-grid">
+          <div><label>Raison sociale</label><input type="text" id="d-raison-sociale" placeholder="ex: SARL EXEMPLE SÉNÉGAL"></div>
+          <div><label>Forme juridique</label><input type="text" id="d-forme-juridique" placeholder="ex: SARL, SA, GIE..."></div>
+          <div><label>Secteur d'activité</label><input type="text" id="d-secteur" placeholder="ex: BTP, agroalimentaire, import-export..."></div>
+          <div><label>Ancienneté de l'entreprise (années)</label><input type="text" id="d-anciennete-entreprise" placeholder="ex: 8"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="synthese-grid" id="synthese-grid"></div>
+    <div class="decision-banner" id="decision-banner"></div>
+
+    <div class="step">
+      <div class="step-head"><div class="step-title">Facteurs de risque &amp; points d'attention (SWOT synthétique)</div></div>
+      <div class="step-body">
+        <div class="field-grid">
+          <div><label>Forces</label><textarea id="d-forces" rows="3" style="width:100%;font-family:'Inter',sans-serif;font-size:0.86rem;padding:8px;border:1px solid var(--paper-line);border-radius:4px;" placeholder="ex: positionnement de marché, ancienneté, diversification clients..."></textarea></div>
+          <div><label>Faiblesses</label><textarea id="d-faiblesses" rows="3" style="width:100%;font-family:'Inter',sans-serif;font-size:0.86rem;padding:8px;border:1px solid var(--paper-line);border-radius:4px;" placeholder="ex: dépendance fournisseur, sous-capitalisation..."></textarea></div>
+          <div><label>Opportunités</label><textarea id="d-opportunites" rows="3" style="width:100%;font-family:'Inter',sans-serif;font-size:0.86rem;padding:8px;border:1px solid var(--paper-line);border-radius:4px;" placeholder="ex: nouveau marché, contrat en cours de signature..."></textarea></div>
+          <div><label>Menaces</label><textarea id="d-menaces" rows="3" style="width:100%;font-family:'Inter',sans-serif;font-size:0.86rem;padding:8px;border:1px solid var(--paper-line);border-radius:4px;" placeholder="ex: concurrence accrue, risque de change, dépendance réglementaire..."></textarea></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="step">
+      <div class="step-head"><div class="step-title">Décision retenue</div></div>
+      <div class="step-body">
+        <div class="field-grid">
+          <div>
+            <label>Décision</label>
+            <select id="d-decision">
+              <option value="">- à sélectionner -</option>
+              <option value="favorable">Favorable</option>
+              <option value="conditionnel">Favorable sous conditions</option>
+              <option value="defavorable">Défavorable</option>
+              <option value="ajourne">Ajournée / complément requis</option>
+            </select>
+          </div>
+          <div>
+            <label>Analyste / Décideur</label>
+            <input type="text" id="d-analyste" placeholder="Nom, fonction">
+          </div>
+        </div>
+        <div style="margin-top:12px;">
+          <label style="font-size:0.76rem;color:var(--ink-soft);display:block;margin-bottom:4px;">Commentaire / conditions particulières</label>
+          <textarea id="d-commentaire" rows="4" style="width:100%;font-family:'Inter',sans-serif;font-size:0.86rem;padding:10px;border:1px solid var(--paper-line);border-radius:4px;"></textarea>
+        </div>
+        <button class="action primary" id="btn-generate-synthese" style="margin-top:14px;">⬇ Télécharger le mémo de crédit complet</button>
+      </div>
+    </div>
+  </section>
+
   <footer>
-    Lignes marquées « regroupé » : à ventiler manuellement si besoin.
-    <div style="margin-top:10px; padding-top:10px; border-top:1px solid var(--paper-line); font-family:'IBM Plex Mono',monospace; font-size:0.68rem; letter-spacing:0.02em; color:var(--muted);">
-      © DMEC — Pôle Business Intelligence et Stratégie Client · Société Générale Sénégal
+    <div style="font-family:'JetBrains Mono',monospace; font-size:0.68rem; letter-spacing:0.02em; color:var(--muted);">
+      © DMEC - Pôle Business Intelligence et Stratégie Client · Société Générale Sénégal
     </div>
   </footer>
+
+  </div> <!-- /.wrap -->
+  </main> <!-- /.app-main -->
+</div> <!-- /.app-shell -->
+
+<!-- ============ ASSISTANT LOCAL (chat sur les documents chargés) ============ -->
+<button id="chat-toggle" aria-label="Ouvrir l'assistant">
+  <svg viewBox="0 0 24 24" width="24" height="24"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+</button>
+
+<div id="chat-panel">
+  <div class="chat-head">
+    <div>
+      <div class="chat-title">Assistant documents</div>
+      <div class="chat-sub">🔒 100% local — cherche dans les données déjà extraites</div>
+    </div>
+    <button id="chat-close" aria-label="Fermer">&times;</button>
+  </div>
+  <div class="chat-messages" id="chat-messages"></div>
+  <div class="chat-suggestions" id="chat-suggestions"></div>
+  <form class="chat-input-row" id="chat-form">
+    <input type="text" id="chat-input" placeholder="Ex : quel est le résultat net ?" autocomplete="off">
+    <button type="submit" id="chat-send" aria-label="Envoyer">
+      <svg viewBox="0 0 24 24" width="18" height="18"><path d="M22 2L11 13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M22 2l-7 20-4-9-9-4 20-7z" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </button>
+  </form>
 </div>
 
 <script>
@@ -334,9 +847,9 @@ const CODES = {
   XI:{label:"Résultat net",section:'resultat'},
 
   ZA:{label:"Trésorerie nette au 1er janvier",section:'flux'}, FA:{label:"Capacité d'autofinancement globale (CAFG)",section:'flux'},
-  ZB:{label:"Flux — activités opérationnelles",section:'flux'}, ZC:{label:"Flux — activités d'investissement",section:'flux'},
-  ZD:{label:"Flux — capitaux propres",section:'flux'}, ZE:{label:"Flux — capitaux étrangers",section:'flux'},
-  ZF:{label:"Flux — activités de financement",section:'flux'}, ZG:{label:"Variation de la trésorerie nette",section:'flux'},
+  ZB:{label:"Flux - activités opérationnelles",section:'flux'}, ZC:{label:"Flux - activités d'investissement",section:'flux'},
+  ZD:{label:"Flux - capitaux propres",section:'flux'}, ZE:{label:"Flux - capitaux étrangers",section:'flux'},
+  ZF:{label:"Flux - activités de financement",section:'flux'}, ZG:{label:"Variation de la trésorerie nette",section:'flux'},
   ZH:{label:"Trésorerie nette au 31 décembre",section:'flux'},
 };
 const ACTIF_CODES = new Set(Object.keys(CODES).filter(c => CODES[c].section === 'actif'));
@@ -431,7 +944,7 @@ const UNCOVERED_ROWS = Object.keys(ROW_LABELS).map(Number).filter(r => !DIRECTLY
 
 /* ============================================================
    2bis. REGROUPEMENTS POUR LA VALIDATION CROISÉE DES TOTAUX
-   (bilan uniquement — les soldes du compte de résultat impliquent
+   (bilan uniquement - les soldes du compte de résultat impliquent
    des additions/soustractions en cascade trop incertaines pour être
    validées automatiquement sans risque de faux positifs)
    ============================================================ */
@@ -465,7 +978,7 @@ function clusterRows(tokens, tol){
 // (probable séparateur de milliers au sein d'un même nombre) d'un espace "de colonne"
 // (rupture entre deux cellules du tableau) grâce à la largeur réelle des tokens.
 // Un grand espace devient une TABULATION, qui sert de frontière dure pour le
-// regex d'extraction des montants — cela évite de fusionner deux nombres
+// regex d'extraction des montants - cela évite de fusionner deux nombres
 // juxtaposés (ex: "1 200 000 300 000") en un seul montant aberrant.
 function joinRowTokens(tokens){
   if (tokens.length === 0) return '';
@@ -526,7 +1039,11 @@ function buildLogicalLines(tokens, sortDescendingY){
 // parenthèses pour les négatifs, et placeholders textuels (-, N/A, néant, nil).
 // Le {1,3} plafonne à 4 groupes de milliers (~999 999 999 999) : garde-fou en complément
 // de joinRowTokens, au cas où une frontière de colonne n'aurait pas été détectée.
-const MONEY_RE = /\(?-?\d{1,3}(?:[ \u00A0.,]\d{3}){1,3}(?:[.,]\d{1,2})?\)?|\(?-?\d+(?:[.,]\d{1,2})?\)?|-|—|N\/A|n\/a|[Nn][ée]ant|[Nn]il/g;
+// Le tiret isolé "-" a été retiré des placeholders : sur les formulaires officiels OHADA, il sert
+// aussi de colonne "convention de signe" (+ / -) à côté de chaque poste, sans rapport avec un
+// montant manquant - le garder générait un faux "0" sur quasiment toutes les lignes de charges.
+// Seul le tiret cadratin "-" (plus rare, moins ambigu) reste traité comme un placeholder explicite.
+const MONEY_RE = /\(?-?\d{1,3}(?:[ \u00A0.,]\d{3}){1,3}(?:[.,]\d{1,2})?\)?|\(?-?\d+(?:[.,]\d{1,2})?\)?|(?<![A-Za-zÀ-ÖØ-öø-ÿ])—(?![A-Za-zÀ-ÖØ-öø-ÿ])|N\/A|n\/a|[Nn][ée]ant|[Nn]il/g;
 
 const PLACEHOLDER_RE = /^(-|—|N\/A|n\/a|[Nn][ée]ant|[Nn]il)$/;
 
@@ -604,8 +1121,16 @@ function isPlausibleCodeLine(rawCode, rest){
   return true;
 }
 
+// Sur beaucoup de documents réels, les colonnes sont en-têtées littéralement "N" et "N-1"
+// (au lieu de l'année civile). "N-1" contient un trait d'union suivi d'un chiffre : sans
+// précaution, MONEY_RE le lirait comme la valeur "-1". On neutralise ces libellés d'exercice
+// avant toute extraction de montant, sur TOUTE la ligne (y compris avant le code, au cas où
+// l'OCR aurait mal séparé l'en-tête de colonne du reste).
+const YEAR_LABEL_RE = /\bN\s*[+-]\s*\d+\b/gi;
+
 function parseLine(line){
-  const m = line.match(/^([A-Z0-9]{2})\b\s*(.*)$/);
+  const cleanedLine = line.replace(YEAR_LABEL_RE, ' ');
+  const m = cleanedLine.match(/^([A-Z0-9]{2})\b\s*(.*)$/);
   if (!m) return null;
   let code = m[1].toUpperCase();
   const rest = m[2];
@@ -616,7 +1141,7 @@ function parseLine(line){
   }
   if (!CODES[code]){
     // Code non reconnu : on ne remonte la ligne comme "suspecte" que si elle ressemble
-    // vraiment à une ligne de données mal lue (voir isPlausibleCodeLine) — sinon on
+    // vraiment à une ligne de données mal lue (voir isPlausibleCodeLine) - sinon on
     // l'ignore silencieusement, comme n'importe quelle ligne de texte non pertinente.
     if (isPlausibleCodeLine(m[1], rest)){
       return { unrecognized: true, rawCode: m[1] };
@@ -627,13 +1152,21 @@ function parseLine(line){
   let tokens = rest.match(MONEY_RE) || [];
   if (tokens.length === 0) return { code, nums: [] };
 
-  const section = CODES[code].section;
-  const maxExpected = section === 'actif' ? 4 : 2;
-  if (tokens.length > maxExpected){
-    const first = tokens[0];
-    const isShortBare = !/[ \u00A0.,]/.test(first) && first.replace('-', '').length <= 2;
-    if (isShortBare) tokens = tokens.slice(1);
-  }
+  // Sur les formulaires officiels OHADA, chaque ligne porte une référence de note ("13", "21",
+  // "3C & 28"...) intercalée entre le libellé et les montants réels. Un nombre "nu" (sans séparateur
+  // de milliers), non nul et petit (< 1000), n'est en pratique JAMAIS un vrai montant en FCFA - c'est
+  // presque toujours une référence de note ou un renvoi de bas de page (y compris entre parenthèses,
+  // ex. "(1)"). On les filtre systématiquement, à ne pas confondre avec un vrai "0" (valeur nulle
+  // légitime, conservée) ni avec un montant réellement négatif et significatif (conservé).
+  const isNoteReference = (t) => {
+    const bare = t.replace(/[()]/g, '');
+    if (/[ \u00A0.,]/.test(bare)) return false; // séparateur présent => vrai montant
+    const v = parseAmount(t);
+    return v !== null && v !== 0 && Math.abs(v) < 1000;
+  };
+  tokens = tokens.filter(t => !isNoteReference(t));
+  if (tokens.length === 0) return { code, nums: [] };
+
   const values = tokens.map(t => parseAmount(t));
   return { code, nums: values };
 }
@@ -642,7 +1175,16 @@ function toAmounts(code, values){
   const section = CODES[code].section;
   if (section === 'actif'){
     if (values.length >= 4) return { brutN:values[0], amortN:values[1], netN:values[2], netN1:values[3] };
-    if (values.length === 3) return { brutN:values[0], amortN:values[1], netN:values[2], netN1:null };
+    if (values.length === 3){
+      // Cas fréquent sur les formulaires officiels : la colonne "Amortissements/Dépréciations"
+      // reste vide quand l'immobilisation n'est pas amortissable (terrains, titres...) - donc
+      // Brut = Net et seules 3 valeurs s'impriment : Brut, Net(N), Net(N-1), pas Brut/Amort/Net(N).
+      // Un "amortissement" supérieur (ou égal) au brut étant impossible, on détecte ce cas ainsi.
+      if (values[1] >= values[0]){
+        return { brutN:values[0], amortN:0, netN:values[1], netN1:values[2] };
+      }
+      return { brutN:values[0], amortN:values[1], netN:values[2], netN1:null };
+    }
     if (values.length === 2) return { brutN:null, amortN:null, netN:values[0], netN1:values[1] };
     if (values.length === 1) return { brutN:null, amortN:null, netN:values[0], netN1:null };
     return { brutN:null, amortN:null, netN:null, netN1:null };
@@ -819,6 +1361,7 @@ btnExtract.addEventListener('click', async () => {
   const byCode = new Map();
   let nbOcrPages = 0;
   suspiciousLines = [];
+  window._allExtractedLines = []; // {text, source} — alimente le chatbot local (recherche plein texte)
 
   for (const d of docsQueue){
     d.status='en cours'; renderDocsQueue();
@@ -828,21 +1371,21 @@ btnExtract.addEventListener('click', async () => {
       if (ext === 'pdf'){
         const buf = await d.file.arrayBuffer();
         const pdf = await pdfjsLib.getDocument({ data: buf }).promise;
-        log(null, `${d.file.name} — ${pdf.numPages} page(s)`);
+        log(null, `${d.file.name} - ${pdf.numPages} page(s)`);
         for (let i=1;i<=pdf.numPages;i++){
           const page = await pdf.getPage(i);
           const { lines, method } = await extractLinesFromPdfPage(page);
-          if (method==='ocr'){ nbOcrPages++; log('ocr', `${d.file.name} — page ${i} : image détectée, OCR…`); }
-          else { log('native', `${d.file.name} — page ${i} : texte natif`); }
+          if (method==='ocr'){ nbOcrPages++; log('ocr', `${d.file.name} - page ${i} : image détectée, OCR…`); }
+          else { log('native', `${d.file.name} - page ${i} : texte natif`); }
           allLines.push(...lines);
         }
       } else if (ext === 'docx'){
-        log('native', `${d.file.name} — lecture du document Word…`);
+        log('native', `${d.file.name} - lecture du document Word…`);
         const buf = await d.file.arrayBuffer();
         const text = await extractDocxText(buf);
         allLines.push(...text.split('\n'));
       } else {
-        log('ocr', `${d.file.name} — OCR de l'image…`);
+        log('ocr', `${d.file.name} - OCR de l'image…`);
         const canvas = await imageFileToCanvas(d.file);
         const { tokens } = await ocrCanvasWithWords(canvas);
         nbOcrPages++;
@@ -850,6 +1393,7 @@ btnExtract.addEventListener('click', async () => {
       }
 
       for (const line of allLines){
+        window._allExtractedLines.push({ text: line, source: d.file.name });
         const parsed = parseLine(line);
         if (!parsed) continue;
         if (parsed.unrecognized){
@@ -865,16 +1409,16 @@ btnExtract.addEventListener('click', async () => {
       d.status='terminé';
     } catch(err){
       console.error(err);
-      log('err', `${d.file.name} — échec : ${err.message||err}`);
+      log('err', `${d.file.name} - échec : ${err.message||err}`);
       d.status='erreur';
     }
     renderDocsQueue();
   }
 
   if (ocrWorker){ await ocrWorker.terminate(); ocrWorker=null; }
-  log(null, `✓ Analyse terminée — ${byCode.size} code(s) reconnu(s).`);
+  log(null, `✓ Analyse terminée - ${byCode.size} code(s) reconnu(s).`);
   if (suspiciousLines.length){
-    log('err', `⚠ ${suspiciousLines.length} ligne(s) avec un code non reconnu (OCR douteux) — voir la section « à vérifier ».`);
+    log('err', `⚠ ${suspiciousLines.length} ligne(s) avec un code non reconnu (OCR douteux) - voir la section « à vérifier ».`);
   }
 
   extraction = { byCode, nbOcrPages, suspiciousLines: suspiciousLines.slice() };
@@ -1042,7 +1586,7 @@ function renderReview(items){
   for (const it of items){ (bySection[it.kind==='crosscheck'?'crosscheck':it.kind==='skip'?'skip':it.section]||bySection.actif).push(it); }
 
   let html = '';
-  const sectionTitles = { actif:'Bilan — Actif', passif:'Bilan — Passif', resultat:'Compte de résultat', crosscheck:'Totaux (calculés par le classeur — pour contrôle uniquement)' };
+  const sectionTitles = { actif:'Bilan - Actif', passif:'Bilan - Passif', resultat:'Compte de résultat', crosscheck:'Totaux (calculés par le classeur - pour contrôle uniquement)' };
   let autoCount=0, reviewCount=0;
 
   for (const key of ['actif','passif','resultat']){
@@ -1057,22 +1601,26 @@ function renderReview(items){
           // Colonne année précédente : affichée pour information/comparaison uniquement.
           // Jamais écrite ni comptabilisée dans les compteurs auto/à vérifier.
           return `<td>
-            <div style="font-size:0.62rem;color:var(--muted);font-family:'IBM Plex Mono',monospace;">${f.label} <span title="Les données des années précédentes ne sont jamais modifiées par l'outil.">🔒</span></div>
-            <div style="font-family:'IBM Plex Mono',monospace;font-size:0.8rem;text-align:right;padding:4px 6px;color:var(--ink-soft);background:#F7F6F5;border:1px solid var(--paper-line);border-radius:3px;">
-              ${f.detected!==null&&f.detected!==undefined?fmt(f.detected):'—'}
+            <div style="font-size:0.62rem;color:var(--muted);font-family:'JetBrains Mono',monospace;">${f.label} <span title="Les données des années précédentes ne sont jamais modifiées par l'outil.">🔒</span></div>
+            <div style="font-family:'JetBrains Mono',monospace;font-size:0.8rem;text-align:right;padding:4px 6px;color:var(--ink-soft);background:#F7F6F5;border:1px solid var(--paper-line);border-radius:3px;">
+              ${f.detected!==null&&f.detected!==undefined?fmt(f.detected):'-'}
             </div>
           </td>`;
         }
         const isConflict = f.existing !== null;
         if (isConflict) reviewCount++; else autoCount++;
         return `<td>
-          <div style="font-size:0.62rem;color:var(--muted);font-family:'IBM Plex Mono',monospace;">${f.label}</div>
+          <div style="font-size:0.62rem;color:var(--muted);font-family:'JetBrains Mono',monospace;">${f.label}</div>
           <input type="text" data-code="${it.code}" data-key="${f.key}" value="${f.detected!==null&&f.detected!==undefined?f.detected:''}">
         </td>`;
       }).join('');
       const writableFields = it.fields.filter(f => f.key !== 'valueN1');
-      const status = writableFields.some(f=>f.existing!==null)
-        ? `<span class="tag kept">valeur existante conservée</span>`
+      const hasExisting = writableFields.some(f=>f.existing!==null);
+      const forceOverwrite = document.getElementById('force-overwrite') ? document.getElementById('force-overwrite').checked : false;
+      const status = hasExisting
+        ? (forceOverwrite
+            ? `<span class="tag" style="background:var(--err-bg);color:var(--err);">⚠ écrasera la valeur existante</span>`
+            : `<span class="tag kept">valeur existante conservée</span>`)
         : (it.aggregate ? `<span class="tag aggregate">regroupé</span>` : `<span class="tag auto">auto</span>`);
       html += `<tr>
         <td><span class="code-pill">${it.code}</span></td>
@@ -1100,14 +1648,14 @@ function renderReview(items){
 
   if (extraction && extraction.suspiciousLines && extraction.suspiciousLines.length){
     const rows = extraction.suspiciousLines.map(s => `<tr><td><span class="code-pill" style="background:var(--err-bg);color:var(--err);">${escapeHtml(s.rawCode)}</span></td><td class="raw-line" style="max-width:420px;" title="${escapeHtml(s.rawLine)}">${escapeHtml(s.rawLine)}</td><td>${escapeHtml(s.source)}</td></tr>`).join('');
-    html += `<div class="section-block"><h3>Lignes suspectes — code non reconnu <span class="count">${extraction.suspiciousLines.length}</span></h3>
+    html += `<div class="section-block"><h3>Lignes suspectes - code non reconnu <span class="count">${extraction.suspiciousLines.length}</span></h3>
       <table class="review"><thead><tr><th>Code lu</th><th>Ligne source</th><th>Document</th></tr></thead><tbody>${rows}</tbody></table>
-      <p style="font-size:0.76rem;color:var(--muted);margin-top:8px;">Ces lignes contiennent un montant mais un code à 2 lettres non reconnu (probable erreur d'OCR) — à vérifier et saisir manuellement si nécessaire.</p>
+      <p style="font-size:0.76rem;color:var(--muted);margin-top:8px;">Ces lignes contiennent un montant mais un code à 2 lettres non reconnu (probable erreur d'OCR) - à vérifier et saisir manuellement si nécessaire.</p>
       </div>`;
   }
 
-  const uncoveredHtml = UNCOVERED_ROWS.sort((a,b)=>a-b).map(r => `<div>Ligne ${r} — ${escapeHtml(ROW_LABELS[r])}</div>`).join('');
-  html += `<details class="uncovered"><summary>Lignes non couvertes (${UNCOVERED_ROWS.length}) — à compléter à la main</summary>
+  const uncoveredHtml = UNCOVERED_ROWS.sort((a,b)=>a-b).map(r => `<div>Ligne ${r} - ${escapeHtml(ROW_LABELS[r])}</div>`).join('');
+  html += `<details class="uncovered"><summary>Lignes non couvertes (${UNCOVERED_ROWS.length}) - à compléter à la main</summary>
     <div class="uncovered-list">${uncoveredHtml}</div></details>`;
 
   reviewBody.innerHTML = html;
@@ -1121,15 +1669,22 @@ function renderReview(items){
   document.getElementById('k-ocr').textContent = extraction.nbOcrPages;
   document.getElementById('k-suspect').textContent = (extraction.suspiciousLines||[]).length;
   kpis.style.display='flex';
+
+  unlockDownstreamModules();
 }
+
+document.getElementById('force-overwrite').addEventListener('change', () => {
+  if (window._reviewItems) renderReview(window._reviewItems);
+});
 
 btnExportEl.addEventListener('click', () => {
   const ws = templateWb.Sheets['Feuille de saisie'];
   const journalRows = [['Code','Ligne cible','Champ','Valeur écrite','Cellule','Statut','Ligne source du document']];
+  const forceOverwrite = document.getElementById('force-overwrite').checked;
 
   document.querySelectorAll('table.review input').forEach(input => {
     const code = input.dataset.code, key = input.dataset.key;
-    if (key === 'valueN1') return; // garde-fou : les années précédentes ne sont jamais écrites (aucun <input> n'existe normalement pour ce champ)
+    if (key === 'valueN1') return; // garde-fou : les années précédentes ne sont jamais écrites (aucun <input> n'existe normalement pour ce champ), même en mode "écraser"
     const item = window._reviewItems.find(it => it.code===code);
     if (!item) return;
     const field = item.fields.find(f=>f.key===key);
@@ -1138,11 +1693,11 @@ btnExportEl.addEventListener('click', () => {
     const num = raw === '' ? null : parseFloat(raw);
     let statusLabel = 'ignoré (vide)';
     if (num !== null){
-      if (field.existing !== null){
-        statusLabel = 'conservé (déjà renseigné) — valeur détectée non écrite';
+      if (field.existing !== null && !forceOverwrite){
+        statusLabel = 'conservé (déjà renseigné) - valeur détectée non écrite';
       } else {
         ws[field.addr] = { t:'n', v: num };
-        statusLabel = 'écrit automatiquement';
+        statusLabel = (field.existing !== null) ? 'écrit (écrase une valeur existante)' : 'écrit automatiquement';
       }
     }
     journalRows.push([item.code, item.rowLabel||item.label, field.label, num, field.addr, statusLabel, item.raw]);
@@ -1156,7 +1711,7 @@ btnExportEl.addEventListener('click', () => {
     if (!f) continue;
     const detected = (f.detected!==null && f.detected!==undefined) ? f.detected : '';
     journalRows.push([item.code, item.rowLabel||item.label, f.label, detected, f.addr,
-      'non modifié — donnée année précédente protégée', item.raw]);
+      'non modifié - donnée année précédente protégée', item.raw]);
   }
 
   const wsJournal = XLSX.utils.aoa_to_sheet(journalRows);
@@ -1177,6 +1732,1298 @@ btnExportEl.addEventListener('click', () => {
   a.download = templateFile.name.replace(/(\.xlsm|\.xlsx)$/i, `_complete$1`);
   document.body.appendChild(a); a.click(); document.body.removeChild(a);
   URL.revokeObjectURL(url);
+});
+
+/* ============================================================
+   7. NAVIGATION ENTRE MODULES (barre latérale)
+   ============================================================ */
+const MODULE_ORDER = ['nf','preanalyse','ratios','scoring','garanties','decision'];
+const moduleTabs = document.querySelectorAll('.sidebar-item');
+const moduleSections = document.querySelectorAll('.module');
+
+function showModule(name){
+  moduleSections.forEach(m => m.classList.toggle('active', m.id === 'module-'+name));
+  moduleTabs.forEach(t => t.classList.toggle('active', t.dataset.module === name));
+  if (name === 'preanalyse') renderPreanalyse();
+  if (name === 'ratios') renderRatios();
+  if (name === 'scoring') renderScoring();
+  if (name === 'garanties') renderGaranties();
+  if (name === 'decision') renderDecision();
+}
+moduleTabs.forEach(t => t.addEventListener('click', () => { if (!t.disabled) { showModule(t.dataset.module); closeMobileSidebar(); } }));
+
+/* ---- Tiroir de navigation mobile ---- */
+const menuToggle = document.getElementById('menu-toggle');
+const appSidebar = document.getElementById('app-sidebar');
+const sidebarBackdrop = document.getElementById('sidebar-backdrop');
+
+function openMobileSidebar(){
+  appSidebar.classList.add('open');
+  sidebarBackdrop.classList.add('open');
+}
+function closeMobileSidebar(){
+  appSidebar.classList.remove('open');
+  sidebarBackdrop.classList.remove('open');
+}
+menuToggle.addEventListener('click', () => {
+  appSidebar.classList.contains('open') ? closeMobileSidebar() : openMobileSidebar();
+});
+sidebarBackdrop.addEventListener('click', closeMobileSidebar);
+
+function unlockDownstreamModules(){
+  moduleTabs.forEach(t => { if (t.dataset.module !== 'nf') t.disabled = false; });
+  markModuleDone('nf');
+  updateSidebarProgress();
+}
+
+function markModuleDone(name){
+  const item = document.querySelector(`.sidebar-item[data-module="${name}"]`);
+  if (!item) return;
+  item.classList.add('done');
+  const num = item.querySelector('.si-num');
+  if (num) num.textContent = '✓';
+  updateSidebarProgress();
+}
+
+function updateSidebarProgress(){
+  const done = document.querySelectorAll('.sidebar-item.done').length;
+  const total = MODULE_ORDER.length;
+  const label = document.getElementById('sidebar-progress-label');
+  if (label) label.textContent = `${done} / ${total} étapes`;
+  document.querySelectorAll('#sidebar-steps .sdot').forEach((dot, i) => {
+    dot.classList.toggle('done', i < done);
+  });
+}
+
+/* ============================================================
+   7bis. MODULE 2 - PRÉ-ANALYSE DOCUMENTAIRE
+   Checklist standard corporate OHADA/Sénégal - À CALIBRER selon
+   la politique KYC/conformité officielle de la banque.
+   ============================================================ */
+const PREANALYSE_CHECKLIST = [
+  { key:'rccm', label:'Registre du Commerce et du Crédit Mobilier (RCCM)', category:'Juridique', mandatory:true, hasDate:true, validityMonths:3 },
+  { key:'ninea', label:"NINEA (Numéro d'Identification Nationale des Entreprises et Associations)", category:'Juridique', mandatory:true, hasDate:false },
+  { key:'statuts', label:'Statuts de la société (à jour)', category:'Juridique', mandatory:true, hasDate:false },
+  { key:'pv_ag', label:"PV de la dernière Assemblée Générale", category:'Juridique', mandatory:true, hasDate:true, validityMonths:24 },
+  { key:'repartition_capital', label:'Répartition du capital / registre des associés', category:'Juridique', mandatory:true, hasDate:false },
+  { key:'pouvoir_signataire', label:'Pouvoir/délégation du signataire de la demande', category:'Juridique', mandatory:true, hasDate:false },
+
+  { key:'quitus_fiscal', label:'Quitus fiscal (attestation de régularité fiscale)', category:'Fiscal & social', mandatory:true, hasDate:true, validityMonths:3 },
+  { key:'attestation_ipres', label:'Attestation IPRES (retraite)', category:'Fiscal & social', mandatory:true, hasDate:true, validityMonths:3 },
+  { key:'attestation_css', label:'Attestation CSS/CNSS (sécurité sociale)', category:'Fiscal & social', mandatory:true, hasDate:true, validityMonths:3 },
+
+  { key:'releves_bancaires', label:'Relevés bancaires (6 derniers mois, toutes banques)', category:'Bancaire', mandatory:true, hasDate:false },
+  { key:'lettre_reference', label:'Lettre de référence bancaire', category:'Bancaire', mandatory:false, hasDate:false },
+
+  { key:'piece_identite', label:'Pièce d\'identité (CNI/Passeport) du/des dirigeant(s)', category:'KYC - Identité & bénéficiaires effectifs', mandatory:true, hasDate:true, isExpiry:true },
+  { key:'justif_domicile', label:'Justificatif de domicile du/des dirigeant(s)', category:'KYC - Identité & bénéficiaires effectifs', mandatory:false, hasDate:false },
+  { key:'registre_be', label:'Registre des bénéficiaires effectifs (RBE)', category:'KYC - Identité & bénéficiaires effectifs', mandatory:true, hasDate:false },
+  { key:'organigramme', label:"Organigramme du groupe / de l'actionnariat", category:'KYC - Identité & bénéficiaires effectifs', mandatory:false, hasDate:false },
+
+  { key:'business_plan', label:"Business plan / étude de faisabilité", category:'Dossier de projet (financement d\'investissement)', mandatory:false, hasDate:false, investmentOnly:true },
+  { key:'devis_proforma', label:'Devis ou factures pro forma des équipements à financer', category:'Dossier de projet (financement d\'investissement)', mandatory:false, hasDate:false, investmentOnly:true },
+  { key:'plan_financement', label:'Plan de financement du projet', category:'Dossier de projet (financement d\'investissement)', mandatory:false, hasDate:false, investmentOnly:true },
+];
+
+window._preanalyse = window._preanalyse || {}; // key -> { status, date, filename }
+
+function isInvestmentDossier(){
+  const cb = document.getElementById('pa-is-investment');
+  return cb ? cb.checked : false;
+}
+
+function docIsStale(item, dateStr){
+  if (!dateStr) return false;
+  const d = new Date(dateStr);
+  if (isNaN(d)) return false;
+  const today = new Date();
+  if (item.isExpiry){
+    // Champ = date d'expiration de la pièce elle-même (ex: CNI) : périmé si déjà dépassée.
+    return d < today;
+  }
+  if (item.validityMonths){
+    // Champ = date d'émission du document : périmé au-delà de sa durée de validité usuelle.
+    const limit = new Date(d);
+    limit.setMonth(limit.getMonth() + item.validityMonths);
+    return limit < today;
+  }
+  return false;
+}
+
+function renderPreanalyse(){
+  const investment = isInvestmentDossier();
+  const categories = [...new Set(PREANALYSE_CHECKLIST.map(i => i.category))];
+  let html = '';
+
+  for (const cat of categories){
+    const items = PREANALYSE_CHECKLIST.filter(i => i.category === cat && (!i.investmentOnly || investment));
+    if (items.length === 0) continue;
+    html += `<div class="doc-category">
+      <div class="doc-category-title">${escapeHtml(cat)}</div>
+      <table class="checklist"><tbody>`;
+    for (const item of items){
+      const state = window._preanalyse[item.key] || { status:'', date:'' };
+      const stale = state.status === 'fourni' && docIsStale(item, state.date);
+      html += `<tr data-key="${item.key}">
+        <td style="width:46%;">
+          <span class="doc-label">${escapeHtml(item.label)}</span>
+          ${item.mandatory ? '<span class="doc-mandatory">obligatoire</span>' : ''}
+        </td>
+        <td style="width:16%;">
+          <select class="pa-status">
+            <option value="" ${state.status===''?'selected':''}>- à renseigner -</option>
+            <option value="fourni" ${state.status==='fourni'?'selected':''}>Fourni</option>
+            <option value="manquant" ${state.status==='manquant'?'selected':''}>Manquant</option>
+            <option value="na" ${state.status==='na'?'selected':''}>Non applicable</option>
+          </select>
+        </td>
+        <td style="width:16%;">
+          ${item.hasDate ? `<input type="date" class="pa-date" value="${state.date||''}" title="${item.isExpiry?'Date d\'expiration':'Date du document'}">` : ''}
+        </td>
+        <td style="width:14%;">
+          <input type="file" class="pa-file">
+        </td>
+        <td style="width:8%;text-align:right;">
+          <span class="doc-status-badge ${stale?'stale':state.status==='fourni'?'provided':state.status==='na'?'na':state.status==='manquant'?'missing':''}">
+            ${stale?'périmé':state.status==='fourni'?'ok':state.status==='na'?'n/a':state.status==='manquant'?'manquant':'-'}
+          </span>
+        </td>
+      </tr>`;
+    }
+    html += `</tbody></table></div>`;
+  }
+  document.getElementById('preanalyse-body').innerHTML = html;
+
+  document.querySelectorAll('#preanalyse-body tr[data-key]').forEach(tr => {
+    const key = tr.dataset.key;
+    const sel = tr.querySelector('.pa-status');
+    const dateEl = tr.querySelector('.pa-date');
+    const fileEl = tr.querySelector('.pa-file');
+    const sync = () => {
+      window._preanalyse[key] = {
+        status: sel.value,
+        date: dateEl ? dateEl.value : '',
+        filename: (fileEl && fileEl.files[0]) ? fileEl.files[0].name : (window._preanalyse[key]||{}).filename,
+      };
+      renderPreanalyse();
+      markModuleDone('preanalyse');
+    };
+    sel.addEventListener('change', sync);
+    if (dateEl) dateEl.addEventListener('change', sync);
+    if (fileEl) fileEl.addEventListener('change', sync);
+  });
+
+  renderPreanalyseSummary(investment);
+}
+
+function computePreanalyseStatus(){
+  const investment = isInvestmentDossier();
+  const applicable = PREANALYSE_CHECKLIST.filter(i => !i.investmentOnly || investment);
+  const mandatory = applicable.filter(i => i.mandatory);
+  const missing = [], stale = [], provided = [];
+  for (const item of applicable){
+    const state = window._preanalyse[item.key] || { status:'' };
+    if (state.status === 'fourni'){
+      provided.push(item);
+      if (docIsStale(item, state.date)) stale.push(item);
+    } else if (item.mandatory && state.status !== 'na'){
+      missing.push(item);
+    }
+  }
+  const mandatoryProvided = mandatory.filter(i => (window._preanalyse[i.key]||{}).status === 'fourni').length;
+  return {
+    totalApplicable: applicable.length, totalMandatory: mandatory.length,
+    mandatoryProvided, missing, stale, provided,
+    completionPct: mandatory.length ? Math.round((mandatoryProvided/mandatory.length)*100) : 100,
+    complete: missing.length === 0,
+  };
+}
+
+function renderPreanalyseSummary(investment){
+  const s = computePreanalyseStatus();
+  const cls = s.complete ? 'g' : (s.completionPct >= 60 ? 'o' : 'r');
+  document.getElementById('preanalyse-summary').innerHTML = `
+    <div class="ps-card"><div class="psl">Complétude obligatoire</div><div class="psv" style="color:var(--${cls==='g'?'ok':cls==='o'?'amber-deep':'err'});">${s.completionPct}%</div></div>
+    <div class="ps-card"><div class="psl">Pièces obligatoires manquantes</div><div class="psv" style="color:${s.missing.length?'var(--err)':'var(--ok)'};">${s.missing.length}</div></div>
+    <div class="ps-card"><div class="psl">Pièces périmées</div><div class="psv" style="color:${s.stale.length?'var(--amber-deep)':'var(--ok)'};">${s.stale.length}</div></div>
+    <div class="ps-card"><div class="psl">Dossier</div><div class="psv" style="color:${s.complete?'var(--ok)':'var(--err)'};">${s.complete?'Complet':'Incomplet'}</div></div>
+  `;
+}
+
+document.getElementById('pa-is-investment').addEventListener('change', renderPreanalyse);
+
+/* ============================================================
+   8. DONNÉES FINANCIÈRES PARTAGÉES (lues depuis la revue NF)
+   ============================================================ */
+function getReviewInputValue(code, key){
+  const el = document.querySelector(`table.review input[data-code="${CSS.escape(code)}"][data-key="${key}"]`);
+  if (!el) return null;
+  const raw = el.value.replace(/[ \u00A0]/g,'').replace(',', '.');
+  return raw === '' ? null : parseFloat(raw);
+}
+
+// Retourne une Map code -> valeur nette (N), reconstruite à partir des valeurs actuellement
+// affichées (et éventuellement corrigées manuellement) dans le tableau de revue du Module 1.
+function collectFinancialValues(){
+  const values = new Map();
+  if (!window._reviewItems) return values;
+  for (const it of window._reviewItems){
+    if (it.kind === 'crosscheck'){
+      if (it.detectedN != null) values.set(it.code, it.detectedN);
+      continue;
+    }
+    if (!it.fields) continue;
+    if (it.kind === 'actif'){
+      const brut = getReviewInputValue(it.code, 'brutN');
+      const amort = getReviewInputValue(it.code, 'amortN');
+      if (brut != null) values.set(it.code, brut - (amort||0));
+    } else if (it.kind === 'actif-net'){
+      const net = getReviewInputValue(it.code, 'netN');
+      if (net != null) values.set(it.code, net);
+    } else if (it.kind === 'passif' || it.kind === 'resultat'){
+      const val = getReviewInputValue(it.code, 'valueN');
+      if (val != null) values.set(it.code, val);
+    }
+  }
+  return values;
+}
+function fv(values, code){ return values.has(code) ? values.get(code) : 0; }
+
+// Valeurs N-1 : l'outil ne les écrit jamais dans le fichier (cf. protection des années
+// antérieures), mais elles restent disponibles côté détection pour l'analyse d'évolution.
+function collectFinancialValuesN1(){
+  const values = new Map();
+  if (!window._reviewItems) return values;
+  for (const it of window._reviewItems){
+    if (it.kind === 'crosscheck'){
+      if (it.detectedN1 != null) values.set(it.code, it.detectedN1);
+      continue;
+    }
+    if (!it.fields) continue;
+    if (it.kind === 'passif' || it.kind === 'resultat'){
+      const f = it.fields.find(fl => fl.key === 'valueN1');
+      if (f && f.detected != null) values.set(it.code, f.detected);
+    }
+    // Les postes d'actif (actif/actif-net) n'ont pas de N-1 capturé par l'outil (limitation connue).
+  }
+  return values;
+}
+
+/* ============================================================
+   9. MODULE 2 - ANALYSE FINANCIÈRE (RATIOS)
+   Seuils indicatifs (vert/orange/rouge) - À CALIBRER selon la
+   politique de risque réelle de la banque (DCE).
+   ============================================================ */
+function classify(value, goodBound, warnBound, higherIsBetter){
+  if (value === null || !isFinite(value)) return 'n';
+  if (higherIsBetter){
+    if (value >= goodBound) return 'g';
+    if (value >= warnBound) return 'o';
+    return 'r';
+  }
+  if (value <= goodBound) return 'g';
+  if (value <= warnBound) return 'o';
+  return 'r';
+}
+
+/* ============================================================
+   9bis. ANALYSE DE L'ÉQUILIBRE FINANCIER (FR / BFR / TRÉSORERIE NETTE)
+   Base de toute analyse crédit corporate - vérifie la cohérence
+   entre l'approche "par le haut du bilan" et "par le bas du bilan".
+   ============================================================ */
+function computeStructureFinanciere(v){
+  const capitauxPropres = fv(v,'CP'), dettesFinancieresLT = fv(v,'DD'), actifImmobilise = fv(v,'AZ');
+  const actifCirculantExploit = fv(v,'BK'), passifCirculantExploit = fv(v,'DP');
+  const tresorerieActif = fv(v,'BT'), tresoreriePassif = fv(v,'DT');
+
+  const ressourcesStables = capitauxPropres + dettesFinancieresLT;
+  const fr = ressourcesStables - actifImmobilise;                    // Fonds de roulement
+  const bfr = actifCirculantExploit - passifCirculantExploit;        // Besoin en fonds de roulement
+  const tresorerieNetteCalculee = fr - bfr;                          // Par le haut du bilan
+  const tresorerieNetteDirecte = tresorerieActif - tresoreriePassif; // Par le bas du bilan (contrôle)
+  const ecart = tresorerieNetteCalculee - tresorerieNetteDirecte;
+  const coherent = Math.abs(ecart) <= Math.max(1, Math.abs(tresorerieNetteDirecte)*0.02);
+
+  return { fr, bfr, tresorerieNetteCalculee, tresorerieNetteDirecte, ecart, coherent, ressourcesStables, actifImmobilise };
+}
+
+/* ============================================================
+   9ter. CAFG ET CAPACITÉ DE REMBOURSEMENT
+   Formule indicative simplifiée (résultat net retraité des charges
+   et produits non décaissés/non encaissés). L'analyste doit la
+   confronter au tableau de flux de trésorerie réel s'il existe.
+   ============================================================ */
+function computeCAFG(v){
+  const resultatNet = fv(v,'XI');
+  const dotationsExploit = fv(v,'RL'), reprisesExploit = fv(v,'TJ');
+  const dotationsFin = fv(v,'RN'), reprisesFin = fv(v,'TL');
+  const produitsCessions = fv(v,'TN'), vcCessions = fv(v,'RO');
+  const dettesFinancieres = fv(v,'DD');
+
+  const cafg = resultatNet + dotationsExploit - reprisesExploit + dotationsFin - reprisesFin - produitsCessions + vcCessions;
+  const capaciteRemboursement = cafg > 0 ? dettesFinancieres / cafg : null; // en années
+
+  return { cafg, capaciteRemboursement };
+}
+
+/* ============================================================
+   9quater. CYCLE D'EXPLOITATION (délais clients/fournisseurs/stocks)
+   Approximation : utilise le CA et les achats hors taxes faute de
+   détail TTC dans la Notice Financière - à affiner si les montants
+   TTC sont disponibles par ailleurs.
+   ============================================================ */
+function computeCycles(v){
+  const ca = fv(v,'XB');
+  const clients = fv(v,'BI'), fournisseurs = fv(v,'DJ'), stocks = fv(v,'BB');
+  const achats = fv(v,'RA') + fv(v,'RC') + fv(v,'RE');
+
+  const dso = ca > 0 ? (clients / ca) * 360 : null;         // délai de recouvrement clients (jours)
+  const dpo = achats > 0 ? (fournisseurs / achats) * 360 : null; // délai de règlement fournisseurs (jours)
+  const dio = achats > 0 ? (stocks / achats) * 360 : null;   // délai de rotation des stocks (jours)
+  const cycleNet = (dso!=null && dpo!=null && dio!=null) ? (dso + dio - dpo) : null;
+
+  return { dso, dpo, dio, cycleNet };
+}
+
+/* ============================================================
+   9quinquies. ÉVOLUTION N / N-1 (croissance et tendance)
+   ============================================================ */
+function computeEvolution(){
+  const vN = collectFinancialValues();
+  const vN1 = collectFinancialValuesN1();
+  const items = [
+    { code:'XB', label:"Chiffre d'affaires" },
+    { code:'XI', label:'Résultat net' },
+    { code:'BZ', label:'Total bilan (actif)' },
+    { code:'CP', label:'Capitaux propres' },
+  ];
+  return items.map(it => {
+    const n = vN.has(it.code) ? vN.get(it.code) : null;
+    const n1 = vN1.has(it.code) ? vN1.get(it.code) : null;
+    const growth = (n!=null && n1!=null && n1!==0) ? (n-n1)/Math.abs(n1) : null;
+    return { ...it, n, n1, growth };
+  });
+}
+
+
+function computeRatios(){
+  const v = collectFinancialValues();
+  const totalActif = fv(v,'BZ'), totalPassif = fv(v,'DZ'), capitauxPropres = fv(v,'CP');
+  const actifCirculant = fv(v,'BK'), tresorerieActif = fv(v,'BT');
+  const passifCirculant = fv(v,'DP'), tresoreriePassif = fv(v,'DT');
+  const dettesFinancieres = fv(v,'DD'), actifImmobilise = fv(v,'AZ');
+  const ca = fv(v,'XB'), resultatNet = fv(v,'XI'), valeurAjoutee = fv(v,'XC'), ebe = fv(v,'XD'), chargesPersonnel = fv(v,'RK');
+
+  const div = (a,b) => (!b || !isFinite(b)) ? null : a/b;
+
+  return {
+    dataAvailable: totalActif !== 0 || totalPassif !== 0,
+    ratios: [
+      { key:'liquidite', label:'Liquidité générale', fmtType:'ratio', category:'Liquidité & solvabilité',
+        value: div(actifCirculant+tresorerieActif, passifCirculant+tresoreriePassif),
+        formula:"(Actif circulant + Trésorerie actif) / (Passif circulant + Trésorerie passif)",
+        cls:function(x){ return classify(x,1.5,1.0,true); } },
+      { key:'autonomie', label:'Autonomie financière', fmtType:'pct', category:'Liquidité & solvabilité',
+        value: div(capitauxPropres, totalPassif),
+        formula:"Capitaux propres / Total passif",
+        cls:function(x){ return classify(x,0.3,0.15,true); } },
+      { key:'endettement', label:'Endettement financier', fmtType:'ratio', category:'Liquidité & solvabilité',
+        value: div(dettesFinancieres, capitauxPropres),
+        formula:"Dettes financières / Capitaux propres",
+        cls:function(x){ return classify(x,0.5,1.0,false); } },
+      { key:'marge', label:'Marge nette', fmtType:'pct', category:'Rentabilité',
+        value: div(resultatNet, ca),
+        formula:"Résultat net / Chiffre d'affaires",
+        cls:function(x){ return classify(x,0.05,0.02,true); } },
+      { key:'roe', label:'Rentabilité financière (ROE)', fmtType:'pct', category:'Rentabilité',
+        value: div(resultatNet, capitauxPropres),
+        formula:"Résultat net / Capitaux propres",
+        cls:function(x){ return classify(x,0.10,0.05,true); } },
+      { key:'roa', label:'Rentabilité économique', fmtType:'pct', category:'Rentabilité',
+        value: div(ebe, totalActif),
+        formula:"Excédent brut d'exploitation / Total actif",
+        cls:function(x){ return classify(x,0.08,0.03,true); } },
+      { key:'personnel', label:'Poids charges de personnel', fmtType:'pct', category:'Rentabilité',
+        value: div(chargesPersonnel, valeurAjoutee),
+        formula:"Charges de personnel / Valeur ajoutée",
+        cls:function(x){ return classify(x,0.5,0.7,false); } },
+      { key:'equilibre', label:'Couverture des emplois stables', fmtType:'ratio', category:'Liquidité & solvabilité',
+        value: div(capitauxPropres+dettesFinancieres, actifImmobilise),
+        formula:"(Capitaux propres + Dettes financières LT) / Actif immobilisé",
+        cls:function(x){ return classify(x,1.0,0.8,true); } },
+    ]
+  };
+}
+
+function fmtDays(x){ return x===null ? '-' : Math.round(x)+' j'; }
+function fmtYears(x){ return x===null ? '-' : x.toFixed(1)+' an'+(x>=2?'s':''); }
+function trendArrow(growth){
+  if (growth === null) return '';
+  if (growth > 0.03) return `<span style="color:var(--ok);">▲ +${(growth*100).toFixed(1)}%</span>`;
+  if (growth < -0.03) return `<span style="color:var(--err);">▼ ${(growth*100).toFixed(1)}%</span>`;
+  return `<span style="color:var(--muted);">▬ ${(growth*100).toFixed(1)}%</span>`;
+}
+
+function renderRatios(){
+  const body = document.getElementById('ratios-body');
+  if (!window._reviewItems){
+    body.innerHTML = `<p style="color:var(--muted);">Complétez d'abord la Notice Financière (Module 1) pour calculer les ratios.</p>`;
+    return;
+  }
+  const v = collectFinancialValues();
+  const { dataAvailable, ratios } = computeRatios();
+  const structure = computeStructureFinanciere(v);
+  const { cafg, capaciteRemboursement } = computeCAFG(v);
+  const cycles = computeCycles(v);
+  const evolution = computeEvolution();
+
+  let html = '';
+  if (!dataAvailable){
+    html += `<p style="color:var(--err);">⚠ Total actif et total passif nuls ou non détectés - vérifiez la Notice Financière avant de poursuivre.</p>`;
+  }
+
+  // --- 1. Équilibre financier : FR / BFR / Trésorerie nette ---
+  html += `<h3 style="margin-top:6px;">1. Équilibre financier</h3>
+  <div class="ratio-grid">
+    <div class="ratio-card">
+      <div class="rl">Fonds de roulement (FR)</div>
+      <div class="rv ${structure.fr>=0?'g':'r'}">${fmt(structure.fr)}</div>
+      <div class="rf">(Capitaux propres + Dettes financières LT) − Actif immobilisé</div>
+    </div>
+    <div class="ratio-card">
+      <div class="rl">Besoin en fonds de roulement (BFR)</div>
+      <div class="rv ${structure.bfr<=structure.fr?'g':'o'}">${fmt(structure.bfr)}</div>
+      <div class="rf">Actif circulant d'exploitation − Passif circulant d'exploitation</div>
+    </div>
+    <div class="ratio-card">
+      <div class="rl">Trésorerie nette</div>
+      <div class="rv ${structure.tresorerieNetteDirecte>=0?'g':'r'}">${fmt(structure.tresorerieNetteDirecte)}</div>
+      <div class="rf">FR − BFR - doit couvrir le décalage du cycle d'exploitation</div>
+    </div>
+  </div>
+  ${!structure.coherent ? `<p style="font-size:0.76rem;color:var(--err);margin-top:8px;">⚠ Incohérence entre la trésorerie calculée par le haut du bilan (${fmt(structure.tresorerieNetteCalculee)}) et celle du bas du bilan (${fmt(structure.tresorerieNetteDirecte)}) - écart de ${fmt(structure.ecart)}. Vérifiez les postes détectés dans la Notice Financière (codes non couverts, lignes regroupées...).</p>`
+    : `<p style="font-size:0.76rem;color:var(--muted);margin-top:8px;">✓ Cohérence vérifiée entre l'approche "haut de bilan" et "bas de bilan" pour la trésorerie nette.</p>`}
+
+  <!-- --- 2. Capacité de remboursement --- -->
+  <h3>2. Capacité de remboursement</h3>
+  <div class="ratio-grid">
+    <div class="ratio-card">
+      <div class="rl">CAFG (capacité d'autofinancement globale, estimée)</div>
+      <div class="rv ${cafg>0?'g':'r'}">${fmt(cafg)}</div>
+      <div class="rf">Résultat net + dotations − reprises (formule simplifiée)</div>
+    </div>
+    <div class="ratio-card">
+      <div class="rl">Dettes financières / CAFG</div>
+      <div class="rv ${classify(capaciteRemboursement,3,5,false)}">${fmtYears(capaciteRemboursement)}</div>
+      <div class="rf">Nombre d'années de CAFG pour rembourser les dettes financières (repère usuel : &lt; 3-4 ans)</div>
+    </div>
+  </div>
+
+  <!-- --- 3. Cycle d'exploitation --- -->
+  <h3>3. Cycle d'exploitation</h3>
+  <div class="ratio-grid">
+    <div class="ratio-card"><div class="rl">Délai clients (DSO)</div><div class="rv ${classify(cycles.dso,45,60,false)}">${fmtDays(cycles.dso)}</div><div class="rf">(Clients / CA) × 360 - approximation hors TVA</div></div>
+    <div class="ratio-card"><div class="rl">Délai fournisseurs (DPO)</div><div class="rv">${fmtDays(cycles.dpo)}</div><div class="rf">(Fournisseurs / Achats) × 360 - approximation hors TVA</div></div>
+    <div class="ratio-card"><div class="rl">Rotation des stocks (DIO)</div><div class="rv ${classify(cycles.dio,30,60,false)}">${fmtDays(cycles.dio)}</div><div class="rf">(Stocks / Achats) × 360 - approximation</div></div>
+    <div class="ratio-card"><div class="rl">Cycle net d'exploitation</div><div class="rv ${classify(cycles.cycleNet,30,60,false)}">${fmtDays(cycles.cycleNet)}</div><div class="rf">DSO + DIO − DPO</div></div>
+  </div>
+
+  <!-- --- 4. Évolution N / N-1 --- -->
+  <h3>4. Évolution N / N-1</h3>
+  <table class="review"><thead><tr><th>Agrégat</th><th>N-1</th><th>N</th><th>Évolution</th></tr></thead><tbody>
+    ${evolution.map(e => `<tr><td>${escapeHtml(e.label)}</td><td>${e.n1!=null?fmt(e.n1):'-'}</td><td>${e.n!=null?fmt(e.n):'-'}</td><td>${trendArrow(e.growth)}</td></tr>`).join('')}
+  </tbody></table>
+  <p style="font-size:0.76rem;color:var(--muted);margin-top:8px;">La colonne N-1 provient de la lecture du document source ; elle n'est jamais écrite dans le fichier Excel (cf. protection des années antérieures).</p>
+
+  <!-- --- 5. Ratios de rentabilité et de solvabilité --- -->
+  <h3>5. Rentabilité, liquidité et solvabilité</h3>`;
+
+  const byCategory = {};
+  for (const r of ratios){ (byCategory[r.category] = byCategory[r.category]||[]).push(r); }
+  for (const cat of Object.keys(byCategory)){
+    html += `<div style="font-size:0.78rem;font-weight:600;color:var(--ink-soft);margin:12px 0 4px;">${escapeHtml(cat)}</div><div class="ratio-grid">`;
+    for (const r of byCategory[cat]){
+      const cls = r.value !== null ? r.cls(r.value) : 'n';
+      const display = r.value === null ? '-' : (r.fmtType === 'pct' ? (r.value*100).toFixed(1)+'%' : r.value.toFixed(2));
+      html += `<div class="ratio-card">
+        <div class="rl">${escapeHtml(r.label)}</div>
+        <div class="rv ${cls}">${display}</div>
+        <div class="rf">${escapeHtml(r.formula)}</div>
+      </div>`;
+    }
+    html += '</div>';
+  }
+
+  body.innerHTML = html;
+  window._lastRatios = ratios;
+  markModuleDone('ratios');
+  window._lastStructure = structure;
+  window._lastCAFG = { cafg, capaciteRemboursement };
+  window._lastCycles = cycles;
+  window._lastEvolution = evolution;
+}
+
+/* ============================================================
+   10. MODULE 3 - SCORING CRÉDIT (barème indicatif)
+   ============================================================ */
+const QUAL_OPTIONS = [ { label:'Faible', pts:0 }, { label:'Moyen', pts:3 }, { label:'Bon', pts:7 }, { label:'Excellent', pts:10 } ];
+
+// Pilier CARACTÈRE : management + ancienneté relation bancaire (2 x /10 = /20)
+const CARACTERE_CRITERIA = [
+  { key:'management', label:'Qualité du management', sub:"Compétence, expérience, gouvernance de l'équipe dirigeante" },
+  { key:'anciennete', label:'Ancienneté relation bancaire', sub:"Historique et régularité de la relation avec la banque" },
+];
+// Pilier CONDITIONS : secteur d'activité + qualité de l'information financière (2 x /10 = /20)
+const CONDITIONS_CRITERIA = [
+  { key:'secteur', label:"Secteur d'activité", sub:"Cyclicité, perspectives, niveau de concurrence du secteur" },
+  { key:'transparence', label:"Qualité de l'information financière", sub:"Fiabilité, certification, transparence des états financiers" },
+];
+
+function renderQualPillar(containerId, criteria){
+  let html = '';
+  for (const c of criteria){
+    html += `<div class="score-row">
+      <div class="sl">${escapeHtml(c.label)}<div class="sub">${escapeHtml(c.sub)}</div></div>
+      <select data-qual="${c.key}">
+        <option value="">- à évaluer -</option>
+        ${QUAL_OPTIONS.map(o=>`<option value="${o.pts}">${escapeHtml(o.label)} (${o.pts} pts)</option>`).join('')}
+      </select>
+      <div class="spts" id="qual-pts-${c.key}">-</div>
+    </div>`;
+  }
+  document.getElementById(containerId).innerHTML = html;
+  for (const c of criteria){
+    const sel = document.querySelector(`select[data-qual="${c.key}"]`);
+    if (window._qualScores && window._qualScores[c.key] !== undefined){ sel.value = window._qualScores[c.key]; }
+    sel.addEventListener('change', updateTotalScore);
+  }
+}
+
+function readQualPillarTotal(criteria){
+  window._qualScores = window._qualScores || {};
+  let total = 0, allAnswered = true;
+  for (const c of criteria){
+    const sel = document.querySelector(`select[data-qual="${c.key}"]`);
+    if (!sel) { allAnswered = false; continue; }
+    const val = sel.value;
+    window._qualScores[c.key] = val;
+    const pts = val === '' ? null : parseInt(val,10);
+    const ptsEl = document.getElementById(`qual-pts-${c.key}`);
+    if (ptsEl) ptsEl.textContent = pts===null?'-':`${pts} / 10`;
+    if (pts === null) allAnswered = false; else total += pts;
+  }
+  return { total, allAnswered };
+}
+
+function renderScoring(){
+  if (!window._reviewItems){
+    ['pillar-capacite-body','pillar-capital-body','pillar-caractere-body','pillar-garanties-body','pillar-conditions-body']
+      .forEach(id => document.getElementById(id).innerHTML = `<p style="color:var(--muted);">Complétez d'abord la Notice Financière (Module 1).</p>`);
+    document.getElementById('total-score').textContent = '-';
+    document.getElementById('rating-pill').textContent = '-';
+    return;
+  }
+
+  const v = collectFinancialValues();
+  const { ratios } = computeRatios();
+  const byKey = {}; ratios.forEach(r => byKey[r.key] = r);
+  const { capaciteRemboursement } = computeCAFG(v);
+  const structure = computeStructureFinanciere(v);
+
+  // --- Pilier 1 : CAPACITÉ (automatique) - capacité de remboursement + liquidité ---
+  const capPts = capaciteRemboursement===null ? 0
+    : capaciteRemboursement<=3 ? 20 : capaciteRemboursement<=5 ? 12 : capaciteRemboursement<=7 ? 6 : 0;
+  document.getElementById('pillar-capacite-body').innerHTML = `
+    <div class="score-row"><div class="sl">Dettes financières / CAFG<div class="sub">Repère usuel : ≤ 3-4 ans</div></div><div class="spts">${fmtYears(capaciteRemboursement)}</div></div>
+    <div class="score-row"><div class="sl">Points attribués</div><div class="spts">${capPts} / 20</div></div>`;
+  document.getElementById('pillar-capacite-sub').textContent = `${capPts} / 20`;
+
+  // --- Pilier 2 : CAPITAL (automatique) - autonomie financière + équilibre FR ---
+  const autonomie = byKey['autonomie'] ? byKey['autonomie'].value : null;
+  let capitalPts = autonomie===null ? 0 : autonomie>=0.3 ? 16 : autonomie>=0.15 ? 10 : autonomie>=0.05 ? 4 : 0;
+  if (structure.fr < 0) capitalPts = Math.max(0, capitalPts - 4); // pénalité si FR négatif
+  document.getElementById('pillar-capital-body').innerHTML = `
+    <div class="score-row"><div class="sl">Autonomie financière<div class="sub">Capitaux propres / Total passif</div></div><div class="spts">${autonomie!=null?(autonomie*100).toFixed(1)+'%':'-'}</div></div>
+    <div class="score-row"><div class="sl">Fonds de roulement<div class="sub">${structure.fr>=0?'Positif':'⚠ Négatif - pénalité appliquée'}</div></div><div class="spts">${fmt(structure.fr)}</div></div>
+    <div class="score-row"><div class="sl">Points attribués</div><div class="spts">${capitalPts} / 20</div></div>`;
+  document.getElementById('pillar-capital-sub').textContent = `${capitalPts} / 20`;
+
+  // --- Pilier 3 : CARACTÈRE (manuel) ---
+  renderQualPillar('pillar-caractere-body', CARACTERE_CRITERIA);
+
+  // --- Pilier 4 : GARANTIES (automatique, dépend du Module 4) ---
+  const exposition = window._exposition;
+  const taux = exposition ? exposition.tauxCouverture : null;
+  const garPts = taux===null||taux===undefined ? null
+    : taux>=1.5 ? 20 : taux>=1.0 ? 16 : taux>=0.7 ? 10 : taux>=0.4 ? 5 : 0;
+  document.getElementById('pillar-garanties-body').innerHTML = `
+    <div class="score-row"><div class="sl">Taux de couverture des garanties<div class="sub">Calculé dans le Module 4 - Garanties &amp; Exposition</div></div><div class="spts">${taux!=null?(taux*100).toFixed(0)+'%':'Non renseigné'}</div></div>
+    <div class="score-row"><div class="sl">Points attribués</div><div class="spts">${garPts!=null?garPts+' / 20':'- / 20'}</div></div>`;
+  document.getElementById('pillar-garanties-sub').textContent = garPts!=null ? `${garPts} / 20` : '- / 20';
+
+  // --- Pilier 5 : CONDITIONS (manuel) ---
+  renderQualPillar('pillar-conditions-body', CONDITIONS_CRITERIA);
+
+  window._scorePillarsFixed = { capPts, capitalPts, garPts };
+  updateTotalScore();
+}
+
+function updateTotalScore(){
+  const fixed = window._scorePillarsFixed || {};
+  const caractere = readQualPillarTotal(CARACTERE_CRITERIA);
+  const conditions = readQualPillarTotal(CONDITIONS_CRITERIA);
+  document.getElementById('pillar-caractere-sub').textContent = `${caractere.total} / 20`;
+  document.getElementById('pillar-conditions-sub').textContent = `${conditions.total} / 20`;
+
+  const garPts = fixed.garPts;
+  const allAnswered = caractere.allAnswered && conditions.allAnswered && garPts != null;
+  const total = (fixed.capPts||0) + (fixed.capitalPts||0) + caractere.total + (garPts||0) + conditions.total;
+
+  document.getElementById('total-score').textContent = allAnswered ? total : `${total}*`;
+  const pill = document.getElementById('rating-pill');
+  let rating, bg, color;
+  if (!allAnswered){ rating='Incomplet'; bg='#5a5a5a'; color='#fff'; }
+  else if (total >= 80){ rating='A - Très bon'; bg='#E4F2E9'; color='#1F5C38'; }
+  else if (total >= 65){ rating='B - Bon'; bg='#E4F2E9'; color='#3F7A57'; }
+  else if (total >= 50){ rating='C - Moyen, sous surveillance'; bg='#FBEEDA'; color='#A66F0C'; }
+  else if (total >= 35){ rating='D - Faible, risque élevé'; bg='#FBEAE8'; color='#B3453A'; }
+  else { rating='E - Très faible'; bg='#FBEAE8'; color='#8A241A'; }
+  pill.textContent = rating;
+  pill.style.background = bg; pill.style.color = color;
+
+  window._scoreTotal = allAnswered ? total : null;
+  if (allAnswered) markModuleDone('scoring');
+  window._scoreRating = allAnswered ? rating : null;
+}
+
+/* ============================================================
+   11. MODULE 4 - GARANTIES & EXPOSITION
+   ============================================================ */
+let garantieRows = [];
+let garantieNextId = 0;
+const GARANTIE_TYPES = ['Hypothèque','Nantissement','Caution/Aval','Gage','Dépôt/Nantissement espèces','Autre'];
+
+function addGarantieRow(){
+  garantieRows.push({ id: garantieNextId++, designation:'', type:'Nantissement', valeur:'', quotite:'80' });
+  renderGarantiesTable();
+}
+function removeGarantieRow(id){
+  garantieRows = garantieRows.filter(r=>r.id!==id);
+  if (garantieRows.length === 0) addGarantieRow();
+  else renderGarantiesTable();
+}
+function parseNum(str){
+  if (!str) return 0;
+  const raw = String(str).replace(/[ \u00A0]/g,'').replace(',', '.');
+  const n = parseFloat(raw);
+  return isNaN(n) ? 0 : n;
+}
+function renderGarantiesTable(){
+  const tbody = document.getElementById('garanties-tbody');
+  tbody.innerHTML = garantieRows.map(r => `
+    <tr data-id="${r.id}">
+      <td><input type="text" class="g-designation" value="${escapeHtml(r.designation)}" placeholder="ex: Immeuble titre foncier n°..."></td>
+      <td><select class="g-type">${GARANTIE_TYPES.map(t=>`<option ${r.type===t?'selected':''}>${escapeHtml(t)}</option>`).join('')}</select></td>
+      <td><input type="text" class="g-valeur" value="${escapeHtml(r.valeur)}" placeholder="ex: 30 000 000"></td>
+      <td><input type="text" class="g-quotite" value="${escapeHtml(r.quotite)}" placeholder="80"></td>
+      <td class="g-retenue" style="font-family:'JetBrains Mono',monospace;text-align:right;">-</td>
+      <td><button onclick="removeGarantieRow(${r.id})" style="border:none;background:none;color:var(--muted);cursor:pointer;font-size:1.1rem;">×</button></td>
+    </tr>`).join('');
+  tbody.querySelectorAll('tr').forEach(tr => {
+    const id = parseInt(tr.dataset.id,10);
+    tr.querySelectorAll('input,select').forEach(el => el.addEventListener('input', () => syncGarantieRow(id, tr)));
+  });
+  computeExposition();
+}
+function syncGarantieRow(id, tr){
+  const row = garantieRows.find(r=>r.id===id);
+  if (!row) return;
+  row.designation = tr.querySelector('.g-designation').value;
+  row.type = tr.querySelector('.g-type').value;
+  row.valeur = tr.querySelector('.g-valeur').value;
+  row.quotite = tr.querySelector('.g-quotite').value;
+  computeExposition();
+}
+function computeExposition(){
+  let totalRetenu = 0;
+  document.querySelectorAll('#garanties-tbody tr').forEach(tr => {
+    const id = parseInt(tr.dataset.id,10);
+    const row = garantieRows.find(r=>r.id===id);
+    if (!row) return;
+    const valeur = parseNum(row.valeur), quotite = parseNum(row.quotite);
+    const retenue = valeur * (quotite/100);
+    totalRetenu += retenue;
+    const cell = tr.querySelector('.g-retenue');
+    if (cell) cell.textContent = fmt(retenue);
+  });
+
+  const montant = parseNum(document.getElementById('g-montant').value);
+  const encours = parseNum(document.getElementById('g-encours').value);
+  const limite = parseNum(document.getElementById('g-limite').value);
+  const dureeMois = parseNum(document.getElementById('g-duree').value);
+  const encoursApres = encours + montant;
+  const depassement = limite > 0 ? encoursApres - limite : 0;
+  const tauxCouverture = montant > 0 ? totalRetenu / montant : null;
+
+  // Indicateur de service de la dette (DSCR simplifié) : annuité linéaire hors intérêts,
+  // rapportée à la CAFG estimée du Module 2. Approximation - à affiner avec un vrai
+  // tableau d'amortissement une fois le taux et la périodicité négociés.
+  let dscr = null, annuiteEstimee = null;
+  if (window._reviewItems && dureeMois > 0 && montant > 0){
+    const v = collectFinancialValues();
+    const { cafg } = computeCAFG(v);
+    annuiteEstimee = montant / (dureeMois/12);
+    dscr = annuiteEstimee > 0 ? cafg / annuiteEstimee : null;
+  }
+
+  window._exposition = { montant, encours, limite, encoursApres, depassement, totalRetenu, tauxCouverture, dscr, annuiteEstimee };
+  if (montant > 0) markModuleDone('garanties');
+
+  const kpis = document.getElementById('exposition-kpis');
+  const covCls = tauxCouverture===null ? 'n' : (tauxCouverture>=1 ? 'g' : tauxCouverture>=0.5 ? 'o' : 'r');
+  const depCls = limite===0 ? 'n' : (depassement>0 ? 'r' : 'g');
+  const dscrCls = dscr===null ? 'n' : (dscr>=1.5 ? 'g' : dscr>=1.2 ? 'o' : 'r');
+  kpis.innerHTML = `
+    <div class="ratio-card"><div class="rl">Total garanties retenues</div><div class="rv">${fmt(totalRetenu)}</div></div>
+    <div class="ratio-card"><div class="rl">Taux de couverture</div><div class="rv ${covCls}">${tauxCouverture===null?'-':(tauxCouverture*100).toFixed(0)+'%'}</div></div>
+    <div class="ratio-card"><div class="rl">Encours après octroi</div><div class="rv">${fmt(encoursApres)}</div></div>
+    <div class="ratio-card"><div class="rl">${depassement>0?'Dépassement de limite':'Marge sous limite'}</div><div class="rv ${depCls}">${fmt(Math.abs(depassement))}</div></div>
+    <div class="ratio-card"><div class="rl">Service de la dette (CAFG / annuité)</div><div class="rv ${dscrCls}">${dscr===null?'-':dscr.toFixed(2)+'x'}</div><div class="rf">${annuiteEstimee!=null?'Annuité estimée (linéaire, hors intérêts) : '+fmt(annuiteEstimee):"Renseignez la durée pour l'estimer"}</div></div>
+  `;
+}
+function renderGaranties(){
+  if (garantieRows.length === 0) addGarantieRow();
+  else renderGarantiesTable();
+  ['g-montant','g-encours','g-limite','g-duree'].forEach(id => {
+    const el = document.getElementById(id);
+    el.removeEventListener('input', computeExposition);
+    el.addEventListener('input', computeExposition);
+  });
+}
+document.getElementById('btn-add-garantie').addEventListener('click', addGarantieRow);
+
+/* ============================================================
+   12. MODULE 5 - DÉCISION FINALE
+   ============================================================ */
+function renderDecision(){
+  const grid = document.getElementById('synthese-grid');
+  if (!window._reviewItems){
+    grid.innerHTML = `<p style="color:var(--muted);">Complétez d'abord les modules précédents.</p>`;
+    document.getElementById('decision-banner').innerHTML = '';
+    document.getElementById('decision-banner').className = 'decision-banner';
+    return;
+  }
+  let nfStatus = 'n', nfLabel = 'Non vérifiée';
+  const crosscheckItems = window._reviewItems.filter(it=>it.kind==='crosscheck' && it.validation);
+  if (crosscheckItems.length){
+    const mismatches = crosscheckItems.filter(it =>
+      (it.validation.N && it.validation.N.status==='mismatch') || (it.validation.N1 && it.validation.N1.status==='mismatch'));
+    nfStatus = mismatches.length ? 'r' : 'g';
+    nfLabel = mismatches.length ? `${mismatches.length} écart(s) détecté(s)` : 'Cohérente';
+  }
+
+  const v = collectFinancialValues();
+  const { capaciteRemboursement } = computeCAFG(v);
+  const structure = computeStructureFinanciere(v);
+  const score = window._scoreTotal;
+  const rating = window._scoreRating;
+  const exposition = window._exposition || {};
+  const tauxCouverture = exposition.tauxCouverture;
+  const depassement = exposition.depassement || 0;
+  const dscr = exposition.dscr;
+  const doc = computePreanalyseStatus();
+
+  grid.innerHTML = `
+    <div class="synthese-card"><div class="sl">Notice financière</div><div class="sv" style="color:${nfStatus==='g'?'var(--ok)':nfStatus==='r'?'var(--err)':'var(--muted)'}">${escapeHtml(nfLabel)}</div></div>
+    <div class="synthese-card"><div class="sl">Dossier documentaire</div><div class="sv" style="color:${doc.complete?'var(--ok)':'var(--err)'}">${doc.complete?'Complet':doc.missing.length+' pièce(s) manquante(s)'}</div></div>
+    <div class="synthese-card"><div class="sl">Équilibre financier (FR)</div><div class="sv" style="color:${structure.fr>=0?'var(--ok)':'var(--err)'}">${structure.fr>=0?'Positif':'Négatif'} (${fmt(structure.fr)})</div></div>
+    <div class="synthese-card"><div class="sl">Capacité de remboursement</div><div class="sv">${fmtYears(capaciteRemboursement)}</div></div>
+    <div class="synthese-card"><div class="sl">Note de scoring (5C)</div><div class="sv">${score!=null?score+' / 100':'Non renseigné'}</div></div>
+    <div class="synthese-card"><div class="sl">Classe de risque</div><div class="sv">${escapeHtml(rating||'-')}</div></div>
+    <div class="synthese-card"><div class="sl">Couverture garanties</div><div class="sv">${tauxCouverture!=null?(tauxCouverture*100).toFixed(0)+'%':'Non renseigné'}</div></div>
+    <div class="synthese-card"><div class="sl">Service de la dette (DSCR)</div><div class="sv">${dscr!=null?dscr.toFixed(2)+'x':'Non renseigné'}</div></div>
+    <div class="synthese-card"><div class="sl">Exposition vs limite</div><div class="sv" style="color:${depassement>0?'var(--err)':'var(--ok)'}">${depassement>0?'Dépassement de '+fmt(depassement):'Dans la limite'}</div></div>
+  `;
+
+  let cls, title, detail;
+  const scoreOk = score != null && score >= 65;
+  const scoreCond = score != null && score >= 50 && score < 65;
+  const covOk = tauxCouverture != null && tauxCouverture >= 1;
+  const covCond = tauxCouverture != null && tauxCouverture >= 0.5;
+  const noOverrun = depassement <= 0;
+  const dscrOk = dscr == null || dscr >= 1.5;    // null = non structuré, on ne pénalise pas
+  const dscrCond = dscr == null || dscr >= 1.2;
+  const frOk = structure.fr >= 0;
+
+  if (!doc.complete){
+    cls='def'; title='Recommandation indicative : Dossier incomplet';
+    detail=`${doc.missing.length} pièce(s) obligatoire(s) manquante(s) en pré-analyse documentaire (Module 2) : ${doc.missing.map(m=>m.label).join(', ')}. Un dossier de crédit ne peut être recommandé favorablement avant complétude du KYC/documentaire, indépendamment des résultats financiers.`;
+  } else if (score == null || tauxCouverture == null){
+    cls='cond'; title='Analyse incomplète';
+    detail="Complétez le scoring (Module 4) et l'exposition/garanties (Module 5) pour obtenir une recommandation indicative.";
+  } else if (scoreOk && covOk && noOverrun && nfStatus!=='r' && dscrOk && frOk){
+    cls='fav'; title='Recommandation indicative : Favorable';
+    detail="Le dossier documentaire est complet, le profil financier (équilibre FR/BFR, capacité de remboursement), le score 5C, la couverture des garanties et le service de la dette sont satisfaisants au regard des seuils indicatifs. Décision finale à confirmer par l'analyste/le comité de crédit.";
+  } else if ((scoreOk||scoreCond) && (covOk||covCond) && nfStatus!=='r' && dscrCond){
+    cls='cond'; title='Recommandation indicative : Favorable sous conditions';
+    detail="Certains critères sont en zone intermédiaire ou d'attention (score, couverture des garanties, service de la dette, équilibre financier). Un renforcement des garanties, une restructuration de l'échéancier ou des conditions particulières peuvent être envisagés.";
+  } else {
+    cls='def'; title='Recommandation indicative : Défavorable';
+    detail="Le score, la couverture des garanties, le service de la dette, l'équilibre financier ou la cohérence de la NF ne sont pas satisfaisants au regard des seuils indicatifs.";
+  }
+  const banner = document.getElementById('decision-banner');
+  banner.className = 'decision-banner ' + cls;
+  banner.innerHTML = `<div class="dt">${escapeHtml(title)}</div><div class="dd">${escapeHtml(detail)}</div>`;
+}
+
+document.getElementById('btn-generate-synthese').addEventListener('click', () => {
+  markModuleDone('decision');
+  renderDecision();
+  const decisionSel = document.getElementById('d-decision');
+  const decisionLabel = decisionSel.options[decisionSel.selectedIndex].text;
+  const analyste = document.getElementById('d-analyste').value;
+  const commentaire = document.getElementById('d-commentaire').value;
+  const exposition = window._exposition || {};
+  const now = new Date();
+  const bannerEl = document.getElementById('decision-banner');
+  const bannerCls = bannerEl.className.replace('decision-banner','').trim();
+
+  const raisonSociale = document.getElementById('d-raison-sociale').value;
+  const formeJuridique = document.getElementById('d-forme-juridique').value;
+  const secteur = document.getElementById('d-secteur').value;
+  const ancienneteEntreprise = document.getElementById('d-anciennete-entreprise').value;
+  const forces = document.getElementById('d-forces').value;
+  const faiblesses = document.getElementById('d-faiblesses').value;
+  const opportunites = document.getElementById('d-opportunites').value;
+  const menaces = document.getElementById('d-menaces').value;
+
+  const typeConcours = document.getElementById('g-type-concours').value;
+  const objet = document.getElementById('g-objet').value;
+  const duree = document.getElementById('g-duree').value;
+  const tauxIndicatif = document.getElementById('g-taux').value;
+  const periodicite = document.getElementById('g-periodicite').value;
+
+  const v = collectFinancialValues();
+  const structure = window._lastStructure || computeStructureFinanciere(v);
+  const cafgData = window._lastCAFG || computeCAFG(v);
+  const cycles = window._lastCycles || computeCycles(v);
+  const evolution = window._lastEvolution || computeEvolution();
+
+  const ratiosHtml = (window._lastRatios||[]).map(r => {
+    const display = r.value === null ? '-' : (r.fmtType==='pct' ? (r.value*100).toFixed(1)+'%' : r.value.toFixed(2));
+    return `<tr><td>${escapeHtml(r.label)}</td><td>${display}</td><td>${escapeHtml(r.category||'')}</td></tr>`;
+  }).join('');
+
+  const evolutionHtml = evolution.map(e =>
+    `<tr><td>${escapeHtml(e.label)}</td><td>${e.n1!=null?fmt(e.n1):'-'}</td><td>${e.n!=null?fmt(e.n):'-'}</td><td>${e.growth!=null?(e.growth*100).toFixed(1)+'%':'-'}</td></tr>`
+  ).join('');
+
+  const docStatus = computePreanalyseStatus();
+  const investmentDossier = isInvestmentDossier();
+  const preanalyseHtml = PREANALYSE_CHECKLIST.filter(i => !i.investmentOnly || investmentDossier).map(item => {
+    const state = window._preanalyse[item.key] || { status:'' };
+    const stale = state.status==='fourni' && docIsStale(item, state.date);
+    const label = stale ? 'Périmé' : state.status==='fourni' ? 'Fourni' : state.status==='na' ? 'Non applicable' : state.status==='manquant' ? 'Manquant' : 'Non renseigné';
+    return `<tr><td>${escapeHtml(item.label)}${item.mandatory?' *':''}</td><td>${escapeHtml(item.category)}</td><td>${label}</td></tr>`;
+  }).join('');
+
+  const garantiesHtml = garantieRows.map(r => {
+    const valeur = parseNum(r.valeur), quotite = parseNum(r.quotite);
+    return `<tr><td>${escapeHtml(r.designation||'-')}</td><td>${escapeHtml(r.type)}</td><td>${fmt(valeur)}</td><td>${quotite}%</td><td>${fmt(valeur*(quotite/100))}</td></tr>`;
+  }).join('');
+
+  const swotBlock = (label, text) => `<div style="flex:1;min-width:180px;"><b>${escapeHtml(label)}</b><p style="white-space:pre-wrap;font-size:0.85rem;">${escapeHtml(text||'-')}</p></div>`;
+
+  const html = `<!DOCTYPE html><html lang="fr"><head><meta charset="UTF-8"><title>Mémo de crédit - ${escapeHtml(raisonSociale||'Dossier')}</title>
+<style>
+body{font-family:Arial,sans-serif;max-width:900px;margin:40px auto;color:#181414;}
+h1{font-size:1.4rem;border-bottom:3px solid #E9041E;padding-bottom:8px;}
+h2{font-size:1.05rem;margin-top:28px;border-left:4px solid #E9041E;padding-left:10px;}
+h3{font-size:0.92rem;margin-top:16px;color:#4A4544;}
+table{width:100%;border-collapse:collapse;margin-top:10px;font-size:0.88rem;}
+td,th{border:1px solid #ddd;padding:6px 10px;text-align:left;}
+.banner{padding:16px;border-radius:6px;margin-top:14px;}
+.fav{background:#E4F2E9;border:1px solid #3F7A57;} .cond{background:#FBEEDA;border:1px solid #A66F0C;} .def{background:#FBEAE8;border:1px solid #B3453A;}
+.muted{color:#8A8583;font-size:0.8rem;}
+.swot{display:flex;flex-wrap:wrap;gap:16px;margin-top:10px;}
+.kpirow{display:flex;flex-wrap:wrap;gap:10px;margin-top:10px;}
+.kpi{flex:1;min-width:140px;border:1px solid #ddd;border-radius:6px;padding:10px;}
+.kpi .l{font-size:0.68rem;text-transform:uppercase;color:#8A8583;} .kpi .v{font-size:1.1rem;font-weight:700;}
+</style></head><body>
+<h1>Mémo de crédit - ${escapeHtml(raisonSociale||'Dossier sans nom')}</h1>
+<p class="muted">Généré le ${now.toLocaleDateString('fr-FR')} à ${now.toLocaleTimeString('fr-FR')} - Direction DCE / COO - © DMEC, Pôle Business Intelligence et Stratégie Client</p>
+<p class="muted"><b>⚠ Grilles de ratios et de scoring indicatives - non calibrées sur la méthodologie officielle de la banque. Analyse à valider par un analyste crédit habilité avant toute décision engageante.</b></p>
+
+<h2>1. Identification</h2>
+<table>
+<tr><td style="width:220px;">Raison sociale</td><td>${escapeHtml(raisonSociale||'-')}</td></tr>
+<tr><td>Forme juridique</td><td>${escapeHtml(formeJuridique||'-')}</td></tr>
+<tr><td>Secteur d'activité</td><td>${escapeHtml(secteur||'-')}</td></tr>
+<tr><td>Ancienneté de l'entreprise</td><td>${escapeHtml(ancienneteEntreprise||'-')} an(s)</td></tr>
+</table>
+
+<h2>2. Pré-analyse documentaire</h2>
+<p>Complétude des pièces obligatoires : <b>${docStatus.completionPct}%</b> (${docStatus.mandatoryProvided} / ${docStatus.totalMandatory}) - Statut global : <b style="color:${docStatus.complete?'#3F7A57':'#B3453A'};">${docStatus.complete?'Dossier complet':'Dossier incomplet'}</b></p>
+<table><tr><th>Pièce</th><th>Catégorie</th><th>Statut</th></tr>${preanalyseHtml || '<tr><td colspan="3">Aucune pièce évaluée</td></tr>'}</table>
+
+<h2>3. Équilibre financier</h2>
+<div class="kpirow">
+  <div class="kpi"><div class="l">Fonds de roulement</div><div class="v">${fmt(structure.fr)}</div></div>
+  <div class="kpi"><div class="l">Besoin en fonds de roulement</div><div class="v">${fmt(structure.bfr)}</div></div>
+  <div class="kpi"><div class="l">Trésorerie nette</div><div class="v">${fmt(structure.tresorerieNetteDirecte)}</div></div>
+</div>
+${!structure.coherent ? `<p class="muted" style="color:#B3453A;">⚠ Écart de cohérence détecté entre les deux méthodes de calcul de la trésorerie nette (${fmt(structure.ecart)}) - vérifier les postes de la Notice Financière.</p>` : ''}
+
+<h3>Capacité de remboursement</h3>
+<div class="kpirow">
+  <div class="kpi"><div class="l">CAFG estimée</div><div class="v">${fmt(cafgData.cafg)}</div></div>
+  <div class="kpi"><div class="l">Dettes financières / CAFG</div><div class="v">${cafgData.capaciteRemboursement!=null?cafgData.capaciteRemboursement.toFixed(1)+' an(s)':'-'}</div></div>
+  <div class="kpi"><div class="l">Service de la dette (DSCR)</div><div class="v">${exposition.dscr!=null?exposition.dscr.toFixed(2)+'x':'-'}</div></div>
+</div>
+
+<h3>Cycle d'exploitation</h3>
+<div class="kpirow">
+  <div class="kpi"><div class="l">Délai clients (DSO)</div><div class="v">${cycles.dso!=null?Math.round(cycles.dso)+' j':'-'}</div></div>
+  <div class="kpi"><div class="l">Délai fournisseurs (DPO)</div><div class="v">${cycles.dpo!=null?Math.round(cycles.dpo)+' j':'-'}</div></div>
+  <div class="kpi"><div class="l">Rotation stocks (DIO)</div><div class="v">${cycles.dio!=null?Math.round(cycles.dio)+' j':'-'}</div></div>
+  <div class="kpi"><div class="l">Cycle net</div><div class="v">${cycles.cycleNet!=null?Math.round(cycles.cycleNet)+' j':'-'}</div></div>
+</div>
+
+<h3>Évolution N / N-1</h3>
+<table><tr><th>Agrégat</th><th>N-1</th><th>N</th><th>Évolution</th></tr>${evolutionHtml}</table>
+
+<h3>Ratios détaillés</h3>
+<table><tr><th>Ratio</th><th>Valeur</th><th>Catégorie</th></tr>${ratiosHtml || '<tr><td colspan="3">Non calculée</td></tr>'}</table>
+
+<h2>4. Scoring crédit - les 5C</h2>
+<p>Note globale : <b>${window._scoreTotal!=null?window._scoreTotal+' / 100':'Non renseignée'}</b> - Classe : <b>${escapeHtml(window._scoreRating||'-')}</b></p>
+<table><tr><th>Pilier</th><th>Points</th></tr>
+<tr><td>1. Capacité (remboursement)</td><td>${document.getElementById('pillar-capacite-sub').textContent}</td></tr>
+<tr><td>2. Capital (structure financière)</td><td>${document.getElementById('pillar-capital-sub').textContent}</td></tr>
+<tr><td>3. Caractère (management)</td><td>${document.getElementById('pillar-caractere-sub').textContent}</td></tr>
+<tr><td>4. Garanties</td><td>${document.getElementById('pillar-garanties-sub').textContent}</td></tr>
+<tr><td>5. Conditions (secteur)</td><td>${document.getElementById('pillar-conditions-sub').textContent}</td></tr>
+</table>
+
+<h2>5. Structuration &amp; garanties</h2>
+<table>
+<tr><td style="width:220px;">Type de concours</td><td>${escapeHtml(typeConcours||'-')}</td></tr>
+<tr><td>Objet du financement</td><td>${escapeHtml(objet||'-')}</td></tr>
+<tr><td>Durée sollicitée</td><td>${escapeHtml(duree||'-')} mois</td></tr>
+<tr><td>Taux d'intérêt indicatif</td><td>${escapeHtml(tauxIndicatif||'-')} %</td></tr>
+<tr><td>Périodicité de remboursement</td><td>${escapeHtml(periodicite||'-')}</td></tr>
+<tr><td>Montant sollicité</td><td>${fmt(exposition.montant)}</td></tr>
+<tr><td>Encours existant</td><td>${fmt(exposition.encours)}</td></tr>
+<tr><td>Encours après octroi</td><td>${fmt(exposition.encoursApres)}</td></tr>
+<tr><td>Limite interne</td><td>${fmt(exposition.limite)}</td></tr>
+<tr><td>Taux de couverture des garanties</td><td>${exposition.tauxCouverture!=null?(exposition.tauxCouverture*100).toFixed(0)+'%':'-'}</td></tr>
+</table>
+<table style="margin-top:10px;"><tr><th>Garantie</th><th>Type</th><th>Valeur estimée</th><th>Quotité</th><th>Valeur retenue</th></tr>${garantiesHtml || '<tr><td colspan="5">Aucune garantie renseignée</td></tr>'}</table>
+
+<h2>6. Facteurs de risque (SWOT)</h2>
+<div class="swot">
+  ${swotBlock('Forces', forces)}
+  ${swotBlock('Faiblesses', faiblesses)}
+  ${swotBlock('Opportunités', opportunites)}
+  ${swotBlock('Menaces', menaces)}
+</div>
+
+<h2>7. Décision</h2>
+<div class="banner ${bannerCls}">${bannerEl.innerHTML}</div>
+<table style="margin-top:14px;">
+<tr><td style="width:220px;">Décision retenue</td><td><b>${escapeHtml(decisionLabel)}</b></td></tr>
+<tr><td>Analyste / Décideur</td><td>${escapeHtml(analyste||'-')}</td></tr>
+</table>
+<p style="margin-top:10px;"><b>Commentaire / conditions particulières :</b><br>${escapeHtml(commentaire||'-').replace(/\n/g,'<br>')}</p>
+
+<p class="muted" style="margin-top:30px;">Document généré automatiquement par l'Assistant Notice Financière - analyse financière, scoring et recommandation indicatifs, à valider selon la méthodologie officielle de la banque avant toute décision engageante.</p>
+</body></html>`;
+
+  const blob = new Blob([html], { type:'text/html' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `memo_credit_${(raisonSociale||'dossier').replace(/[^a-z0-9]+/gi,'_').toLowerCase()}_${now.toISOString().slice(0,10)}.html`;
+  document.body.appendChild(a); a.click(); document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+});
+
+/* ============================================================
+   13. ASSISTANT LOCAL — CHAT SUR LES DOCUMENTS CHARGÉS
+   100% local : aucune requête réseau, recherche uniquement dans
+   les données déjà extraites en mémoire par l'application.
+   ============================================================ */
+
+// Termes courants -> code SYSCOHADA. Trié par longueur décroissante à l'usage
+// (voir findByKeyword) pour matcher les expressions les plus spécifiques d'abord.
+const CHAT_KEYWORDS = [
+  { terms:['chiffre d\'affaires', 'ca ht', 'ventes'], code:'XB' },
+  { terms:['resultat net', 'bénéfice net', 'benefice net', 'perte nette'], code:'XI' },
+  { terms:['resultat d\'exploitation', 'resultat exploitation'], code:'XE' },
+  { terms:['resultat financier'], code:'XF' },
+  { terms:['resultat hors activites ordinaires', 'resultat hao'], code:'XH' },
+  { terms:['valeur ajoutee'], code:'XC' },
+  { terms:['excedent brut d\'exploitation', 'ebe'], code:'XD' },
+  { terms:['total actif', 'total bilan actif', 'actif total'], code:'BZ' },
+  { terms:['total passif', 'passif total'], code:'DZ' },
+  { terms:['total actif immobilise', 'immobilisations'], code:'AZ' },
+  { terms:['actif circulant'], code:'BK' },
+  { terms:['tresorerie actif'], code:'BT' },
+  { terms:['tresorerie passif'], code:'DT' },
+  { terms:['capitaux propres'], code:'CP' },
+  { terms:['dettes financieres'], code:'DD' },
+  { terms:['passif circulant'], code:'DP' },
+  { terms:['stocks'], code:'BB' },
+  { terms:['clients'], code:'BI' },
+  { terms:['fournisseurs'], code:'DJ' },
+  { terms:['charges de personnel', 'masse salariale'], code:'RK' },
+  { terms:['capital social', 'capital'], code:'CA' },
+  { terms:['banques', 'disponibilites', 'caisse'], code:'BS' },
+];
+
+function normalizeQuery(s){
+  return s.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').trim();
+}
+
+// Cherche une valeur détectée pour un code donné dans les items de la revue NF (si
+// disponible) ou, à défaut, directement dans les codes bruts détectés à l'extraction.
+// Mots vides français : ignorés lors de la comparaison mot-à-mot, pour ne garder que les
+// termes significatifs d'une question (évite que "le", "de", "est"... ne faussent le score).
+const STOPWORDS_FR = new Set(['le','la','les','un','une','des','du','de','et','ou','est','es','ce',
+  'qui','que','quoi','quel','quelle','quels','quelles','combien','comment','pour','dans','sur',
+  'avec','sans','au','aux','se','sa','son','ses','mon','ma','mes','ton','ta','tes','notre','nos',
+  'votre','vos','leur','leurs','il','elle','ils','elles','je','tu','nous','vous','y','en','ne',
+  'pas','plus','moins','si','mais','donc','or','ni','car','cette','ces','cet','dois','peux',
+  'peut','svp','stp','merci','bonjour','salut','question','sais','connais','faut','faudrait']);
+
+function normalizeWords(s){
+  return normalizeQuery(s).replace(/[^a-z0-9\s]/g,' ').split(/\s+/).filter(w => w.length>=3 && !STOPWORDS_FR.has(w));
+}
+
+// Index construit une seule fois : mots significatifs de CHAQUE libellé de code SYSCOHADA
+// (les 108 entrées de CODES), pour permettre une recherche libre bien plus large que les
+// seuls mots-clés prédéfinis de CHAT_KEYWORDS.
+let _codeLabelIndex = null;
+function getCodeLabelIndex(){
+  if (_codeLabelIndex) return _codeLabelIndex;
+  _codeLabelIndex = Object.keys(CODES).map(code => ({ code, words: normalizeWords(CODES[code].label) }));
+  return _codeLabelIndex;
+}
+
+function findCodesByFreeText(q){
+  const qWords = normalizeWords(q);
+  if (qWords.length === 0) return [];
+  const scored = getCodeLabelIndex().map(entry => {
+    const score = qWords.reduce((s,w) => s + (entry.words.some(ew => ew===w || ew.startsWith(w) || w.startsWith(ew)) ? 1 : 0), 0);
+    return { code: entry.code, score };
+  }).filter(e => e.score > 0).sort((a,b) => b.score - a.score);
+  return scored;
+}
+
+function findRatioByFreeText(q){
+  if (!window._lastRatios) return null;
+  const qWords = normalizeWords(q);
+  let best = null, bestScore = 0;
+  for (const r of window._lastRatios){
+    const rWords = normalizeWords(r.label);
+    const score = qWords.reduce((s,w) => s + (rWords.some(rw => rw===w || rw.startsWith(w) || w.startsWith(rw)) ? 1 : 0), 0);
+    if (score > bestScore){ bestScore = score; best = r; }
+  }
+  return bestScore > 0 ? best : null;
+}
+
+function lookupCodeValue(code){
+  if (window._reviewItems){
+    const it = window._reviewItems.find(i => i.code === code);
+    if (it){
+      if (it.kind === 'crosscheck') return { n: it.detectedN, n1: it.detectedN1, label: it.rowLabel||it.label, source: it.source };
+      if (it.fields){
+        const fN = it.fields.find(f => f.key==='valueN' || f.key==='netN' || f.key==='brutN');
+        const fN1 = it.fields.find(f => f.key==='valueN1');
+        return { n: fN ? fN.detected : null, n1: fN1 ? fN1.detected : null, label: it.rowLabel||it.label, source: it.source };
+      }
+    }
+  }
+  if (extraction && extraction.byCode && extraction.byCode.has(code)){
+    const det = extraction.byCode.get(code);
+    const amounts = toAmounts(code, det.values);
+    const n = amounts.netN!==undefined ? amounts.netN : amounts.valueN;
+    const n1 = amounts.netN1!==undefined ? amounts.netN1 : amounts.valueN1;
+    return { n, n1, label: CODES[code].label, source: det.source };
+  }
+  return null;
+}
+
+function findByKeyword(query){
+  const sorted = [...CHAT_KEYWORDS].sort((a,b) => Math.max(...b.terms.map(t=>t.length)) - Math.max(...a.terms.map(t=>t.length)));
+  for (const entry of sorted){
+    for (const term of entry.terms){
+      if (query.includes(normalizeQuery(term))) return entry.code;
+    }
+  }
+  return null;
+}
+
+function answerQuestion(raw){
+  const q = normalizeQuery(raw);
+
+  if (!extraction || !extraction.byCode || extraction.byCode.size === 0){
+    return { text:"Aucun document analysé pour l'instant. Chargez et analysez vos fichiers dans le Module 1 (Notice Financière) avant de poser une question." };
+  }
+
+  // 1) Code SYSCOHADA explicite (ex: "BI", "code XI", "c'est quoi CA ?")
+  // On exige des majuscules TELLES QUE TAPÉES par l'utilisateur (pas de mise en capitale
+  // automatique) : sinon des mots français courants comme "ce", "tu", "si" seraient confondus
+  // avec de vrais codes SYSCOHADA (CE, TU n'existe pas mais CA, CE, CB... si).
+  const codeMatch = raw.match(/\b([A-Z]{2})\b/);
+  if (codeMatch && CODES[codeMatch[1]]){
+    const code = codeMatch[1];
+    const val = lookupCodeValue(code);
+    if (val && (val.n!=null || val.n1!=null)){
+      return { text:`${code} - ${CODES[code].label}\nN : ${val.n!=null?fmt(val.n):'non détecté'}\nN-1 : ${val.n1!=null?fmt(val.n1):'non détecté'}`,
+        source: val.source };
+    }
+    return { text:`${code} - ${CODES[code].label}\nCe code n'a pas été détecté avec une valeur dans les documents chargés.` };
+  }
+
+  // 2) Question sur la cohérence / les anomalies du dossier
+  if (/equilibr|coherenc|anomalie|erreur|ecart|incoherenc/.test(q)){
+    const parts = [];
+    if (window._reviewItems){
+      const crosschecks = window._reviewItems.filter(it=>it.kind==='crosscheck' && it.validation);
+      const mismatches = crosschecks.filter(it => (it.validation.N&&it.validation.N.status==='mismatch') || (it.validation.N1&&it.validation.N1.status==='mismatch'));
+      parts.push(mismatches.length
+        ? `⚠ ${mismatches.length} écart(s) de cohérence détecté(s) sur : ${mismatches.map(m=>m.code).join(', ')}.`
+        : '✓ Aucun écart détecté sur les totaux de contrôle vérifiés.');
+    }
+    if (suspiciousLines && suspiciousLines.length){
+      parts.push(`⚠ ${suspiciousLines.length} ligne(s) avec un code non reconnu, à vérifier manuellement.`);
+    }
+    return { text: parts.join('\n') || "Aucune information de validation disponible pour l'instant." };
+  }
+
+  // 3) Question sur les documents chargés eux-mêmes
+  if (/combien de (document|fichier|page)|quels (document|fichier)|liste des (document|fichier)/.test(q)){
+    const list = docsQueue.map(d => `- ${d.file.name} (${d.status})`).join('\n');
+    return { text: `${docsQueue.length} document(s) chargé(s) :\n${list || 'aucun'}` };
+  }
+
+  // 4) Liste de tous les codes détectés (question très ouverte)
+  if (/tous les codes|tout ce qui a ete detecte|liste des codes|liste complete/.test(q)){
+    const codes = [...extraction.byCode.keys()].sort();
+    return { text: `${codes.length} code(s) détecté(s) au total :\n${codes.join(', ')}\n\nDemandez-moi le détail de l'un d'entre eux (ex : "${codes[0]}").` };
+  }
+
+  // 5) Question sur un ratio déjà calculé (Module 3 - Analyse financière)
+  if (/ratio|rentabilit|endettement|liquidit|solvabilit|marge|besoin en fonds|fonds de roulement|\bbfr\b|\bfr\b|cafg|autofinancement|cycle d.exploitation|\bdso\b|\bdpo\b|\bdio\b|tresorerie nette/.test(q)){
+    if (window._lastRatios){
+      const r = findRatioByFreeText(q);
+      if (r){
+        const display = r.value === null ? '—' : (r.fmtType==='pct' ? (r.value*100).toFixed(1)+'%' : r.value.toFixed(2));
+        return { text:`${r.label}\nValeur : ${display}\nFormule : ${r.formula}` };
+      }
+    } else {
+      return { text:"Les ratios ne sont pas encore calculés. Ouvrez le Module 3 (Analyse financière) pour les générer, puis reposez-moi la question." };
+    }
+  }
+
+  // 6) Terme financier courant -> code correspondant (expressions les plus fréquentes)
+  const kwCode = findByKeyword(q);
+  if (kwCode){
+    const val = lookupCodeValue(kwCode);
+    if (val && (val.n!=null || val.n1!=null)){
+      return { text:`${CODES[kwCode].label} (${kwCode})\nN : ${val.n!=null?fmt(val.n):'non détecté'}\nN-1 : ${val.n1!=null?fmt(val.n1):'non détecté'}`,
+        source: val.source };
+    }
+    // Pas de valeur détectée pour ce code : on continue plutôt que de s'arrêter net.
+  }
+
+  // 7) Recherche large sur TOUS les libellés de codes SYSCOHADA (108 entrées), pas seulement
+  // les mots-clés prédéfinis — capte des formulations libres qui recoupent le libellé officiel.
+  // Seuil de 2 mots correspondants minimum (sauf question à un seul mot significatif) pour
+  // éviter les faux positifs du type "totalement" ~ "Total..." sur un seul mot coïncident.
+  const qWordCount = normalizeWords(q).length;
+  const minScore = qWordCount <= 1 ? 1 : 2;
+  const candidates = findCodesByFreeText(q).filter(c => c.score >= minScore && extraction.byCode.has(c.code));
+  if (candidates.length){
+    const top = candidates.slice(0, 3);
+    const blocks = top.map(c => {
+      const val = lookupCodeValue(c.code);
+      const valTxt = val && (val.n!=null||val.n1!=null) ? `N : ${val.n!=null?fmt(val.n):'—'} | N-1 : ${val.n1!=null?fmt(val.n1):'—'}` : 'valeur non détectée';
+      return `${c.code} - ${CODES[c.code].label}\n${valTxt}`;
+    });
+    return { text: blocks.join('\n\n') };
+  }
+
+  // 8) Recherche plein texte dans les lignes brutes extraites (dernier repli)
+  if (window._allExtractedLines && window._allExtractedLines.length){
+    const words = normalizeWords(q);
+    const scored = window._allExtractedLines.map(l => {
+      const lineWords = normalizeWords(l.text);
+      const score = words.reduce((s,w) => s + (lineWords.some(lw => lw===w || lw.startsWith(w) || w.startsWith(lw)) ? 1 : 0), 0);
+      return { ...l, score };
+    }).filter(l => l.score > 0).sort((a,b) => b.score - a.score).slice(0,6);
+    if (scored.length){
+      const text = scored.map(l => `• ${l.text.replace(/\t/g,'  ')} (${l.source})`).join('\n');
+      return { text:`Voici ce que j'ai trouvé dans les documents :\n${text}` };
+    }
+  }
+
+  return { text:"Je n'ai pas trouvé d'information correspondante dans les documents analysés. Essayez avec un code SYSCOHADA (ex: \"BI\"), un terme comme \"chiffre d'affaires\", \"résultat net\" ou \"liquidité\", ou demandez \"liste des codes\" pour voir tout ce qui a été détecté." };
+}
+
+/* ---- Interface du chat ---- */
+const chatToggle = document.getElementById('chat-toggle');
+const chatPanel = document.getElementById('chat-panel');
+const chatClose = document.getElementById('chat-close');
+const chatMessages = document.getElementById('chat-messages');
+const chatForm = document.getElementById('chat-form');
+const chatInput = document.getElementById('chat-input');
+const chatSuggestions = document.getElementById('chat-suggestions');
+
+const CHAT_SUGGESTIONS = ["Quel est le résultat net ?", "Total actif ?", "Le bilan est-il équilibré ?", "Quels documents sont chargés ?"];
+
+function addChatMessage(role, text, source){
+  const div = document.createElement('div');
+  div.className = `chat-msg ${role}`;
+  div.textContent = text;
+  if (source){
+    const src = document.createElement('span');
+    src.className = 'cm-source';
+    src.textContent = `Source : ${source}`;
+    div.appendChild(src);
+  }
+  chatMessages.appendChild(div);
+  chatMessages.scrollTop = chatMessages.scrollHeight;
+  return div;
+}
+
+function renderChatSuggestions(){
+  chatSuggestions.innerHTML = CHAT_SUGGESTIONS.map(s => `<button type="button">${escapeHtml(s)}</button>`).join('');
+  chatSuggestions.querySelectorAll('button').forEach(btn => {
+    btn.addEventListener('click', () => { chatInput.value = btn.textContent; chatForm.dispatchEvent(new Event('submit')); });
+  });
+}
+
+chatToggle.addEventListener('click', () => {
+  const isOpen = chatPanel.classList.toggle('open');
+  chatToggle.classList.toggle('open', isOpen);
+  if (isOpen && chatMessages.children.length === 0){
+    addChatMessage('bot', "Bonjour. Posez-moi n'importe quelle question sur les documents déjà analysés (montants, codes SYSCOHADA, ratios, cohérence du bilan...) - je cherche dans tout ce qui a été extrait, y compris le texte brut et les 108 libellés de codes SYSCOHADA. Tout reste local, rien n'est envoyé à l'extérieur.\n\nÀ savoir : je suis un moteur de recherche, pas une IA conversationnelle - je réponds mieux à des questions factuelles précises (\"quel est le résultat net ?\") qu'à du raisonnement libre. Les suggestions ci-dessous sont juste des exemples pour démarrer : tapez librement n'importe quelle question.");
+    renderChatSuggestions();
+    chatInput.focus();
+  }
+});
+chatClose.addEventListener('click', () => { chatPanel.classList.remove('open'); chatToggle.classList.remove('open'); });
+
+chatForm.addEventListener('submit', (e) => {
+  e.preventDefault();
+  const q = chatInput.value.trim();
+  if (!q) return;
+  addChatMessage('user', q);
+  chatInput.value = '';
+  const { text, source } = answerQuestion(q);
+  setTimeout(() => addChatMessage('bot', text, source), 150);
 });
 </script>
 
