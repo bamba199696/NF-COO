@@ -750,7 +750,11 @@
           <label style="font-size:0.76rem;color:var(--ink-soft);display:block;margin-bottom:4px;">Commentaire / conditions particulières</label>
           <textarea id="d-commentaire" rows="4" style="width:100%;font-family:'Inter',sans-serif;font-size:0.86rem;padding:10px;border:1px solid var(--paper-line);border-radius:4px;"></textarea>
         </div>
-        <button class="action primary" id="btn-generate-synthese" style="margin-top:14px;">⬇ Télécharger le mémo de crédit complet</button>
+        <div style="display:flex; gap:10px; flex-wrap:wrap; margin-top:14px;">
+          <button class="action amber" id="btn-export-end">⬇ Télécharger la Notice Financière</button>
+          <button class="action primary" id="btn-generate-synthese">⬇ Télécharger le mémo de crédit complet</button>
+        </div>
+        <p style="font-size:0.78rem;color:var(--muted);margin-top:8px;">Les deux fichiers reprennent les données et corrections saisies tout au long de l'analyse.</p>
       </div>
     </div>
   </section>
@@ -1472,9 +1476,32 @@ btnExtract.addEventListener('click', async () => {
   buildReview();
 });
 
+let targetSheetName = 'Feuille de saisie';
+
 async function loadTemplateWorkbook(){
   const buf = await templateFile.arrayBuffer();
   templateWb = XLSX.read(buf, { type:'array', bookVBA:true, cellStyles:true, cellFormula:true });
+
+  // Le nom de l'onglet de saisie varie selon les classeurs (« Feuille de saisie » dans la
+  // Notice Financière complète, mais parfois juste « Feuil1 » sur un export à onglet unique).
+  // On détecte le bon onglet par empreinte de contenu plutôt que par un nom fixe : on cherche
+  // celui qui contient bien "IMMOBILISATIONS INCORPORELLES" en colonne B (ligne 19 normalement),
+  // pour rester fiable même si l'onglet est renommé ou décalé de quelques lignes.
+  if (templateWb.Sheets['Feuille de saisie']){
+    targetSheetName = 'Feuille de saisie';
+  } else {
+    let found = null;
+    for (const name of templateWb.SheetNames){
+      const ws = templateWb.Sheets[name];
+      const hasFingerprint = Object.keys(ws).some(addr => {
+        const cell = ws[addr];
+        return cell && typeof cell.v === 'string' && cell.v.toUpperCase().includes('IMMOBILISATIONS INCORPORELLES');
+      });
+      if (hasFingerprint){ found = name; break; }
+    }
+    targetSheetName = found || templateWb.SheetNames[0];
+    log('native', `Onglet « Feuille de saisie » non trouvé par son nom : utilisation de l'onglet « ${targetSheetName} » (structure reconnue).`);
+  }
 }
 
 function cellAddr(col, row){ return col+row; }
@@ -1486,7 +1513,7 @@ function getExisting(ws, addr){
 }
 
 function buildReview(){
-  const ws = templateWb.Sheets['Feuille de saisie'];
+  const ws = templateWb.Sheets[targetSheetName];
   const items = [];
 
   for (const [code, det] of extraction.byCode.entries()){
@@ -1762,7 +1789,7 @@ function writeNumberPreserveStyle(ws, addr, num){
 }
 
 btnExportEl.addEventListener('click', () => {
-  const ws = templateWb.Sheets['Feuille de saisie'];
+  const ws = templateWb.Sheets[targetSheetName];
   const journalRows = [['Code','Ligne cible','Champ','Valeur écrite','Cellule','Statut','Ligne source du document']];
   const forceOverwrite = document.getElementById('force-overwrite').checked;
 
@@ -2659,6 +2686,14 @@ function renderDecision(){
   banner.className = 'decision-banner ' + cls;
   banner.innerHTML = `<div class="dt">${escapeHtml(title)}</div><div class="dd">${escapeHtml(detail)}</div>`;
 }
+
+document.getElementById('btn-export-end').addEventListener('click', () => {
+  if (!templateWb){
+    alert("Chargez le modèle et lancez l'extraction (étapes 1 à 3) avant de télécharger la Notice Financière.");
+    return;
+  }
+  btnExportEl.click();
+});
 
 document.getElementById('btn-generate-synthese').addEventListener('click', () => {
   markModuleDone('decision');
