@@ -10,6 +10,7 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/tesseract.js/5.1.0/tesseract.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.8.0/mammoth.browser.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
 
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap');
@@ -555,8 +556,9 @@
         </span>
       </label>
       <button class="action amber" id="btn-export">⬇ Télécharger la Notice Financière complétée</button>
+      <button class="action" id="btn-export-journal" style="display:none;margin-left:8px;background:#EEF2F6;color:var(--ink-soft);">⬇ Journal de contrôle</button>
       <p style="font-size:0.8rem;color:var(--muted);margin-top:10px;">
-        Ajoute un onglet « Journal OCR » (traçabilité) - vérifiez l'ouverture du fichier dans Excel.
+        Le fichier téléchargé est votre modèle d'origine, à l'identique (couleurs, formules, macros, onglets) : seules les cellules de l'exercice N sont complétées, en montants exprimés dans l'unité de la cellule C11. Le journal de contrôle est un fichier séparé.
       </p>
     </div>
   </div>
@@ -1039,6 +1041,191 @@ function buildLogicalLines(tokens, sortDescendingY){
   return lines;
 }
 
+/* @@TABLE_EXTRACTOR_START */
+/* ============================================================
+   3bis. LECTEUR DE TABLEAU PAR COLONNES (méthode principale)
+   Les états financiers SYSCOHADA sont des tableaux : chaque poste a un code
+   (AD, AE…) dans la colonne REF, et ses montants sont alignés à droite dans des
+   colonnes fixes (Brut / Amort. / Net N / Net N-1 à l'actif ; N / N-1 ailleurs).
+   Plutôt que de lire le texte ligne par ligne (fragile : libellés sur plusieurs
+   lignes, fragments décalés de 1 pt, libellé et montant collés dans un même
+   fragment), on utilise la POSITION de chaque fragment :
+     1. les codes servent d'ancres de ligne ;
+     2. les montants sont regroupés en colonnes par leur bord droit ;
+     3. chaque montant est rattaché à l'ancre la plus proche verticalement.
+   Coordonnées attendues : x de gauche à droite, y de haut en bas.
+   ============================================================ */
+const TABLE_COLUMNS = {
+  actif:    ['brutN','amortN','netN','netN1'],
+  passif:   ['valueN','valueN1'],
+  resultat: ['valueN','valueN1'],
+  flux:     ['valueN','valueN1'],
+};
+
+function median(arr){
+  if (!arr.length) return 0;
+  const s = [...arr].sort((a,b)=>a-b);
+  const m = Math.floor(s.length/2);
+  return s.length % 2 ? s[m] : (s[m-1]+s[m])/2;
+}
+
+// Découpe chaque fragment en mots, avec une position x estimée au prorata des caractères
+// (un fragment peut contenir libellé + montant, ex. "Aménagements … 2 621 457 340").
+function splitTokensToAtoms(tokens){
+  const atoms = [];
+  tokens.forEach((t, itemId) => {
+    const s = t.str;
+    if (!s || !s.trim()) return;
+    const width = (t.width && t.width > 0) ? t.width : s.length * 4;
+    const cw = width / Math.max(1, s.length);
+    const re = /\S+/g; let m;
+    while ((m = re.exec(s))){
+      atoms.push({ x: t.x + m.index*cw, width: m[0].length*cw, y: t.y, h: t.height || cw*2, str: m[0], cw, itemId });
+    }
+  });
+  return atoms;
+}
+
+const NUM_HEAD_RE = /^\(?[-−–]?\d{1,3}\)?$/;
+const NUM_GROUP_RE = /^\d{3}\)?$/;
+
+// Fusionne les morceaux d'un même nombre ("3" "083" "938" "681" -> 3 083 938 681) sur une
+// même ligne visuelle. Un groupe suivant doit faire exactement 3 chiffres et être séparé
+// par un simple espace : une note ("16") collée à un montant ne fusionne donc jamais.
+// Les fragments de texte qui se superposent à un nombre (en-tête « 31/12/N » imprimé
+// par-dessus, repère « B » de la ligne TB…) sont ignorés pendant la fusion : seuls les
+// morceaux numériques sont enchaînés entre eux. Deux morceaux issus du même fragment PDF
+// sont toujours fusionnés ; sinon il faut un simple espace d'écart.
+function mergeNumberAtoms(lineAtoms, mergeGap){
+  const out = [];
+  const isNumPiece = a => NUM_HEAD_RE.test(a.str) || NUM_GROUP_RE.test(a.str);
+  const nums = lineAtoms.filter(isNumPiece).sort((a,b)=>a.x-b.x);
+  for (const a of lineAtoms) if (!isNumPiece(a)) out.push({ kind:'txt', str:a.str, x:a.x, right:a.x+a.width, y:a.y });
+  let i = 0;
+  while (i < nums.length){
+    const a = nums[i];
+    let str = a.str, right = a.x + a.width, j = i + 1, last = a;
+    if (NUM_HEAD_RE.test(a.str) && !a.str.endsWith(')')){
+      while (j < nums.length && NUM_GROUP_RE.test(nums[j].str) && !str.endsWith(')') &&
+             (nums[j].itemId === last.itemId || (nums[j].x - right) <= mergeGap)){
+        str += ' ' + nums[j].str; right = nums[j].x + nums[j].width; last = nums[j]; j++;
+      }
+    }
+    out.push({ kind:'num', str, x:a.x, right, y:a.y, groups:j-i });
+    i = j;
+  }
+  return out;
+}
+
+function clusterValues(values, tol){
+  const sorted = [...values].sort((a,b)=>a-b);
+  const clusters = [];
+  for (const v of sorted){
+    const last = clusters[clusters.length-1];
+    if (last && v - last.items[last.items.length-1] <= tol) last.items.push(v);
+    else clusters.push({ items:[v] });
+  }
+  return clusters.map(c => ({ center: median(c.items), count: c.items.length }));
+}
+
+// Lit les postes d'une page. Retourne [{ code, values, rawLine, anchorCount }] où values suit
+// l'ordre de TABLE_COLUMNS[section] (null = cellule vide).
+function extractCodeTableFromTokens(tokens){
+  const atoms = splitTokensToAtoms(tokens);
+  if (atoms.length === 0) return [];
+
+  const digitAtoms = atoms.filter(a => /^\d+$/.test(a.str));
+  const cw = median((digitAtoms.length ? digitAtoms : atoms).map(a => a.cw)) || 4;
+  const medianH = median(atoms.map(a => a.h)) || cw*2;
+  const lineTol = Math.max(1.5, 0.35*medianH);
+  const mergeGap = 1.8*cw;
+  const colTol = Math.max(12, 4*cw);
+
+  // 1) Lignes visuelles -> fusion des nombres
+  const lines = clusterRows([...atoms].sort((a,b)=>a.y-b.y), lineTol);
+  const items = [];
+  for (const line of lines) items.push(...mergeNumberAtoms(line.tokens, mergeGap));
+
+  // 2) Ancres : codes connus, regroupés par section autour d'une même colonne REF
+  const known = items.filter(it => it.kind==='txt' && /^[A-Z]{2}$/.test(it.str) && CODES[it.str]);
+  const bySection = {};
+  for (const k of known){ const s = CODES[k.str].section; (bySection[s] = bySection[s] || []).push(k); }
+  const sections = [];
+  for (const [s, list] of Object.entries(bySection)){
+    const mx = median(list.map(k => k.x));
+    const kept = list.filter(k => Math.abs(k.x - mx) <= colTol);
+    if (kept.length >= 3) sections.push({ name:s, medianX:mx, anchors:kept.map(k => ({ code:k.str, x:k.x, y:k.y, known:true })) });
+  }
+  if (sections.length === 0) return [];
+  sections.sort((a,b)=>a.medianX-b.medianX);
+
+  // Codes non répertoriés (FB, FC… du tableau de flux) alignés sur la colonne REF : servent
+  // de séparateurs de ligne pour qu'aucun montant ne soit rattaché à la mauvaise ligne.
+  for (const it of items){
+    if (it.kind!=='txt' || !/^[A-Z]{2}$/.test(it.str)) continue;
+    const sec = sections.find(s => Math.abs(it.x - s.medianX) <= colTol);
+    if (sec && !sec.anchors.some(a => a.x===it.x && a.y===it.y)) sec.anchors.push({ code:it.str, x:it.x, y:it.y, known:false });
+  }
+
+  const results = [];
+  sections.forEach((sec, si) => {
+    const zoneLeft = sec.medianX + 2*cw;
+    const zoneRight = si+1 < sections.length ? sections[si+1].medianX - colTol/2 : Infinity;
+    const ys = [...new Set(sec.anchors.map(a => Math.round(a.y)))].sort((a,b)=>a-b);
+    const gaps = []; for (let i=1;i<ys.length;i++){ if (ys[i]-ys[i-1] > lineTol) gaps.push(ys[i]-ys[i-1]); }
+    const rowTol = Math.max(0.6*medianH, Math.min(0.45*(median(gaps)||medianH*2), 1.3*medianH));
+
+    // 3) Montants de la zone, rattachés à l'ancre la plus proche verticalement
+    const assigned = new Map(); // anchor -> [num]
+    for (const n of items){
+      if (n.kind!=='num' || n.x < zoneLeft || n.x >= zoneRight) continue;
+      const value = parseAmount(n.str);
+      if (value === null) continue;
+      // Une référence de note ("3", "16", "21"…) n'est jamais un montant : nombre nu < 100.
+      if (n.groups === 1 && Math.abs(value) < 100 && value !== 0) continue;
+      let best = null, bestDy = Infinity;
+      for (const a of sec.anchors){ const dy = Math.abs(n.y - a.y); if (dy < bestDy){ bestDy = dy; best = a; } }
+      if (!best || bestDy > rowTol) continue;
+      if (!assigned.has(best)) assigned.set(best, []);
+      assigned.get(best).push({ ...n, value });
+    }
+
+    // 4) Colonnes : regroupement des bords droits (montants alignés à droite)
+    const colNames = TABLE_COLUMNS[sec.name] || ['valueN','valueN1'];
+    const allNums = [...assigned.values()].flat();
+    const clusterTol = Math.max(8, 2.2*cw);
+    let clusters = clusterValues(allNums.map(n => n.right), clusterTol).filter(c => c.count >= 2);
+    clusters = clusters.sort((a,b)=>b.count-a.count).slice(0, colNames.length).sort((a,b)=>a.center-b.center);
+    let names;
+    if (clusters.length === colNames.length) names = colNames;
+    else if (sec.name === 'actif' && clusters.length === 3) names = ['brutN','netN','netN1']; // pas de colonne amort.
+    else names = colNames.slice(0, clusters.length);
+
+    // 5) Valeurs par ancre connue
+    for (const a of sec.anchors){
+      if (!a.known) continue;
+      const nums = assigned.get(a) || [];
+      const vals = colNames.map(() => null);
+      for (let ci = 0; ci < clusters.length; ci++){
+        let pick = null, pickD = Infinity;
+        for (const n of nums){ const d = Math.abs(n.right - clusters[ci].center); if (d < pickD){ pickD = d; pick = n; } }
+        if (pick && pickD <= clusterTol*1.5) vals[colNames.indexOf(names[ci])] = pick.value;
+      }
+      if (sec.name === 'actif'){
+        const [b, am, nt] = vals;
+        if (b === null && nt !== null) vals[0] = nt + (am || 0); // brut non imprimé : brut = net + amort.
+      }
+      if (vals.every(v => v === null)) continue;
+      const label = items.filter(it => it.kind==='txt' && Math.abs(it.y - a.y) <= rowTol && it.x > a.x && it.x < zoneRight && it !== a)
+                         .sort((p,q)=>p.x-q.x).map(it => it.str).join(' ');
+      results.push({ code:a.code, values:vals, anchorCount:sec.anchors.filter(x=>x.known).length,
+                     rawLine: `${a.code} ${label} ${nums.map(n=>n.str).join(' | ')}`.replace(/\s+/g,' ').trim() });
+    }
+  });
+  return results;
+}
+/* @@TABLE_EXTRACTOR_END */
+
 /* ============================================================
    4. EXTRACTION DES MONTANTS D'UNE LIGNE
    ============================================================ */
@@ -1261,7 +1448,7 @@ async function ocrCanvasWithWords(canvas){
   const worker = await getOcrWorker();
   const clean = preprocessForOCR(canvas);
   const { data } = await worker.recognize(clean);
-  const tokens = (data.words || []).map(w => ({ x: w.bbox.x0, y: (w.bbox.y0+w.bbox.y1)/2, str: w.text, width: w.bbox.x1-w.bbox.x0 }));
+  const tokens = (data.words || []).map(w => ({ x: w.bbox.x0, y: (w.bbox.y0+w.bbox.y1)/2, str: w.text, width: w.bbox.x1-w.bbox.x0, height: w.bbox.y1-w.bbox.y0 }));
   return { text:(data.text||'').trim(), tokens };
 }
 async function imageFileToCanvas(file){
@@ -1279,15 +1466,22 @@ async function extractDocxText(buf){ const { value } = await mammoth.extractRawT
 
 async function extractLinesFromPdfPage(page){
   const content = await page.getTextContent();
-  const tokens = content.items.map(it => ({ x: it.transform[4], y: it.transform[5], str: it.str, width: it.width }))
-                              .filter(t => t.str && t.str.trim().length>0);
+  // Coordonnées converties dans le repère de la page affichée (x vers la droite, y vers le bas),
+  // ce qui gère aussi les pages tournées (bilans au format paysage).
+  const viewport = page.getViewport({ scale: 1 });
+  const tokens = content.items
+    .filter(it => it.str && it.str.trim().length>0)
+    .map(it => {
+      const tx = pdfjsLib.Util.transform(viewport.transform, it.transform);
+      return { x: tx[4], y: tx[5], str: it.str, width: it.width, height: Math.hypot(it.transform[2], it.transform[3]) };
+    });
   const nativeLen = tokens.reduce((s,t)=>s+t.str.length,0);
   if (nativeLen >= MIN_NATIVE_CHARS){
-    return { lines: buildLogicalLines(tokens, true), method:'native' };
+    return { lines: buildLogicalLines(tokens, false), tableRows: extractCodeTableFromTokens(tokens), method:'native' };
   }
   const canvas = await renderPageToCanvas(page, RENDER_SCALE);
   const { tokens: ocrTokens } = await ocrCanvasWithWords(canvas);
-  return { lines: buildLogicalLines(ocrTokens, false), method:'ocr' };
+  return { lines: buildLogicalLines(ocrTokens, false), tableRows: extractCodeTableFromTokens(ocrTokens), method:'ocr' };
 }
 
 /* ============================================================
@@ -1389,6 +1583,18 @@ btnExtract.addEventListener('click', async () => {
 
   const byCode = new Map();
   let nbOcrPages = 0;
+  // Résultats du lecteur de tableau (méthode principale) : pour chaque code, on garde
+  // l'occurrence issue de la page où le tableau est le plus complet (l'état financier
+  // lui-même, pas une note annexe qui reprendrait un code isolé).
+  const tableBest = new Map();
+  const registerTableRows = (rows, source, page) => {
+    for (const r of (rows || [])){
+      const cur = tableBest.get(r.code);
+      if (!cur || r.anchorCount > cur.anchorCount){
+        tableBest.set(r.code, { values: r.values, rawLine: r.rawLine, source: `${source} (p.${page})`, anchorCount: r.anchorCount, viaTable: true });
+      }
+    }
+  };
   suspiciousLines = [];
   window._allExtractedLines = []; // {text, source} — alimente le chatbot local (recherche plein texte)
 
@@ -1403,10 +1609,11 @@ btnExtract.addEventListener('click', async () => {
         log(null, `${d.file.name} - ${pdf.numPages} page(s)`);
         for (let i=1;i<=pdf.numPages;i++){
           const page = await pdf.getPage(i);
-          const { lines, method } = await extractLinesFromPdfPage(page);
+          const { lines, method, tableRows } = await extractLinesFromPdfPage(page);
           if (method==='ocr'){ nbOcrPages++; log('ocr', `${d.file.name} - page ${i} : image détectée, OCR…`); }
           else { log('native', `${d.file.name} - page ${i} : texte natif`); }
           allLines.push(...lines);
+          registerTableRows(tableRows, d.file.name, i);
         }
       } else if (ext === 'docx'){
         log('native', `${d.file.name} - lecture du document Word…`);
@@ -1419,6 +1626,7 @@ btnExtract.addEventListener('click', async () => {
         const { tokens } = await ocrCanvasWithWords(canvas);
         nbOcrPages++;
         allLines.push(...buildLogicalLines(tokens, false));
+        registerTableRows(extractCodeTableFromTokens(tokens), d.file.name, 1);
       }
 
       for (const line of allLines){
@@ -1445,6 +1653,15 @@ btnExtract.addEventListener('click', async () => {
   }
 
   if (ocrWorker){ await ocrWorker.terminate(); ocrWorker=null; }
+
+  // Le lecteur de tableau est prioritaire : il remplace la lecture ligne à ligne pour chaque
+  // code qu'il a trouvé (plus fiable : positions réelles des colonnes Brut/Amort./Net, N/N-1).
+  let nbTable = 0;
+  for (const [code, det] of tableBest){
+    byCode.set(code, det);
+    nbTable++;
+  }
+  if (nbTable) log('native', `${nbTable} poste(s) lu(s) par positionnement dans les colonnes du tableau.`);
 
   // Passe de secours : pour chaque code du mapping non détecté par son préfixe (OCR manqué,
   // colonne décalée, etc.), on cherche le libellé officiel correspondant (celui vérifié contre
@@ -1473,8 +1690,167 @@ btnExtract.addEventListener('click', async () => {
   btnExtract.disabled = false;
 
   await loadTemplateWorkbook();
+  normalizeExtractionForNF();
   buildReview();
 });
+
+/* @@NF_NORMALIZE_START */
+// Mise au format de la Notice Financière, appliquée UNE fois après lecture du modèle :
+//  1) Unité : les états financiers sont en FCFA, la NF est saisie dans l'unité de sa cellule C11
+//     (« Milliers » -> ÷ 1 000, « Millions » -> ÷ 1 000 000), arrondie à l'entier.
+//  2) Signes : les formules de la NF SOUSTRAIENT les charges (=E107-E108-E109, VA = … -E115…),
+//     elles doivent donc être saisies en positif. Certains états financiers impriment les charges
+//     en négatif (convention « tout signé ») : on détecte la convention du document puis
+//     on remet les charges en valeur absolue. Les variations de stocks (RB, RD, RF), elles aussi
+//     soustraites dans la NF, changent de signe uniquement si le document est « tout signé ».
+const NF_CHARGE_CODES = ['RA','RC','RE','RG','RH','RI','RJ','RK','RL','RM','RN','RO','RP','RQ','RS'];
+const NF_VARIATION_CODES = ['RB','RD','RF'];
+
+function readNfUnitDivisor(ws){
+  const raw = ws && ws['C11'] ? String(ws['C11'].v || '').toLowerCase() : '';
+  if (raw.includes('million')) return 1e6;
+  if (raw.includes('millier')) return 1e3;
+  return 1;
+}
+
+function detectNegativeChargeConvention(byCode){
+  let neg = 0, pos = 0;
+  for (const c of NF_CHARGE_CODES){
+    const det = byCode.get(c);
+    if (!det) continue;
+    for (const v of det.values.slice(0, 2)){
+      if (v == null || v === 0) continue;
+      if (v < 0) neg++; else pos++;
+    }
+  }
+  return neg > pos;
+}
+
+function normalizeValuesForNF(code, values, divisor, chargesNegative){
+  return values.map(v => {
+    if (v == null) return v;
+    let x = v;
+    if (NF_CHARGE_CODES.includes(code)) x = Math.abs(x);
+    else if (NF_VARIATION_CODES.includes(code) && chargesNegative) x = -x;
+    const r = Math.round(x / divisor);
+    return Object.is(r, -0) ? 0 : r;
+  });
+}
+
+// Ajustement d'arrondi. Arrondir chaque ligne au millier fait dériver les sous-totaux que la NF
+// recalcule (somme d'arrondis ≠ arrondi de la somme) : l'EBE ou le résultat net de la NF
+// différeraient de quelques unités du PDF, et le contrôle E158 (résultat passif = résultat du
+// compte de résultat) afficherait FAUX. On recalcule donc chaque sous-total EXACTEMENT comme les
+// formules de la NF, on le compare au total imprimé dans le PDF, et l'écart est reporté sur la
+// ligne la plus importante du bloc - uniquement s'il s'agit d'un écart d'arrondi (≤ nombre de
+// lignes du bloc / 2 + 1). Un écart plus grand n'est jamais masqué : il signale une lecture
+// erronée et remonte en alerte.
+const RECON_GROUPS = [
+  // Compte de résultat (colonne N). sign : +1 si la ligne est ajoutée dans la formule NF, -1 si soustraite.
+  { target:'XB', idx:0, parts:{TA:1,TB:1,TC:1,TD:1}, pick:'largest', label:"Chiffre d'affaires" },
+  { target:'XD', idx:0, parts:{TA:1,RA:-1,RB:-1,TB:1,TC:1,TD:1,RC:-1,RD:-1,RE:-1,RF:-1,TG:1,TH:1,TE:1,TF:1,RG:-1,RH:-1,RI:-1,RJ:-1,RK:-1,TI:1},
+    candidates:['RC','RE','RK','RH','RA','RG','RI','RJ'], pick:'largest', label:"Excédent brut d'exploitation" },
+  { target:'XE', idx:0, parts:{TA:1,RA:-1,RB:-1,TB:1,TC:1,TD:1,RC:-1,RD:-1,RE:-1,RF:-1,TG:1,TH:1,TE:1,TF:1,RG:-1,RH:-1,RI:-1,RJ:-1,RK:-1,TI:1,TJ:1,RL:-1},
+    candidates:['RL','TJ'], pick:'first', label:"Résultat d'exploitation" },
+  { target:'XF', idx:0, parts:{TK:1,RM:-1,TM:1,TL:1,RN:-1}, candidates:['RM','TK','RN','TL','TM'], pick:'first', label:'Résultat financier' },
+  { target:'XH', idx:0, parts:{TN:1,TO:1,RP:-1,RO:-1}, candidates:['TN','RO','TO','RP'], pick:'first', label:'Résultat HAO' },
+  { target:'XI', idx:0, parts:{TA:1,RA:-1,RB:-1,TB:1,TC:1,TD:1,RC:-1,RD:-1,RE:-1,RF:-1,TG:1,TH:1,TE:1,TF:1,RG:-1,RH:-1,RI:-1,RJ:-1,RK:-1,TI:1,TJ:1,RL:-1,
+    TK:1,RM:-1,TM:1,TL:1,RN:-1,TN:1,TO:1,RP:-1,RO:-1,RQ:-1,RS:-1}, candidates:['RS','RQ'], pick:'first', label:'Résultat net' },
+  // Actif : colonnes Brut (idx 0) et Amortissements (idx 1).
+  ...[0,1].flatMap(idx => [
+    { target:'AZ', idx, parts:{AE:1,AF:1,AG:1,AH:1,AJ:1,AK:1,AL:1,AM:1,AN:1,AP:1,AR:1,AS:1}, pick:'largest', label:'Total actif immobilisé' },
+    { target:'BK', idx, parts:{BA:1,BB:1,BH:1,BI:1,BJ:1}, pick:'largest', label:'Total actif circulant' },
+    { target:'BT', idx, parts:{BQ:1,BR:1,BS:1}, pick:'largest', label:'Total trésorerie actif' },
+  ]),
+  // Passif (colonne N). CJ n'est jamais ajusté : il doit rester égal au résultat net (contrôle E158).
+  { target:'CP', idx:0, parts:{CA:1,CB:1,CD:1,CE:1,CF:1,CG:1,CH:1,CJ:1,CL:1,CM:1}, candidates:['CA','CF','CH','CG','CD','CE','CL','CM','CB'], pick:'largest', label:'Capitaux propres' },
+  { target:'DD', idx:0, parts:{DA:1,DB:1,DC:1}, pick:'largest', label:'Dettes financières' },
+  { target:'DP', idx:0, parts:{DH:1,DI:1,DJ:1,DK:1,DM:1,DN:1}, pick:'largest', label:'Passif circulant' },
+  { target:'DT', idx:0, parts:{DQ:1,DR:1}, pick:'largest', label:'Trésorerie passif' },
+];
+
+function reconcileRounding(byCode){
+  const notes = [], alerts = [];
+  const val = (code, idx) => { const d = byCode.get(code); const v = d && d.values ? d.values[idx] : null; return v == null ? 0 : v; };
+  const has = (code, idx) => { const d = byCode.get(code); return !!(d && d.values && d.values[idx] != null); };
+  const tidx = (code, idx) => (CODES[code] && CODES[code].section === 'actif') ? idx : 0;
+
+  for (const g of RECON_GROUPS){
+    if (!has(g.target, tidx(g.target, g.idx))) continue;
+    const target = val(g.target, tidx(g.target, g.idx));
+    const codes = Object.keys(g.parts);
+    if (!codes.some(c => has(c, g.idx))) continue;
+    const computed = codes.reduce((s, c) => s + g.parts[c]*val(c, g.idx), 0);
+    const diff = target - computed;
+    if (diff === 0) continue;
+    const tolerance = Math.floor(codes.filter(c => has(c, g.idx)).length / 2) + 1;
+    if (Math.abs(diff) > tolerance){
+      alerts.push({ target:g.target, label:g.label, diff, computed, expected:target });
+      continue;
+    }
+    let pool = (g.candidates || codes).filter(c => has(c, g.idx));
+    if (!pool.length) continue;
+    const chosen = g.pick === 'largest' ? pool.reduce((a, b) => Math.abs(val(b, g.idx)) > Math.abs(val(a, g.idx)) ? b : a) : pool[0];
+    const delta = diff * g.parts[chosen];
+    const det = byCode.get(chosen);
+    det.values[g.idx] += delta;
+    if (CODES[chosen] && CODES[chosen].section === 'actif' && det.values[2] != null) det.values[2] = det.values[0] - (det.values[1] || 0);
+    det.roundingAdj = (det.roundingAdj || 0) + delta;
+    notes.push({ code:chosen, delta, target:g.target, label:g.label });
+  }
+
+  // Équilibre du bilan dans la NF : total passif = total actif net tel que la NF le calcule.
+  const actifCodes = ['AE','AF','AG','AH','AJ','AK','AL','AM','AN','AP','AR','AS','BA','BB','BH','BI','BJ','BQ','BR','BS','BU'];
+  const passifCodes = ['CA','CB','CD','CE','CF','CG','CH','CJ','CL','CM','DA','DB','DC','DH','DI','DJ','DK','DM','DN','DQ','DR','DV'];
+  if (actifCodes.some(c => has(c,0)) && passifCodes.some(c => has(c,0))){
+    const actifNet = actifCodes.reduce((s,c) => s + val(c,0) - val(c,1), 0);
+    const passif = passifCodes.reduce((s,c) => s + val(c,0), 0);
+    const diff = actifNet - passif;
+    if (diff !== 0 && Math.abs(diff) <= 3){
+      const pool = ['DJ','DM','DK','DA','DH','DI','DN','DQ','DR'].filter(c => has(c,0));
+      if (pool.length){
+        const chosen = pool.reduce((a,b) => Math.abs(val(b,0)) > Math.abs(val(a,0)) ? b : a);
+        byCode.get(chosen).values[0] += diff;
+        byCode.get(chosen).roundingAdj = (byCode.get(chosen).roundingAdj || 0) + diff;
+        notes.push({ code:chosen, delta:diff, target:'BZ/DZ', label:'Équilibre actif = passif' });
+      }
+    } else if (Math.abs(diff) > 3){
+      alerts.push({ target:'BZ/DZ', label:'Équilibre actif = passif', diff, computed:passif, expected:actifNet });
+    }
+  }
+  return { notes, alerts };
+}
+/* @@NF_NORMALIZE_END */
+
+function normalizeExtractionForNF(){
+  if (!extraction || !extraction.byCode) return;
+  const ws = templateWb && templateWb.Sheets[targetSheetName];
+  const divisor = readNfUnitDivisor(ws);
+  const chargesNegative = detectNegativeChargeConvention(extraction.byCode);
+  for (const [code, det] of extraction.byCode){
+    if (det.normalized) continue;
+    det.rawValues = det.values.slice();
+    det.values = normalizeValuesForNF(code, det.values, divisor, chargesNegative);
+    det.normalized = true;
+  }
+  extraction.unitDivisor = divisor;
+  extraction.chargesNegative = chargesNegative;
+  const unitLabel = divisor === 1e3 ? 'milliers' : divisor === 1e6 ? 'millions' : 'unités';
+  log('native', `Montants convertis en ${unitLabel} (cellule C11 du modèle).`);
+  if (chargesNegative) log('native', `Charges imprimées en négatif dans le document : remises en positif comme l'exigent les formules de la NF.`);
+
+  const { notes, alerts } = reconcileRounding(extraction.byCode);
+  for (const n of notes){
+    const det = extraction.byCode.get(n.code);
+    if (det && !/\[arrondi/.test(det.rawLine || '')) det.rawLine = `${det.rawLine || ''} [arrondi ${det.roundingAdj > 0 ? '+' : ''}${det.roundingAdj}]`;
+    log('native', `Ajustement d'arrondi : ${n.code} ${n.delta > 0 ? '+' : ''}${n.delta} pour que « ${n.label} » de la NF soit égal au total du document.`);
+  }
+  for (const a of alerts){
+    log('err', `⚠ « ${a.label} » : la somme des lignes lues (${a.computed.toLocaleString('fr-FR')}) diffère du total du document (${a.expected.toLocaleString('fr-FR')}) de ${a.diff.toLocaleString('fr-FR')}. Écart trop grand pour un arrondi : vérifiez les lignes de ce bloc à l'étape de relecture.`);
+  }
+  extraction.roundingNotes = notes;
+  extraction.roundingAlerts = alerts;
+}
 
 let targetSheetName = 'Feuille de saisie';
 
@@ -1788,61 +2164,189 @@ function writeNumberPreserveStyle(ws, addr, num){
   }
 }
 
-btnExportEl.addEventListener('click', () => {
-  const ws = templateWb.Sheets[targetSheetName];
-  const journalRows = [['Code','Ligne cible','Champ','Valeur écrite','Cellule','Statut','Ligne source du document']];
+/* @@XLSX_PATCH_START */
+/* ============================================================
+   EXPORT FIDÈLE DU MODÈLE (aucune réécriture du classeur)
+   Le fichier téléchargé est le fichier d'origine dans lequel on a uniquement changé la
+   valeur <v> des cellules à compléter, directement dans le XML de la feuille. Tout le
+   reste est conservé à l'octet près : couleurs, polices, bordures, formats, largeurs,
+   formules, macros (.xlsm), commentaires, validations, onglets.
+   Garde-fous : une cellule contenant une formule n'est jamais modifiée ; une cellule
+   créée reprend le style de sa ligne ou de sa colonne, pour garder la mise en forme.
+   ============================================================ */
+function xlColToNum(col){ let n = 0; for (const ch of col) n = n*26 + (ch.charCodeAt(0) - 64); return n; }
+function xlSplitAddr(addr){ const m = /^([A-Z]+)(\d+)$/.exec(addr); return { col: m[1], row: parseInt(m[2], 10) }; }
+
+function xlInheritedStyle(sheetXml, rowAttrs, col){
+  const rs = /\bs="(\d+)"/.exec(rowAttrs || ''), custom = /\bcustomFormat="(1|true)"/.test(rowAttrs || '');
+  if (rs && custom) return rs[1];
+  const c = xlColToNum(col);
+  const colsRe = /<col\b([^>]*)\/?>/g; let m;
+  while ((m = colsRe.exec(sheetXml))){
+    const min = /\bmin="(\d+)"/.exec(m[1]), max = /\bmax="(\d+)"/.exec(m[1]), st = /\bstyle="(\d+)"/.exec(m[1]);
+    if (min && max && st && c >= +min[1] && c <= +max[1]) return st[1];
+  }
+  return null;
+}
+
+function xlPatchCell(sheetXml, addr, value){
+  const v = String(value);
+  const cellRe = new RegExp('<c\\b(?=[^>]*\\br="' + addr + '")([^>]*?)(\\/>|>([\\s\\S]*?)<\\/c>)');
+  const m = cellRe.exec(sheetXml);
+  if (m){
+    if (/<f[\s>\/]/.test(m[3] || '')) return { xml: sheetXml, status: 'formula' };
+    const attrs = m[1].replace(/\s+t="[^"]*"/, '');
+    return { xml: sheetXml.slice(0, m.index) + '<c' + attrs + '><v>' + v + '</v></c>' + sheetXml.slice(m.index + m[0].length), status: 'written' };
+  }
+  const { col, row } = xlSplitAddr(addr);
+  const rowRe = new RegExp('<row\\b(?=[^>]*\\br="' + row + '")([^>]*?)(\\/>|>([\\s\\S]*?)<\\/row>)');
+  const rm = rowRe.exec(sheetXml);
+  const style = xlInheritedStyle(sheetXml, rm ? rm[1] : '', col);
+  const newCell = '<c r="' + addr + '"' + (style ? ' s="' + style + '"' : '') + '><v>' + v + '</v></c>';
+  if (rm){
+    const rowAttrs = rm[1].replace(/\s+spans="[^"]*"/, '');
+    let inner = rm[3] || '';
+    let insertAt = inner.length;
+    const cRe = /<c\b[^>]*\br="([A-Z]+)\d+"/g; let cm;
+    while ((cm = cRe.exec(inner))){ if (xlColToNum(cm[1]) > xlColToNum(col)){ insertAt = cm.index; break; } }
+    inner = inner.slice(0, insertAt) + newCell + inner.slice(insertAt);
+    return { xml: sheetXml.slice(0, rm.index) + '<row' + rowAttrs + '>' + inner + '</row>' + sheetXml.slice(rm.index + rm[0].length), status: 'written' };
+  }
+  const newRow = '<row r="' + row + '">' + newCell + '</row>';
+  const rowsRe = /<row\b[^>]*\br="(\d+)"/g; let r2, insertPos = -1;
+  while ((r2 = rowsRe.exec(sheetXml))){ if (+r2[1] > row){ insertPos = r2.index; break; } }
+  if (insertPos < 0){
+    if (/<sheetData\s*\/>/.test(sheetXml)) return { xml: sheetXml.replace(/<sheetData\s*\/>/, '<sheetData>' + newRow + '</sheetData>'), status: 'written' };
+    insertPos = sheetXml.indexOf('</sheetData>');
+  }
+  return { xml: sheetXml.slice(0, insertPos) + newRow + sheetXml.slice(insertPos), status: 'written' };
+}
+
+// Excel recalcule toutes les formules à l'ouverture (les totaux de la NF sont donc à jour).
+function xlForceRecalc(workbookXml){
+  if (/<calcPr\b/.test(workbookXml)){
+    return workbookXml.replace(/<calcPr\b([^>]*?)(\/?)>/, (all, attrs, slash) =>
+      '<calcPr' + attrs.replace(/\s+fullCalcOnLoad="[^"]*"/, '') + ' fullCalcOnLoad="1"' + slash + '>');
+  }
+  const anchors = ['<oleSize', '<customWorkbookViews', '<pivotCaches', '<smartTagPr', '<smartTagTypes', '<webPublishing', '<fileRecoveryPr', '<webPublishObjects', '<extLst', '</workbook>'];
+  for (const a of anchors){ const i = workbookXml.indexOf(a); if (i >= 0) return workbookXml.slice(0, i) + '<calcPr fullCalcOnLoad="1"/>' + workbookXml.slice(i); }
+  return workbookXml;
+}
+
+function xlDecodeXmlAttr(s){ return s.replace(/&amp;/g,'&').replace(/&lt;/g,'<').replace(/&gt;/g,'>').replace(/&quot;/g,'"').replace(/&apos;/g,"'"); }
+
+async function xlSheetPath(zip, sheetName){
+  const wb = await zip.file('xl/workbook.xml').async('string');
+  const rels = await zip.file('xl/_rels/workbook.xml.rels').async('string');
+  const sheetRe = /<sheet\b([^>]*)\/?>/g; let m, rid = null;
+  while ((m = sheetRe.exec(wb))){
+    const name = /\bname="([^"]*)"/.exec(m[1]), id = /\br:id="([^"]*)"/.exec(m[1]);
+    if (name && id && xlDecodeXmlAttr(name[1]) === sheetName){ rid = id[1]; break; }
+  }
+  if (!rid) throw new Error('Onglet « ' + sheetName + ' » introuvable dans le classeur.');
+  const relRe = /<Relationship\b([^>]*)\/?>/g;
+  while ((m = relRe.exec(rels))){
+    const id = /\bId="([^"]*)"/.exec(m[1]), target = /\bTarget="([^"]*)"/.exec(m[1]);
+    if (id && target && id[1] === rid){
+      const t = target[1];
+      return t.startsWith('/') ? t.slice(1) : 'xl/' + t.replace(/^\.\//, '');
+    }
+  }
+  throw new Error('Feuille « ' + sheetName + ' » introuvable dans les relations du classeur.');
+}
+
+// writes : [{ addr, value }]  ->  { blob, results: [{ addr, value, status }] }
+async function patchWorkbookValues(originalBuffer, sheetName, writes, mimeType){
+  const zip = await JSZip.loadAsync(originalBuffer);
+  const path = await xlSheetPath(zip, sheetName);
+  let sheetXml = await zip.file(path).async('string');
+  const results = [];
+  for (const w of writes){
+    const r = xlPatchCell(sheetXml, w.addr, w.value);
+    sheetXml = r.xml;
+    results.push({ addr: w.addr, value: w.value, status: r.status });
+  }
+  zip.file(path, sheetXml, { createFolders: false });
+  const wbXml = await zip.file('xl/workbook.xml').async('string');
+  zip.file('xl/workbook.xml', xlForceRecalc(wbXml), { createFolders: false });
+  const blob = await zip.generateAsync({ type: 'blob', mimeType, compression: 'DEFLATE' });
+  return { blob, results };
+}
+/* @@XLSX_PATCH_END */
+
+function downloadBlob(blob, fileName){
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = fileName;
+  document.body.appendChild(a); a.click(); document.body.removeChild(a);
+  setTimeout(() => URL.revokeObjectURL(url), 1000);
+}
+
+let lastJournalRows = null;
+
+btnExportEl.addEventListener('click', async () => {
+  if (!templateFile || !window._reviewItems){ alert("Lancez d'abord l'extraction (étapes 1 à 3)."); return; }
+  const journalRows = [['Code','Ligne cible','Champ','Valeur','Cellule','Statut','Ligne source du document']];
   const forceOverwrite = document.getElementById('force-overwrite').checked;
+  const writes = [], meta = [];
 
   document.querySelectorAll('table.review input').forEach(input => {
     const code = input.dataset.code, key = input.dataset.key;
-    if (key === 'valueN1') return; // garde-fou : les années précédentes ne sont jamais écrites (aucun <input> n'existe normalement pour ce champ), même en mode "écraser"
+    if (key === 'valueN1') return; // les années précédentes ne sont jamais écrites
     const item = window._reviewItems.find(it => it.code===code);
     if (!item) return;
     const field = item.fields.find(f=>f.key===key);
     if (!field) return;
     const raw = input.value.replace(/[ \u00A0]/g,'').replace(',', '.');
     const num = raw === '' ? null : parseFloat(raw);
-    let statusLabel = 'ignoré (vide)';
-    if (num !== null){
-      if (field.existing !== null && !forceOverwrite){
-        statusLabel = 'conservé (déjà renseigné) - valeur détectée non écrite';
-      } else {
-        writeNumberPreserveStyle(ws, field.addr, num);
-        statusLabel = (field.existing !== null) ? 'écrit (écrase une valeur existante)' : 'écrit automatiquement';
-      }
+    if (num === null || isNaN(num)){
+      journalRows.push([item.code, item.rowLabel||item.label, field.label, '', field.addr, 'ignoré (vide)', item.raw]);
+      return;
     }
-    journalRows.push([item.code, item.rowLabel||item.label, field.label, num, field.addr, statusLabel, item.raw]);
+    if (field.existing !== null && !forceOverwrite){
+      journalRows.push([item.code, item.rowLabel||item.label, field.label, num, field.addr, 'conservé (déjà renseigné) - valeur détectée non écrite', item.raw]);
+      return;
+    }
+    writes.push({ addr: field.addr, value: num });
+    meta.push({ item, field, num });
   });
 
-  // Traçabilité des valeurs "année précédente" détectées : jamais écrites dans le classeur,
-  // mais consignées ici pour montrer qu'elles ont bien été lues et volontairement protégées.
-  for (const item of (window._reviewItems||[])){
-    if (!item.fields) continue;
-    const f = item.fields.find(fl => fl.key === 'valueN1');
-    if (!f) continue;
-    const detected = (f.detected!==null && f.detected!==undefined) ? f.detected : '';
-    journalRows.push([item.code, item.rowLabel||item.label, f.label, detected, f.addr,
-      'non modifié - donnée année précédente protégée', item.raw]);
+  try {
+    const isXlsm = /\.xlsm$/i.test(templateFile.name);
+    const mime = isXlsm ? 'application/vnd.ms-excel.sheet.macroEnabled.12' : 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet';
+    const original = await templateFile.arrayBuffer();
+    const { blob, results } = await patchWorkbookValues(original, targetSheetName, writes, mime);
+    results.forEach((r, i) => {
+      const { item, field, num } = meta[i];
+      const status = r.status === 'formula' ? 'non écrit : la cellule contient une formule du modèle'
+                   : (field.existing !== null ? 'écrit (écrase une valeur existante)' : 'écrit');
+      journalRows.push([item.code, item.rowLabel||item.label, field.label, num, field.addr, status, item.raw]);
+    });
+    for (const item of (window._reviewItems||[])){
+      if (!item.fields) continue;
+      const f = item.fields.find(fl => fl.key === 'valueN1');
+      if (!f) continue;
+      journalRows.push([item.code, item.rowLabel||item.label, f.label, (f.detected ?? ''), f.addr, 'non modifié - année précédente protégée', item.raw]);
+    }
+    lastJournalRows = journalRows;
+    downloadBlob(blob, templateFile.name.replace(/(\.xlsm|\.xlsx)$/i, '_complete$1'));
+    const nbWritten = results.filter(r => r.status === 'written').length;
+    log('native', `Notice Financière générée : ${nbWritten} cellule(s) complétée(s), mise en forme du modèle conservée à l'identique.`);
+    const jb = document.getElementById('btn-export-journal'); if (jb) jb.style.display = 'inline-block';
+  } catch (err){
+    console.error(err);
+    alert("Échec de la génération de la Notice Financière : " + (err.message || err));
   }
+});
 
-  const wsJournal = XLSX.utils.aoa_to_sheet(journalRows);
-  wsJournal['!cols'] = [{wch:8},{wch:32},{wch:14},{wch:16},{wch:8},{wch:34},{wch:60}];
-  if (templateWb.SheetNames.includes('Journal OCR')) {
-    templateWb.Sheets['Journal OCR'] = wsJournal;
-  } else {
-    XLSX.utils.book_append_sheet(templateWb, wsJournal, 'Journal OCR');
-  }
-
-  const isXlsm = /\.xlsm$/i.test(templateFile.name);
-  const bookType = isXlsm ? 'xlsm' : 'xlsx';
-  const wbout = XLSX.write(templateWb, { bookType, type:'array', bookVBA:isXlsm });
-  const blob = new Blob([wbout], { type:'application/octet-stream' });
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = url;
-  a.download = templateFile.name.replace(/(\.xlsm|\.xlsx)$/i, `_complete$1`);
-  document.body.appendChild(a); a.click(); document.body.removeChild(a);
-  URL.revokeObjectURL(url);
+// Journal de contrôle : fichier séparé, pour ne rien ajouter au classeur de la NF.
+document.getElementById('btn-export-journal').addEventListener('click', () => {
+  if (!lastJournalRows) return;
+  const wb = XLSX.utils.book_new();
+  const ws = XLSX.utils.aoa_to_sheet(lastJournalRows);
+  ws['!cols'] = [{wch:8},{wch:34},{wch:14},{wch:16},{wch:8},{wch:44},{wch:70}];
+  XLSX.utils.book_append_sheet(wb, ws, 'Journal OCR');
+  XLSX.writeFile(wb, templateFile.name.replace(/(\.xlsm|\.xlsx)$/i, '_journal_controle.xlsx'));
 });
 
 /* ============================================================
@@ -2168,7 +2672,7 @@ function computeCAFG(v){
   const resultatNet = fv(v,'XI');
   const dotationsExploit = fv(v,'RL'), reprisesExploit = fv(v,'TJ');
   const dotationsFin = fv(v,'RN'), reprisesFin = fv(v,'TL');
-  const produitsCessions = fv(v,'TN'), vcCessions = fv(v,'RO');
+  const produitsCessions = fv(v,'TN'), vcCessions = Math.abs(fv(v,'RO')); // RO est saisi en négatif dans la NF
   const dettesFinancieres = fv(v,'DD');
 
   const cafg = resultatNet + dotationsExploit - reprisesExploit + dotationsFin - reprisesFin - produitsCessions + vcCessions;
