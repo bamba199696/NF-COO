@@ -122,6 +122,7 @@
   #log-box .tag-native{ color:#7FD9A8; }
   #log-box .tag-ocr{ color:var(--amber); }
   #log-box .tag-err{ color:#F19B92; }
+  #log-box .tag-warn{ color:#F2C46D; }
   @keyframes fadein{ to{ opacity:1; } }
 
   .kpi-row{ display:flex; gap:10px; flex-wrap:wrap; margin-top:18px; }
@@ -404,6 +405,27 @@
   .pv-foot span{ color:#E9041E; }
   @media (max-width:640px){ .pa-preview-meta{ order:3; flex-basis:100%; } .pv-page{ padding:24px 16px; } .pa-preview{ padding:0; } .pa-preview-card{ border-radius:0; } }
   .pa-synth-details{ margin:0 0 18px; }
+  .an-sources{ display:flex; flex-direction:column; gap:8px; margin-bottom:14px; }
+  .an-src{ display:flex; align-items:center; gap:12px; flex-wrap:wrap; }
+  .an-src-k{ flex:0 0 150px; font-size:0.8rem; font-weight:600; color:var(--ink); }
+  .an-src .file-chip{ margin:0; }
+  .an-src-none{ font-size:0.8rem; color:var(--muted); }
+  .an-drop{ padding:14px; }
+  .an-table{ margin-bottom:20px; }
+  .an-sec textarea.an-text{ width:100%; border:1px solid var(--paper-line); border-radius:6px; padding:9px 11px; font-family:'Inter',sans-serif; font-size:0.86rem; line-height:1.6; resize:none; overflow:hidden; background:#fff; color:var(--ink); }
+  @media (max-width:640px){ .an-src-k{ flex-basis:100%; } }
+  .cd-lignes input{ width:100%; min-width:110px; border:1px solid var(--paper-line); border-radius:4px; padding:6px 8px; font-size:0.84rem; background:#fff; }
+  .cd-lignes input{ text-align:left; }
+  .cd-lignes input.num{ text-align:right; font-family:'JetBrains Mono',monospace; }
+  .cd-lignes .cd-del{ border:0; background:none; font-size:1.1rem; color:var(--muted); cursor:pointer; }
+  .cd-lignes .cd-del:disabled{ opacity:0.3; cursor:default; }
+  .cd-total{ font-size:0.84rem; margin:8px 0; }
+  .cd-bad{ color:var(--err); margin-left:8px; }
+  .cd-note{ display:inline-block; font-size:0.72rem; font-weight:600; padding:2px 8px; border-radius:4px; white-space:nowrap; }
+  .cd-np{ background:var(--ok-bg); color:var(--ok); } .cd-nz{ background:#EEF2F6; color:var(--muted); }
+  .cd-nm{ background:#FBEEDA; color:#8A5300; } .cd-nc{ background:var(--err-bg); color:var(--err); }
+  .cd-avis-prop{ font-size:0.76rem; color:var(--muted); margin-top:4px; }
+  textarea.cd-concl{ width:100%; border:1px solid var(--paper-line); border-radius:6px; padding:9px 11px; font-family:'Inter',sans-serif; font-size:0.86rem; line-height:1.6; resize:none; overflow:hidden; background:#fff; }
   .pa-link{ border:none; background:none; color:var(--accent); font-size:0.76rem; cursor:pointer; padding:0; text-decoration:underline; }
   #pa-generate{ margin-top:14px; }
   .pa-secondary{ background:#EEF2F6; color:var(--ink-soft); margin-top:8px; }
@@ -594,6 +616,16 @@
   .signature{ display:flex; align-items:center; gap:6px; font-family:'JetBrains Mono',monospace; font-size:0.58rem; letter-spacing:0.02em; color:var(--muted); }
   .sig-mark{ display:inline-flex; align-items:center; justify-content:center; width:21px; height:21px; flex-shrink:0; border:1.2px solid currentColor;
              border-radius:50%; font-family:'Inter',sans-serif; font-size:0.42rem; font-weight:700; letter-spacing:0.02em; line-height:1; }
+  .unit-check{ margin-top:10px; padding:9px 12px; border-radius:var(--r-sm, 4px); font-size:0.82rem; border:1px solid var(--paper-line); line-height:1.5; }
+  .unit-check.warn{ display:flex; align-items:center; gap:10px; flex-wrap:wrap; }
+  .unit-check.ok{ background:var(--ok-bg); border-color:rgba(63,122,87,0.25); color:var(--ink); }
+  .unit-check.warn{ background:#FCF6EA; border-color:rgba(166,111,12,0.25); color:var(--ink); }
+  .unit-check select{ font-family:'Inter',sans-serif; font-size:0.82rem; padding:5px 8px; border:1px solid var(--line-strong, #D6D1D0); border-radius:4px; background:#fff; }
+  .balance-summary{ margin-top:14px; padding:10px 14px; border-radius:var(--r-sm, 4px); font-size:0.83rem; display:flex; align-items:center; gap:6px 18px; flex-wrap:wrap; border:1px solid; }
+  .balance-summary.good{ background:var(--ok-bg); border-color:rgba(63,122,87,0.35); color:var(--ok); }
+  .balance-summary.bad{ background:var(--err-bg); border-color:rgba(179,69,58,0.4); color:var(--err); }
+  .balance-summary .bs-year{ color:var(--ink); font-variant-numeric:tabular-nums; }
+  .balance-summary .bs-more{ margin-left:auto; border:1px solid currentColor; background:#fff; color:inherit; border-radius:4px; padding:3px 10px; font-size:0.76rem; cursor:pointer; }
 </style>
 </head>
 <body>
@@ -625,10 +657,22 @@
       <span class="si-icon"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg></span>
       <span>Pré-analyse</span><span class="si-num">2</span>
     </button>
+    <button class="sidebar-item" data-module="eco">
+      <span class="si-icon"><svg viewBox="0 0 24 24"><path d="M3 3v18h18"/><path d="M7 15l4-4 3 3 5-6"/></svg></span>
+      <span>Analyse économique</span><span class="si-num">3</span>
+    </button>
+    <button class="sidebar-item" data-module="fin">
+      <span class="si-icon"><svg viewBox="0 0 24 24"><path d="M3 10l9-6 9 6"/><path d="M5 10v8M9.5 10v8M14.5 10v8M19 10v8"/><path d="M3 21h18"/></svg></span>
+      <span>Analyse financière</span><span class="si-num">4</span>
+    </button>
+    <button class="sidebar-item" data-module="credap">
+      <span class="si-icon"><svg viewBox="0 0 24 24"><path d="M6 2h9l5 5v15a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1V3a1 1 0 0 1 1-1z"/><path d="M14 2v6h6"/><path d="M8.5 14.5l2.5 2.5 4.5-5"/></svg></span>
+      <span>CREDAP</span><span class="si-num">5</span>
+    </button>
     <div class="sidebar-progress">
-      <div class="spl" id="sidebar-progress-label">0 / 2 étapes</div>
+      <div class="spl" id="sidebar-progress-label">0 / 5 étapes</div>
       <div class="sidebar-steps" id="sidebar-steps">
-        <div class="sdot"></div><div class="sdot"></div>
+        <div class="sdot"></div><div class="sdot"></div><div class="sdot"></div><div class="sdot"></div><div class="sdot"></div>
       </div>
     </div>
   </nav>
@@ -639,7 +683,7 @@
   <section class="module active" id="module-nf">
 
   <header class="module-head">
-    <div class="eyebrow">Dossier crédit · Module 1 / 2</div>
+    <div class="eyebrow">Dossier crédit · Module 1 / 5</div>
     <h1>Notice Financière</h1>
     <p class="lede">Des états financiers du client à la Notice Financière remplie, contrôlée et prête à l'emploi.</p>
   </header>
@@ -658,6 +702,7 @@
       </label>
       <input type="file" id="input-template" accept=".xlsm,.xlsx">
       <div id="template-chip"></div>
+      <div id="template-unit" class="unit-check" style="display:none;"></div>
     </div>
   </div>
 
@@ -688,6 +733,7 @@
     <div class="step-body">
       <button class="action primary" id="btn-extract" disabled>Analyser les documents</button>
       <div id="log-box"></div>
+      <div id="balance-summary" class="balance-summary" style="display:none;" role="status"></div>
       <div class="kpi-row" id="kpis" style="display:none;">
         <div class="kpi"><div class="n" id="k-codes">0</div><div class="l">Postes détectés</div></div>
         <div class="kpi"><div class="n" id="k-auto">0</div><div class="l">Cellules à compléter</div></div>
@@ -725,7 +771,7 @@
   <!-- ============ MODULE 2 : PRÉ-ANALYSE ============ -->
   <section class="module" id="module-preanalyse">
     <header class="module-head">
-      <div class="eyebrow">Dossier crédit · Module 2 / 2</div>
+      <div class="eyebrow">Dossier crédit · Module 2 / 5</div>
       <h1>Pré-analyse du dossier</h1>
     </header>
 
@@ -809,6 +855,192 @@
         <summary>Chiffres clés recalculés depuis la NF</summary>
         <div id="pa-synthesis"></div>
       </details>
+    </div>
+  </section>
+
+
+  <!-- ============ MODULE 3 : ANALYSE ÉCONOMIQUE ============ -->
+  <section class="module" id="module-eco">
+    <header class="module-head">
+      <div class="eyebrow">Dossier crédit · Module 3 / 5</div>
+      <h1>Analyse économique</h1>
+    </header>
+
+    <div class="step">
+      <div class="step-head">
+        <div class="step-num" id="an-eco-num-1">1</div>
+        <div class="step-title">Sources</div>
+      </div>
+      <div class="step-body">
+        <div class="an-sources" id="an-eco-sources"></div>
+        <label class="drop an-drop" id="an-eco-drop" for="an-eco-input">
+          <div class="glyph" aria-hidden="true"></div>
+          <div class="instr"><b>Cliquez</b> ou glissez une autre NF</div>
+        </label>
+        <input type="file" id="an-eco-input" accept=".xlsm,.xlsx">
+      </div>
+    </div>
+
+    <div class="step">
+      <div class="step-head">
+        <div class="step-num">2</div>
+        <div class="step-title">Générer</div>
+      </div>
+      <div class="step-body">
+        <div class="field-grid">
+          <div><label for="an-eco-unit">Unité des montants de la NF</label>
+            <select id="an-eco-unit"><option>Milliers</option><option>Millions</option><option value="Unités">Unités (FCFA)</option></select></div>
+        </div>
+        <button class="action primary" id="an-eco-generate" disabled style="margin-top:14px;">Générer l'analyse économique</button>
+        <div id="an-eco-alerts"></div>
+      </div>
+    </div>
+
+    <div id="an-eco-result" style="display:none;">
+      <div class="step">
+        <div class="step-head"><div class="step-title">Analyse économique</div></div>
+        <div class="step-body">
+          <div class="an-table" id="an-eco-table"></div>
+          <div id="an-eco-sections"></div>
+          <div class="pa-download-bar">
+            <button type="button" class="action primary" id="an-eco-preview"><span class="ico ico-eye" aria-hidden="true"></span>Lire avant téléchargement</button>
+            <button type="button" class="action amber" id="an-eco-download"><span class="ico ico-download" aria-hidden="true"></span>Télécharger le Word</button>
+            <button type="button" class="action pa-secondary" id="an-eco-print"><span class="ico ico-print" aria-hidden="true"></span>Imprimer</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ MODULE 4 : ANALYSE FINANCIÈRE ============ -->
+  <section class="module" id="module-fin">
+    <header class="module-head">
+      <div class="eyebrow">Dossier crédit · Module 4 / 5</div>
+      <h1>Analyse financière</h1>
+    </header>
+
+    <div class="step">
+      <div class="step-head">
+        <div class="step-num" id="an-fin-num-1">1</div>
+        <div class="step-title">Sources</div>
+      </div>
+      <div class="step-body">
+        <div class="an-sources" id="an-fin-sources"></div>
+        <label class="drop an-drop" id="an-fin-drop" for="an-fin-input">
+          <div class="glyph" aria-hidden="true"></div>
+          <div class="instr"><b>Cliquez</b> ou glissez une autre NF</div>
+        </label>
+        <input type="file" id="an-fin-input" accept=".xlsm,.xlsx">
+      </div>
+    </div>
+
+    <div class="step">
+      <div class="step-head">
+        <div class="step-num">2</div>
+        <div class="step-title">Générer</div>
+      </div>
+      <div class="step-body">
+        <div class="field-grid">
+          <div><label for="an-fin-unit">Unité des montants de la NF</label>
+            <select id="an-fin-unit"><option>Milliers</option><option>Millions</option><option value="Unités">Unités (FCFA)</option></select></div>
+        </div>
+        <button class="action primary" id="an-fin-generate" disabled style="margin-top:14px;">Générer l'analyse financière</button>
+        <div id="an-fin-alerts"></div>
+      </div>
+    </div>
+
+    <div id="an-fin-result" style="display:none;">
+      <div class="step">
+        <div class="step-head"><div class="step-title">Analyse financière</div></div>
+        <div class="step-body">
+          <div class="an-table" id="an-fin-table"></div>
+          <div id="an-fin-sections"></div>
+          <div class="pa-download-bar">
+            <button type="button" class="action primary" id="an-fin-preview"><span class="ico ico-eye" aria-hidden="true"></span>Lire avant téléchargement</button>
+            <button type="button" class="action amber" id="an-fin-download"><span class="ico ico-download" aria-hidden="true"></span>Télécharger le Word</button>
+            <button type="button" class="action pa-secondary" id="an-fin-print"><span class="ico ico-print" aria-hidden="true"></span>Imprimer</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+
+  <!-- ============ MODULE 5 : SYNTHÈSE ET CREDAP ============ -->
+  <section class="module" id="module-credap">
+    <header class="module-head">
+      <div class="eyebrow">Dossier crédit · Module 5 / 5</div>
+      <h1>Synthèse du dossier et CREDAP</h1>
+    </header>
+
+    <div class="step">
+      <div class="step-head">
+        <div class="step-num" id="an-credap-num-1">1</div>
+        <div class="step-title">Sources</div>
+      </div>
+      <div class="step-body">
+        <div class="an-sources" id="an-credap-sources"></div>
+        <label class="drop an-drop" id="an-credap-drop" for="an-credap-input">
+          <div class="glyph" aria-hidden="true"></div>
+          <div class="instr"><b>Cliquez</b> ou glissez une autre NF</div>
+        </label>
+        <input type="file" id="an-credap-input" accept=".xlsm,.xlsx">
+      </div>
+    </div>
+
+    <div class="step">
+      <div class="step-head">
+        <div class="step-num">2</div>
+        <div class="step-title">Demande de crédit</div>
+      </div>
+      <div class="step-body">
+        <div class="field-grid">
+          <div><label for="cd-groupe">Groupe</label><input type="text" id="cd-groupe"></div>
+          <div><label for="cd-rct">Code RCT</label><input type="text" id="cd-rct"></div>
+          <div><label for="cd-secteur">Secteur d'activité</label><input type="text" id="cd-secteur"></div>
+          <div><label for="cd-notation">Notation interne</label><input type="text" id="cd-notation"></div>
+          <div><label for="cd-nature">Nature de la demande</label>
+            <select id="cd-nature"><option value="">Choisissez un élément.</option><option>Renouvellement à l'identique</option><option>Réamenagement des lignes</option><option>Augmentation des lignes</option><option>Nouvelle demande</option></select></div>
+          <div><label for="an-credap-unit">Unité des montants de la NF</label>
+            <select id="an-credap-unit"><option>Milliers</option><option>Millions</option><option value="Unités">Unités (FCFA)</option></select></div>
+        </div>
+        <div class="pa-label" style="margin-top:16px;">Lignes demandées</div>
+        <div id="cd-lignes"></div>
+        <button type="button" class="action pa-add" id="cd-add-ligne">+ Ajouter une ligne</button>
+        <label class="pa-label" for="cd-garanties" style="margin-top:14px;">Garanties</label>
+        <textarea id="cd-garanties" class="pa-textarea" rows="2"></textarea>
+        <button class="action primary" id="an-credap-generate" disabled style="margin-top:14px;">Générer la synthèse et le CREDAP</button>
+        <div id="an-credap-alerts"></div>
+      </div>
+    </div>
+
+    <div id="an-credap-result" style="display:none;">
+      <div class="step">
+        <div class="step-head"><div class="step-title">Appréciation du dossier</div></div>
+        <div class="step-body">
+          <div id="cd-grille"></div>
+          <div class="field-grid" style="margin-top:14px;">
+            <div><label for="cd-avis">Avis</label>
+              <select id="cd-avis"><option>Favorable</option><option>Favorable sous conditions</option><option>Réservé</option><option>Défavorable</option></select>
+              <div class="cd-avis-prop" id="cd-avis-prop"></div></div>
+          </div>
+          <label class="pa-label" for="cd-conditions" style="margin-top:12px;">Conditions</label>
+          <textarea id="cd-conditions" class="pa-textarea" rows="2"></textarea>
+          <label class="pa-label" for="cd-conclusion" style="margin-top:12px;">Conclusion</label>
+          <textarea id="cd-conclusion" class="an-text cd-concl" rows="3"></textarea>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-head"><div class="step-title">CREDAP</div></div>
+        <div class="step-body">
+          <div id="cd-sections"></div>
+          <div class="pa-download-bar">
+            <button type="button" class="action primary" id="an-credap-preview"><span class="ico ico-eye" aria-hidden="true"></span>Lire avant téléchargement</button>
+            <button type="button" class="action amber" id="an-credap-download"><span class="ico ico-download" aria-hidden="true"></span>Télécharger le CREDAP</button>
+            <button type="button" class="action pa-secondary" id="an-credap-print"><span class="ico ico-print" aria-hidden="true"></span>Imprimer</button>
+          </div>
+        </div>
+      </div>
     </div>
   </section>
 
@@ -1776,7 +2008,7 @@ function log(tag, text){
   logBox.style.display='block';
   const line = document.createElement('div');
   line.className='line';
-  const label = tag==='ocr'?'OCR':tag==='native'?'TEXTE':tag==='err'?'ERREUR':'';
+  const label = tag==='ocr'?'OCR':tag==='native'?'TEXTE':tag==='err'?'ERREUR':tag==='warn'?'ALERTE':'';
   line.innerHTML = (tag?`<span class="tag-${tag}">${label}</span> `:'') + escapeHtml(text);
   logBox.appendChild(line); logBox.scrollTop = logBox.scrollHeight;
 }
@@ -1788,15 +2020,48 @@ dropTemplate.addEventListener('dragleave', ()=>dropTemplate.classList.remove('dr
 dropTemplate.addEventListener('drop', e=>{ dropTemplate.classList.remove('dragover'); if (e.dataTransfer.files.length) setTemplate(e.dataTransfer.files[0]); });
 inputTemplate.addEventListener('change', ()=>{ if (inputTemplate.files.length) setTemplate(inputTemplate.files[0]); });
 
+// Unité de la NF (cellule C11) vérifiée dès le chargement du modèle, avant toute lecture des états
+// financiers : tous les montants (exercice N comme N-1) seront convertis dans cette unité.
+let templateUnit = null;   // { divisor, label, source:'modele'|'choix' }
+const NF_UNIT_LABELS = { 1e3:'milliers de FCFA', 1e6:'millions de FCFA', 1:'francs CFA' };
+function readNfUnit(ws){
+  const text = ws && ws['C11'] ? String(ws['C11'].v == null ? '' : ws['C11'].v).trim() : '';
+  const raw = text.toLowerCase();
+  if (raw.includes('million')) return { divisor:1e6, text };
+  if (raw.includes('millier')) return { divisor:1e3, text };
+  return { divisor:null, text };
+}
+function renderTemplateUnit(){
+  const box = document.getElementById('template-unit');
+  if (!templateFile || !templateUnit){ box.style.display = 'none'; box.innerHTML = ''; return; }
+  if (templateUnit.source === 'modele'){ box.style.display = 'none'; box.innerHTML = ''; return; }   // unité lue : rien à afficher
+  box.style.display = '';
+  box.className = 'unit-check warn';
+  box.innerHTML = `${templateUnit.text ? `Unité du modèle non reconnue (« ${escapeHtml(templateUnit.text)} »)` : 'Unité du modèle non renseignée'} : choisissez l'unité des montants de la NF avant l'analyse.
+    <select id="template-unit-choice" aria-label="Unité des montants de la NF"><option value="">Choisir…</option><option value="1000">Milliers</option><option value="1000000">Millions</option><option value="1">Francs CFA (unités)</option></select>`;
+  const sel = document.getElementById('template-unit-choice');
+  if (templateUnit.divisor) sel.value = String(templateUnit.divisor);
+  sel.addEventListener('change', () => { templateUnit.divisor = sel.value ? +sel.value : null; invalidateExtraction('Unité de la NF modifiée'); checkReadyToExtract(); });
+}
 async function setTemplate(file){
-  templateFile = file; templateWb = null;
+  templateFile = file; templateWb = null; templateUnit = null;
   invalidateExtraction('Modèle remplacé');
   templateChip.innerHTML = `<span class="file-chip">${escapeHtml(file.name)} <button onclick="clearTemplate()">×</button></span>`;
   document.getElementById('num-1').classList.add('done');
   document.getElementById('sub-1').textContent = 'chargé';
+  try {
+    await loadTemplateWorkbook();
+    const u = readNfUnit(templateWb.Sheets[targetSheetName]);
+    templateUnit = { divisor: u.divisor, text: u.text, source: u.divisor ? 'modele' : 'choix' };
+  } catch (err){
+    console.error(err);
+    templateUnit = null;
+    log('err', `Lecture du modèle impossible : ${err.message || err}`);
+  }
+  renderTemplateUnit();
   checkReadyToExtract();
 }
-function clearTemplate(){ templateFile=null; templateWb=null; invalidateExtraction('Modèle retiré'); templateChip.innerHTML=''; document.getElementById('num-1').classList.remove('done'); document.getElementById('sub-1').textContent='.xlsm ou .xlsx'; checkReadyToExtract(); }
+function clearTemplate(){ templateUnit=null; renderTemplateUnit(); templateFile=null; templateWb=null; invalidateExtraction('Modèle retiré'); templateChip.innerHTML=''; document.getElementById('num-1').classList.remove('done'); document.getElementById('sub-1').textContent='.xlsm ou .xlsx'; checkReadyToExtract(); }
 
 ['dragover','dragleave','drop'].forEach(evt => dropDocs.addEventListener(evt, e=>e.preventDefault()));
 dropDocs.addEventListener('dragover', ()=>dropDocs.classList.add('dragover'));
@@ -1808,7 +2073,7 @@ inputDocs.addEventListener('change', ()=>{ if (inputDocs.files.length) addDocs(i
 // et l'export pour qu'une NF ne puisse pas être générée à partir de données périmées.
 function invalidateExtraction(reason){
   const had = !!(window._reviewItems || extraction);
-  ['step-review', 'step-export', 'kpis'].forEach(id => { const el = document.getElementById(id); if (el) el.style.display = 'none'; });
+  ['step-review', 'step-export', 'kpis', 'balance-summary'].forEach(id => { const el = document.getElementById(id); if (el) el.style.display = 'none'; });
   window._reviewItems = null; extraction = null; lastJournalRows = null;
   if (had) log('err', `${reason} : relancez « Analyser les documents » avant de générer la NF.`);
 }
@@ -1831,7 +2096,7 @@ function renderDocsQueue(){
     </div>`).join('');
   document.getElementById('num-2').classList.toggle('done', docsQueue.length>0);
 }
-function checkReadyToExtract(){ btnExtract.disabled = !(templateFile && docsQueue.length>0); }
+function checkReadyToExtract(){ btnExtract.disabled = !(templateFile && docsQueue.length>0 && templateUnit && templateUnit.divisor); }
 
 // Recherche de secours : retrouve la valeur d'un code à partir de son libellé officiel
 // (celui du mapping NF <-> états financiers, déjà vérifié) quand le code à 2 lettres n'a pas
@@ -1890,6 +2155,7 @@ async function extractDocument(d){
   const ext = d.file.name.split('.').pop().toLowerCase();
   let allLines = [];
   let notes = [];
+  const statementLines = [];
   if (ext === 'pdf'){
     const buf = await d.file.arrayBuffer();
     const pdf = await pdfjsLib.getDocument({ data: buf }).promise;
@@ -1899,6 +2165,7 @@ async function extractDocument(d){
       const { lines: pl, method, tableRows, tokens: pageTokens } = await extractLinesFromPdfPage(page);
       if (method==='ocr'){ nbOcr++; log('ocr', `${d.file.name} - page ${i} : image détectée, OCR…`); }
       if (pageTokens) try { notes.push(...parseNotesFromTokens(pageTokens)); } catch (e){ console.warn('notes p.' + i, e); }
+      if ((tableRows || []).length >= 5) statementLines.push(...pl);     // pages des états (bilan, résultat, flux)
       allLines.push(...pl);
       registerTableRows(tableRows, i);
     }
@@ -1945,7 +2212,9 @@ async function extractDocument(d){
   for (const [code, det] of byCode) det.values = canonicalValues(code, det.values);
   notes = finalizeNotes(notes);
   if (notes.length) log('native', `${d.file.name} - ${notes.length} note(s) annexe(s) lue(s) : ${notes.map(n => n.id).join(', ')}.`);
-  return { byCode, lines, suspicious, nbOcr, nbTable, nbFallback, notes };
+  // unité lue uniquement sur les pages des états (la fiche de synthèse DGID est, elle, en milliers)
+  const unit = detectDocumentUnit(ext === 'pdf' ? statementLines : allLines);
+  return { byCode, lines, suspicious, nbOcr, nbTable, nbFallback, notes, unit };
 }
 
 function setDocYear(id, value){
@@ -1968,7 +2237,10 @@ async function runExtraction(){
 
   await loadTemplateWorkbook();
   let ws = templateWb.Sheets[targetSheetName];
-  const divisor = readNfUnitDivisor(ws);
+  // unité de la NF : celle du modèle, ou celle choisie quand le modèle ne la précise pas
+  if (!templateUnit){ const u = readNfUnit(ws); templateUnit = { divisor: u.divisor || 1, text: u.text, source: u.divisor ? 'modele' : 'choix' }; }
+  const divisor = templateUnit.divisor;
+  log('native', `Unité de la Notice Financière : ${NF_UNIT_LABELS[divisor]}${templateUnit.source === 'choix' ? ' (choisie, le modèle ne la précise pas)' : ''}.`);
   const docs = [];
 
   for (const d of docsQueue){
@@ -1982,7 +2254,7 @@ async function runExtraction(){
       window._allExtractedLines.push(...r.lines);
       suspiciousLines.push(...r.suspicious);
       nbOcrPages += r.nbOcr;
-      docs.push({ name: d.file.name, year, byCode: r.byCode, notes: r.notes, ocr: r.nbOcr > 0, lines: r.lines, entity: detectEntityName(r.lines) });
+      docs.push({ name: d.file.name, year, byCode: r.byCode, notes: r.notes, ocr: r.nbOcr > 0, lines: r.lines, entity: detectEntityName(r.lines), unit: r.unit });
       d.status='terminé';
     } catch(err){
       console.error(err);
@@ -1993,9 +2265,11 @@ async function runExtraction(){
   }
   if (ocrWorker){ await ocrWorker.terminate(); ocrWorker=null; }
 
+  // Unité des montants imprimés dans chaque état financier (FCFA, milliers, millions) : tous les montants
+  // sont ramenés en francs CFA avant conversion dans l'unité de la NF, pour l'exercice N comme pour N-1.
+  harmonizeDocumentUnits(docs);
   for (const doc of docs) normalizeDocForNF(doc, divisor);
-  const unitLabel = divisor === 1e3 ? 'milliers' : divisor === 1e6 ? 'millions' : 'unités';
-  log('native', `Montants convertis en ${unitLabel}, unité du modèle de Notice Financière.`);
+  log('native', `Montants convertis en ${NF_UNIT_LABELS[divisor]} pour tous les exercices (N, N-1, N-2).`);
 
   // Colonnes d'exercice non préparées dans le modèle (formules, mise en forme, en-têtes) : complétées
   // à partir des autres exercices du même classeur avant toute écriture.
@@ -2052,6 +2326,7 @@ async function runExtraction(){
   btnExtract.textContent = "Analyser les documents";
   btnExtract.disabled = false;
 
+  try { extraction.evalWb = await readXlsxWorkbook(await templateFile.arrayBuffer()); } catch (e){ extraction.evalWb = null; }
   buildReview();
   showBalancePopup(computeBalanceChecks(docs, divisor), restated);
 }
@@ -2081,14 +2356,6 @@ btnExtract.addEventListener('click', async () => {
 const NF_CHARGE_CODES = ['RA','RC','RE','RG','RH','RI','RJ','RK','RL','RM','RN','RO','RP','RQ','RS'];
 const NF_VARIATION_CODES = ['RB','RD','RF'];
 
-function readNfUnitDivisor(ws){
-  const text = ws && ws['C11'] ? String(ws['C11'].v == null ? '' : ws['C11'].v).trim() : '';
-  const raw = text.toLowerCase();
-  if (raw.includes('million')) return 1e6;
-  if (raw.includes('millier')) return 1e3;
-  log('err', text ? `Unité du modèle non reconnue (« ${text} ») : montants écrits en francs CFA (unités).` : `Unité du modèle non renseignée : montants écrits en francs CFA (unités).`);
-  return 1;
-}
 
 function detectNegativeChargeConvention(byCode){
   let neg = 0, pos = 0;
@@ -2260,6 +2527,42 @@ function detectEntityName(lines){
   let best = null, bestN = 0;
   for (const [k, n] of votes) if (n > bestN || (n === bestN && best && k.length < best.length)){ best = k; bestN = n; }
   return best;
+}
+
+// Unité des montants d'un état financier : mention « en milliers de FCFA », « (en millions) », « KFCFA »…
+// Les en-têtes se répètent sur chaque page : l'unité la plus citée l'emporte. À défaut : francs CFA.
+function detectDocumentUnit(lines){
+  const votes = { 1:0, 1e3:0, 1e6:0 };
+  for (const l of (lines || [])){
+    const t = String(typeof l === 'string' ? l : (l && l.text) || '').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '');
+    if (/\b(en|montants? en|exprimes? en|unite\s*:?)\s*(\(?\s*)?milliers?\b|\bk\s?fcfa\b|\bkxof\b|\bk\s?f\s?cfa\b|milliers de (francs|f\s?cfa|xof)/.test(t)) votes[1e3]++;
+    else if (/\b(en|montants? en|exprimes? en|unite\s*:?)\s*(\(?\s*)?millions?\b|\bm\s?fcfa\b|\bmxof\b|millions de (francs|f\s?cfa|xof)/.test(t)) votes[1e6]++;
+    else if (/\b(en|montants? en|exprimes? en|unite\s*:?)\s*(\(?\s*)?(f\s?cfa|francs cfa|xof)\b/.test(t)) votes[1]++;
+  }
+  const best = Object.entries(votes).sort((a, b) => b[1] - a[1])[0];
+  return best[1] > 0 ? +best[0] : 1;
+}
+
+// Tous les documents en francs CFA : mention d'unité lue dans chaque document, puis contrôle croisé de
+// l'exercice commun (exercice propre d'un document = colonne N-1 du suivant) pour corriger une unité non
+// mentionnée (rapport de 1 000 ou de 1 000 000 sur le total du bilan).
+function harmonizeDocumentUnits(docs){
+  const scale = (doc, k) => { for (const det of doc.byCode.values()) det.values = det.values.map(v => v == null ? v : v * k); };
+  const label = u => u === 1e3 ? 'milliers de FCFA' : u === 1e6 ? 'millions de FCFA' : 'FCFA';
+  for (const doc of docs){
+    if (doc.unit && doc.unit !== 1){ scale(doc, doc.unit); log('native', `${doc.name} : montants imprimés en ${label(doc.unit)}, convertis en francs CFA avant report dans la NF.`); }
+  }
+  const total = (doc, idx) => { const d = doc.byCode.get('BZ') || doc.byCode.get('DZ'); if (!d) return null; const v = d.values[d === doc.byCode.get('BZ') ? idx : (idx >= 2 ? idx - 2 : idx)]; return v == null || v === 0 ? null : Math.abs(v); };
+  for (const a of docs) for (const b of docs){
+    if (a.year == null || b.year !== a.year + 1) continue;
+    const own = total(a, 2), next = total(b, 3);                 // net N du plus ancien / net N-1 du plus récent
+    if (!own || !next) continue;
+    for (const k of [1e3, 1e6]){
+      const near = (x, y) => Math.abs(x / y - 1) < 0.02;
+      if (near(own * k, next) && !(a.unit && a.unit !== 1)){ scale(a, k); a.unit = k; log('native', `${a.name} : montants manifestement en ${label(k)} (écart d'un facteur ${k.toLocaleString('fr-FR')} avec ${b.name}), convertis en francs CFA.`); break; }
+      if (near(next * k, own) && !(b.unit && b.unit !== 1)){ scale(b, k); b.unit = k; log('native', `${b.name} : montants manifestement en ${label(k)} (écart d'un facteur ${k.toLocaleString('fr-FR')} avec ${a.name}), convertis en francs CFA.`); break; }
+    }
+  }
 }
 
 function detectDocumentYear(lines, fileName){
@@ -2457,7 +2760,23 @@ function showModal(title, bodyHtml){
   m.querySelector('.app-modal-ok').focus();
 }
 
-function showBalancePopup(checks, restated){
+// Rappel permanent de l'équilibre du bilan, sous le bouton d'analyse : vert si chaque exercice est
+// équilibré, rouge sinon. Un clic rouvre le détail.
+function renderBalanceSummary(checks, restated){
+  const box = document.getElementById('balance-summary');
+  if (!checks){ box.style.display = 'none'; box.innerHTML = ''; return; }
+  const f = v => v == null ? '-' : Math.round(v).toLocaleString('fr-FR');
+  const bad = !checks.length || checks.some(c => c.status !== 'équilibré');
+  box.className = 'balance-summary ' + (bad ? 'bad' : 'good');
+  box.innerHTML = `<b>${!checks.length ? 'Équilibre du bilan non vérifié' : bad ? 'Bilan déséquilibré' : 'Bilan équilibré'}</b>`
+    + checks.map(c => `<span class="bs-year">${c.year || c.period} : actif ${f(c.actif)} / passif ${f(c.passif)} FCFA${c.status === 'équilibré' ? '' : c.diff != null ? `, écart ${f(c.diff)}` : ', total manquant'}</span>`).join('')
+    + `<button type="button" class="bs-more">Détail</button>`;
+  box.style.display = '';
+  box.querySelector('.bs-more').addEventListener('click', () => showBalancePopup(checks, restated, true));
+}
+
+function showBalancePopup(checks, restated, noSummary){
+  if (!noSummary) renderBalanceSummary(checks, restated);
   if (!checks.length){
     showModal('Équilibre du bilan', '<p>Les totaux de l\'actif et du passif n\'ont pas été trouvés dans les documents : vérifiez l\'équilibre à l\'étape de relecture.</p>');
     return;
@@ -2476,7 +2795,7 @@ function showBalancePopup(checks, restated){
     <table class="review modal-table"><thead><tr><th>Exercice</th><th>Total actif (FCFA)</th><th>Total passif (FCFA)</th><th>Écart</th><th>Statut</th></tr></thead><tbody>${rows}</tbody></table>
     ${restatedHtml}
     ${window._nfRolled ? `<p><b>Notice Financière mise à jour :</b> exercices ${window._nfRolled.from.replace(/-/g, ', ')} → ${window._nfRolled.to.replace(/-/g, ', ')}. Les données déjà saisies ont été décalées de ${window._nfRolled.shift} exercice(s) vers la gauche et la colonne ${window._nfRolled.to.split('-').pop()} a été ajoutée.</p>` : ''}
-    <p class="mm">Totaux de l'actif et du passif lus dans les états financiers, avant conversion dans l'unité de la NF.</p>`);
+    <p class="mm">Totaux de l'actif et du passif lus dans les états financiers, en francs CFA. Report dans la NF en ${templateUnit ? NF_UNIT_LABELS[templateUnit.divisor] : 'unité de la NF'}, pour chaque exercice.</p>`);
 }
 /* @@MULTIYEAR_END */
 
@@ -2580,9 +2899,138 @@ function buildReview(){
   }
 
   items.sort((a,b) => (a.row || 999) - (b.row || 999));
+  applyColumnModes(items, ws);
   applyCrosscheckValidation(items);
   renderReview(items);
   window._reviewItems = items;
+}
+
+/* ============================================================
+   3ter. MONTANTS DÉJÀ SAISIS DANS LE MODÈLE : MÊME UNITÉ, MÊMES CHIFFRES ?
+   Une colonne d'exercice ne doit jamais mélanger des montants saisis dans le modèle et des montants
+   des états financiers qui ne leur correspondent pas (autre unité, autre jeu de comptes) : le net,
+   les totaux et les ratios de la NF seraient faux. Par exercice, les postes renseignés des deux côtés
+   sont comparés. Concordants : le modèle est conservé et seules les cases vides sont complétées.
+   Discordants (unité différente, ou au moins la moitié des postes) : la colonne est entièrement
+   reprise des états financiers, dans l'unité de la NF.
+   ============================================================ */
+function nfNum(v){ if (v === null || v === undefined || v === '') return null; const n = typeof v === 'number' ? v : parseFloat(String(v).replace(/[\s  ]/g, '').replace(',', '.')); return Number.isFinite(n) ? n : null; }
+function nfUnitFactor(ratios){
+  if (ratios.length < 2) return null;
+  const sorted = ratios.slice().sort((a, b) => a - b), med = sorted[Math.floor(sorted.length / 2)];
+  for (const f of [1e3, 1e6, 1e-3, 1e-6]){
+    const near = r => Math.abs(Math.log10(r / f)) < 0.06;
+    if (near(med) && ratios.filter(near).length >= 0.6 * ratios.length) return f;
+  }
+  return null;
+}
+const nfSectionOf = it => it.kind === 'actif' ? 'actif' : 'passif';    // passif et compte de résultat : même colonne de saisie
+const nfClose = (a, b) => Math.abs(a - b) <= Math.max(2, Math.abs(b) * 0.005);
+function nfColumnCheck(items, p, sec){
+  let n = 0, bad = 0; const ratios = [], samples = [];
+  const compare = (ex, det, it) => {
+    if (ex === null || det === null || det === undefined) return;
+    if (!ex && !det) return;
+    n++;
+    if (nfClose(ex, det)) return;
+    bad++;
+    if (ex && det && Math.sign(ex) === Math.sign(det)) ratios.push(Math.abs(det / ex));
+    if (samples.length < 5) samples.push({ label: it.rowLabel || it.label, ex, det });
+  };
+  for (const it of items){
+    if (!it.fields || it.kind === 'crosscheck' || it.kind === 'skip' || nfSectionOf(it) !== sec) continue;
+    if (it.kind === 'actif'){
+      const fb = it.fields.find(f => f.key === 'brut' + p), fa = it.fields.find(f => f.key === 'amort' + p);
+      if (!fb || (fb.existing === null && (!fa || fa.existing === null)) || fb.detected == null) continue;
+      const exNet = (nfNum(fb.existing) || 0) - (nfNum(fa && fa.existing) || 0);
+      compare(exNet, fb.detected - (fb.netOnly ? 0 : (fa && fa.detected) || 0), it);
+    } else {
+      const f = it.fields.find(f => f.key === 'value' + p);
+      if (!f || f.existing === null) continue;
+      compare(nfNum(f.existing), f.detected, it);
+    }
+  }
+  const unit = nfUnitFactor(ratios);
+  return { n, bad, unit, samples, replace: !!unit || (n >= 3 && bad / n >= 0.5) };
+}
+// Cases de saisie d'un exercice (hors formules du modèle) pour une section
+function nfInputRows(sec){ const out = []; for (const [a, b] of (sec === 'actif' ? NF_ROLL_ACTIF_ROWS : NF_ROLL_PASSIF_ROWS)) for (let r = a; r <= b; r++) out.push(r); return out; }
+function nfIsInput(ws, addr){ const c = ws[addr]; return !!c && c.v !== undefined && c.v !== null && c.v !== '' && (!c.f || !/\$?[A-Z]{1,3}\$?\d/.test(c.f)); }
+function nfInputCells(ws, p, sec){
+  const i = { N2:0, N1:1, N:2 }[p], out = [];
+  for (const r of nfInputRows(sec)){
+    const cols = sec === 'actif' ? NF_ROLL_ACTIF_COLS[i] : [NF_ROLL_PASSIF_COLS[i]];
+    for (const col of cols) if (nfIsInput(ws, col + r)) out.push(col + r);
+  }
+  return out;
+}
+// Total de la section tel qu'il ressortirait de la NF (cases conservées + cases complétées), recalculé avec
+// les formules du modèle et comparé au total des états financiers : un écart que les seuls montants des
+// états financiers n'ont pas révèle un mélange de deux jeux de chiffres.
+function nfTotalCheck(items, ws, p, sec){
+  const wb = extraction.evalWb, sheet = targetSheetName;
+  if (!wb || !wb.Sheets[sheet] || typeof makeEvaluator !== 'function') return null;
+  const own = items.filter(it => it.fields && nfSectionOf(it) === sec && it.kind !== 'crosscheck' && it.kind !== 'skip');
+  if (!own.some(it => it.fields.some(f => f.period === p && f.detected != null))) return null;   // aucun montant lu pour cet exercice
+  const inputs = nfInputCells(ws, p, sec);
+  if (!inputs.length) return null;                                                              // colonne vide dans le modèle
+  const totalAddr = sec === 'actif' ? PA_ACTIF_COLS[p].n + '62' : PA_PASSIF_COLS[p] + '103';
+  const run = (clearAll, onlyFill) => {
+    const cells = { ...wb.Sheets[sheet] };
+    if (clearAll) for (const a of inputs) cells[a] = { t:'n' };
+    for (const it of own) for (const f of it.fields){
+      if (f.period !== p || f.detected == null) continue;
+      if (onlyFill && nfFieldAction(it, f, f.detected).act !== 'write') continue;
+      cells[f.addr] = { t:'n', v: f.detected };
+    }
+    const ev = makeEvaluator({ SheetNames: wb.SheetNames, Sheets: { ...wb.Sheets, [sheet]: cells } });
+    return ev.num(sheet, totalAddr);
+  };
+  let mixed, efSum;
+  try { mixed = run(false, true); efSum = run(true, false); } catch (e){ return null; }
+  const target = (items.find(it => it.kind === 'crosscheck' && it.code === (sec === 'actif' ? 'BZ' : 'DZ')) || {})['detected' + p];
+  const ref = target != null ? target : efSum;
+  const tol = Math.max(5, Math.abs(ref) * 0.001);
+  if (Math.abs(mixed - ref) > tol && Math.abs(efSum - ref) < Math.abs(mixed - ref) / 2) return { mixed, ref };
+  return null;
+}
+function applyColumnModes(items, ws){
+  const unitLbl = templateUnit && NF_UNIT_LABELS[templateUnit.divisor] || 'unité de la NF';
+  const fmtN = v => Math.round(v).toLocaleString('fr-FR');
+  const secLbl = { actif:'actif', passif:'passif et compte de résultat' };
+  extraction.clearCells = [];
+  extraction.columnChecks = {};
+  for (const p of PERIODS) for (const sec of ['actif', 'passif']){
+    const y = extraction.years[p];
+    const ck = nfColumnCheck(items, p, sec);
+    const tot = ck.replace ? null : nfTotalCheck(items, ws, p, sec);
+    extraction.columnChecks[p + ':' + sec] = { ...ck, total: tot };
+    if (ck.replace || tot){
+      const fieldAddrs = new Set();
+      for (const it of items) if (nfSectionOf(it) === sec) for (const f of (it.fields || [])) if (f.period === p){ f.overwrite = true; fieldAddrs.add(f.addr); }
+      for (const addr of nfInputCells(ws, p, sec)) if (!fieldAddrs.has(addr)) extraction.clearCells.push(addr);
+      const why = ck.unit
+        ? `les montants déjà saisis dans le modèle sont environ ${(ck.unit >= 1 ? ck.unit : 1 / ck.unit).toLocaleString('fr-FR')} fois ${ck.unit >= 1 ? 'plus petits' : 'plus grands'} que ceux des états financiers (unité différente)`
+        : ck.replace ? `les montants déjà saisis dans le modèle diffèrent de ceux des états financiers pour ${ck.bad} poste(s) sur ${ck.n}`
+        : `les montants déjà saisis dans le modèle, complétés par les états financiers, donneraient un total de ${fmtN(tot.mixed)} au lieu de ${fmtN(tot.ref)}`;
+      log('err', `Exercice ${y}, ${secLbl[sec]} : ${why}. Cette partie de la colonne ${y} est entièrement reprise des états financiers, en ${unitLbl}, pour ne pas mélanger deux jeux de chiffres.`);
+    } else if (ck.bad){
+      log('warn', `Exercice ${y}, ${secLbl[sec]} : ${ck.bad} poste(s) déjà saisi(s) dans le modèle diffèrent des états financiers et sont conservés : ` +
+        ck.samples.map(s => `${s.label} (${fmtN(s.ex)} saisi, ${fmtN(s.det)} lu)`).join(' ; ') + '.');
+    }
+  }
+}
+// Décision d'écriture d'une case de la relecture : 'write' (force pour remplacer une saisie), 'clear', 'keep', 'empty'
+function nfFieldAction(item, field, num){
+  if (num === null) return field.overwrite && field.existing !== null ? { act:'clear' } : { act:'empty' };
+  if (field.existing !== null && !field.overwrite) return { act:'keep' };
+  // Ligne d'actif : un brut lu ne complète un amortissement saisi (et inversement) que s'ils concordent
+  const partner = item.kind === 'actif' ? item.fields.find(f => f.period === field.period && f !== field) : null;
+  if (!field.overwrite && partner && partner.existing !== null){
+    const pe = nfNum(partner.existing);
+    if (pe === null || partner.detected == null || !nfClose(pe, partner.detected)) return { act:'keep', pair:true };
+  }
+  return { act:'write', force: !!field.overwrite };
 }
 
 /* ============================================================
@@ -2676,7 +3124,7 @@ function renderReview(items){
       <table class="review"><thead><tr><th>Poste de la NF</th><th>Valeurs détectées par exercice</th><th>Statut</th><th>Ligne source</th></tr></thead><tbody>`;
     for (const it of list){
       const fieldsHtml = `<td><div class="year-fields${it.kind === 'actif' ? ' yf-pairs' : ''}">` + it.fields.map(f => {
-        const isConflict = f.existing !== null;
+        const isConflict = f.existing !== null && !f.overwrite;
         if (isConflict) reviewCount++; else autoCount++;
         const lock = isConflict ? ` <span class="lock-ico" role="img" aria-label="Valeur conservée" title="Cellule déjà remplie dans le modèle (${escapeHtml(String(f.existing))}) : conservée."></span>` : '';
         const shown = f.inputValue !== undefined ? f.inputValue : (f.detected!==null&&f.detected!==undefined ? f.detected : '');
@@ -2685,8 +3133,10 @@ function renderReview(items){
           <input type="text" inputmode="decimal" data-code="${escapeHtml(it.code)}" data-key="${f.key}" value="${escapeHtml(String(shown))}"${f.netOnly ? ' title="Seul le net est imprimé pour cet exercice (colonne N-1 du document) : saisi en brut, amortissements à compléter si connus."' : ''}>
         </label>`;
       }).join('') + '</div></td>';
-      const hasExisting = it.fields.some(f=>f.existing!==null);
-      const status = hasExisting ? `<span class="tag kept">valeurs existantes conservées</span>`
+      const hasExisting = it.fields.some(f=>f.existing!==null && !f.overwrite);
+      const replaced = it.fields.some(f=>f.existing!==null && f.overwrite);
+      const status = replaced ? `<span class="tag" style="background:var(--warn-bg, #FFF4E5);color:var(--warn, #9A5B00);">saisie du modèle remplacée</span>`
+        : hasExisting ? `<span class="tag kept">valeurs existantes conservées</span>`
         : (it.aggregate ? `<span class="tag aggregate">regroupé</span>` : `<span class="tag auto">auto</span>`);
       const viaLabelBadge = it.viaLabel ? `<span class="tag" style="background:var(--info-bg);color:var(--info);margin-left:4px;" title="Poste non lu directement : valeur retrouvée en cherchant son libellé dans le document, à vérifier.">via libellé</span>` : '';
       const raw = stripPostCodes(it.raw);
@@ -3209,9 +3659,13 @@ async function buildCompletedNf(){
     const item = window._reviewItems.find(it => it.code === input.dataset.code); if (!item) return;
     const field = item.fields.find(f => f.key === input.dataset.key); if (!field) return;
     const num = parseReviewInput(input.value);
-    if (num === null || Number.isNaN(num) || (field.existing !== null && !forceOverwrite)) return;
-    writes.push({ addr: field.addr, value: num });
+    if (Number.isNaN(num)) return;
+    const d = nfFieldAction(item, field, num);
+    if (d.act === 'write') writes.push({ addr: field.addr, value: num, force: d.force });
+    else if (d.act === 'clear') writes.push({ addr: field.addr, value: null, force: true });
   });
+  for (const addr of (extraction.clearCells || [])) writes.push({ addr, value: null, force: true });
+  if (templateUnit && templateUnit.source === 'choix' && templateUnit.divisor) writes.push({ addr:'C11', value: templateUnit.divisor === 1e6 ? 'Millions' : templateUnit.divisor === 1e3 ? 'Milliers' : 'Unités' });
   const isXlsm = /\.xlsm$/i.test(templateFile.name);
   const mime = isXlsm ? 'application/vnd.ms-excel.sheet.macroEnabled.12' : 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet';
   const { blob } = await patchWorkbookValues(await templateFile.arrayBuffer(), targetSheetName, writes, mime);
@@ -3232,6 +3686,11 @@ btnExportEl.addEventListener('click', async () => {
     if (!field) return;
     const num = parseReviewInput(input.value);
     if (num === null){
+      if (nfFieldAction(item, field, num).act === 'clear'){
+        writes.push({ addr: field.addr, value: null, force: true });
+        meta.push({ item, field, num: '' });
+        return;
+      }
       journalRows.push([item.code, item.rowLabel||item.label, field.label, '', field.addr, 'ignoré (vide)', item.raw]);
       return;
     }
@@ -3240,14 +3699,17 @@ btnExportEl.addEventListener('click', async () => {
       journalRows.push([item.code, item.rowLabel||item.label, field.label, input.value, field.addr, 'ignoré (valeur illisible)', item.raw]);
       return;
     }
-    if (field.existing !== null && !forceOverwrite){
-      journalRows.push([item.code, item.rowLabel||item.label, field.label, num, field.addr, 'conservé (déjà renseigné) - valeur détectée non écrite', item.raw]);
+    const dec = nfFieldAction(item, field, num);
+    if (dec.act === 'keep'){
+      journalRows.push([item.code, item.rowLabel||item.label, field.label, num, field.addr, dec.pair ? 'conservé (ligne déjà renseignée dans le modèle) - valeur détectée non écrite' : 'conservé (déjà renseigné) - valeur détectée non écrite', item.raw]);
       return;
     }
-    writes.push({ addr: field.addr, value: num });
+    writes.push({ addr: field.addr, value: num, force: dec.force });
     meta.push({ item, field, num });
   });
+  for (const addr of (extraction.clearCells || [])){ writes.push({ addr, value: null, force: true }); journalRows.push(['', '', '', '', addr, 'vidé (colonne reprise des états financiers)', '']); }
 
+  if (templateUnit && templateUnit.source === 'choix' && templateUnit.divisor) writes.push({ addr:'C11', value: templateUnit.divisor === 1e6 ? 'Millions' : templateUnit.divisor === 1e3 ? 'Milliers' : 'Unités' });
   if (unreadable.length && !confirm(`Valeur(s) illisible(s), non écrite(s) dans la NF :\n\n${unreadable.slice(0, 12).join('\n')}${unreadable.length > 12 ? `\n… et ${unreadable.length - 12} autre(s)` : ''}\n\nGénérer quand même la Notice Financière ?`)) return;
 
   try {
@@ -3256,9 +3718,11 @@ btnExportEl.addEventListener('click', async () => {
     const original = await templateFile.arrayBuffer();
     const { blob, results } = await patchWorkbookValues(original, targetSheetName, writes, mime);
     results.forEach((r, i) => {
+      if (!meta[i]) return;                                            // unité écrite dans le modèle
       const { item, field, num } = meta[i];
       const status = r.status === 'formula' ? 'non écrit : la cellule contient une formule du modèle'
-                   : (field.existing !== null ? 'écrit (écrase une valeur existante)' : 'écrit');
+                   : num === '' ? 'vidé (colonne reprise des états financiers)'
+                   : (field.existing !== null ? 'écrit (remplace la valeur du modèle)' : 'écrit');
       journalRows.push([item.code, item.rowLabel||item.label, field.label, num, field.addr, status, item.raw]);
     });
     lastJournalRows = journalRows;
@@ -3278,7 +3742,7 @@ btnExportEl.addEventListener('click', async () => {
 /* ============================================================
    7. NAVIGATION ENTRE MODULES (barre latérale)
    ============================================================ */
-const MODULE_ORDER = ['nf','preanalyse'];
+const MODULE_ORDER = ['nf','preanalyse','eco','fin','credap'];
 const moduleTabs = document.querySelectorAll('.sidebar-item');
 const moduleSections = document.querySelectorAll('.module');
 
@@ -3286,6 +3750,7 @@ function showModule(name){
   moduleSections.forEach(m => m.classList.toggle('active', m.id === 'module-'+name));
   moduleTabs.forEach(t => t.classList.toggle('active', t.dataset.module === name));
   if (name === 'preanalyse'){ paRefreshReady(); paAutoFromStep1(); }
+  if (name === 'eco' || name === 'fin' || name === 'credap') anOnShow(name);
 }
 moduleTabs.forEach(t => t.addEventListener('click', () => { if (!t.disabled) { showModule(t.dataset.module); closeMobileSidebar(); } }));
 
@@ -3453,7 +3918,7 @@ function makeEvaluator(wb){
       if (ch === '"'){ let j = i + 1, s = ''; while (j < src.length){ if (src[j] === '"'){ if (src[j+1] === '"'){ s += '"'; j += 2; continue; } break; } s += src[j++]; } toks.push({ t:'str', v:s }); i = j + 1; continue; }
       let m;
       const rest = src.slice(i);
-      if ((m = /^('(?:[^']|'')+'|[A-Za-z_][A-Za-z0-9_. ]*?)!(\$?[A-Z]{1,3}\$?\d+)(?::(\$?[A-Z]{1,3}\$?\d+))?/.exec(rest))){
+      if ((m = /^('(?:[^']|'')+'|[A-Za-z_][A-Za-z0-9_. ]*?)!(\$?[A-Z]{1,3}\$?\d+)(?::(?:(?:'(?:[^']|'')+'|[A-Za-z_][A-Za-z0-9_. ]*?)!)?(\$?[A-Z]{1,3}\$?\d+))?/.exec(rest))){
         const sheet = m[1].startsWith("'") ? m[1].slice(1, -1).replace(/''/g, "'") : m[1];
         toks.push({ t:'ref', sheet, a:m[2].replace(/\$/g,''), b:m[3] ? m[3].replace(/\$/g,'') : null }); i += m[0].length; continue;
       }
@@ -4831,6 +5296,1305 @@ function initPreanalyseModule(){
 }
 initPreanalyseModule();
 /* @@PREANALYSE_UI_END */
+/* @@ANALYSE_ENGINE_START */
+/* ============================================================
+   MODULES 3 ET 4 : ANALYSE ÉCONOMIQUE ET ANALYSE FINANCIÈRE
+   Sources : la NF (feuille de saisie et onglets de calcul : bilan actif, bilan passif, compte de
+   résultat, flux de trésorerie, synthèse), l'état financier (notes annexes, tableau des flux) et
+   le questionnaire de pré-analyse. Les montants restent dans l'unité de la NF.
+   ============================================================ */
+const AN_PERIODS = ['N2', 'N1', 'N'];
+function anNorm(s){ return String(s == null ? '' : s).toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/[ \s]+/g, ' ').trim(); }
+function anYearOf(v){
+  if (typeof v === 'number'){
+    if (v > 1900 && v < 2200) return Math.round(v);
+    if (v > 20000 && v < 80000) return new Date(Math.round((v - 25569) * 86400000)).getUTCFullYear();
+    return null;
+  }
+  const m = String(v == null ? '' : v).match(/(?:19|20)\d{2}/); return m ? +m[0] : null;
+}
+
+/* ---------- 1. Lecture des onglets de calcul de la NF ---------- */
+const AN_TAB_PATTERNS = { synth:/^synth[eè]se.*dev/i, actif:/^actif.*dev/i, passif:/^passif.*dev/i, resultat:/^r[ée]sultat.*dev/i, flux:/flux.*dev/i };
+function anTabReader(wb, d){
+  if (!wb || typeof makeEvaluator !== 'function') return null;
+  let ev; try { ev = makeEvaluator(wb); } catch (e){ return null; }
+  const val = (sh, a) => { try { return ev.value(sh, a); } catch (e){ return null; } };
+  const tabs = {};
+  for (const [k, re] of Object.entries(AN_TAB_PATTERNS)){
+    const name = wb.SheetNames.find(n => re.test(n)); if (!name) continue;
+    const cells = wb.Sheets[name], cols = {};
+    // ligne d'en-tête : dates de clôture des exercices (les colonnes « % » sont ignorées)
+    for (let r = 8; r <= 16 && !Object.keys(cols).length; r++){
+      for (const c of 'CDEFGHIJKL'){
+        if (!cells[c + r]) continue;
+        const yv = anYearOf(val(name, c + r));
+        for (const p of AN_PERIODS) if (yv && yv === d.years[p] && !cols[p]) cols[p] = c;
+      }
+    }
+    if (!Object.keys(cols).length) continue;
+    const rows = [];
+    for (const a of Object.keys(cells)){ const m = /^B(\d+)$/.exec(a); if (m && cells[a].v != null && cells[a].v !== '') rows.push({ r:+m[1], t:anNorm(cells[a].v) }); }
+    rows.sort((x, y) => x.r - y.r);
+    tabs[k] = { name, cols, rows };
+  }
+  const get = (k, re) => {
+    const t = tabs[k]; if (!t) return null;
+    const row = t.rows.find(x => re.test(x.t)); if (!row) return null;
+    const out = {};
+    for (const p of AN_PERIODS){
+      const c = t.cols[p]; const v = c ? val(t.name, c + row.r) : null;
+      out[p] = typeof v === 'number' && isFinite(v) ? v : null;
+    }
+    return out;
+  };
+  return { tabs, get, names: Object.values(tabs).map(t => t.name) };
+}
+
+/* ---------- 2. Agrégats par exercice (onglets de la NF, à défaut feuille de saisie) ---------- */
+function anBuildData(wb, d){
+  const ind = computeNfIndicators(d);
+  const T = anTabReader(wb, d);
+  const M = { N2:{}, N1:{}, N:{} }, src = {};
+  const R = (r, p) => d.cr[r][p], PS = (r, p) => d.passif[r][p], A = (r, p) => d.actifNet[r][p], B = (r, p) => d.actifBrut[r][p];
+  const g = (k, re) => T ? T.get(k, re) : null;
+  const set = (key, tabv, fb) => {
+    let fromTab = false;
+    for (const p of AN_PERIODS){
+      let v = tabv && tabv[p] != null ? tabv[p] : null;
+      if (v !== null) fromTab = true;
+      if (v === null && fb) v = fb(p);
+      M[p][key] = v == null || !isFinite(v) ? null : v;
+    }
+    src[key] = fromTab ? 'onglet' : 'saisie';
+  };
+  /* Compte de résultat */
+  set('ca', null, p => ind[p].ca);
+  set('production', g('resultat', /^activite$/), p => ind[p].ca + R(121, p) + R(122, p));
+  set('achats', g('resultat', /^- achats/), p => R(108, p) + R(115, p) + R(117, p));
+  set('margeBrute', g('resultat', /^marge brute/), p => R(127, p) + R(123, p) + R(124, p));
+  set('chargesExt', g('resultat', /charges externes/), p => R(123, p) + R(124, p));
+  set('va', g('resultat', /^valeur ajoutee/), p => R(127, p));
+  set('personnel', g('resultat', /salaires/), p => R(128, p));
+  set('impots', g('resultat', /^- impots, taxes|^- impots et taxes/), p => R(125, p));
+  set('ebe', g('resultat', /^excedent brut/), p => R(130, p));
+  set('dotAmort', g('resultat', /dotations aux amortissements/), p => R(132, p));
+  set('re', g('resultat', /^excedent net/), p => R(134, p));
+  set('prodFin', g('resultat', /produits? financiers/), p => R(135, p));
+  set('ff', g('resultat', /^- interets/), p => R(136, p));
+  set('hao', g('resultat', /^resultat hors activites/), p => R(144, p));
+  set('is', g('resultat', /impots sur les societes/), p => R(155, p));
+  set('rn', g('resultat', /^resultat de l.exercice$/), p => R(156, p));
+  set('mba', g('resultat', /^mba$/), p => ind[p].mba);
+  /* Bilan */
+  set('totalBilan', g('passif', /^total de bilan/), p => ind[p].totalBilan);
+  set('rp', g('passif', /^ressources propres/), p => ind[p].rp);
+  set('capital', null, p => PS(67, p) + PS(68, p));
+  set('reserves', null, p => PS(69, p) + PS(70, p) + PS(71, p) + PS(72, p) + PS(73, p) + PS(74, p));
+  set('ran', null, p => PS(75, p));
+  set('rnBilan', null, p => PS(76, p));
+  set('dettesMLT', g('passif', /^dettes a moyen et long terme/), p => PS(83, p) + PS(84, p) + PS(85, p) + PS(86, p));
+  set('creditBail', null, p => PS(85, p));
+  set('cca', null, p => PS(84, p) + PS(97, p));
+  set('provRC', g('passif', /^prov risques/), p => PS(82, p));
+  set('fournisseurs', null, p => PS(90, p));
+  set('fiscSoc', null, p => PS(91, p));
+  set('banques', null, p => PS(96, p));
+  set('partCT', null, p => PS(95, p));
+  set('immo', g('actif', /^total des immobilisations/), p => A(41, p));
+  set('immoBrut', null, p => B(41, p));
+  set('immoCorpBrut', null, p => B(27, p));
+  set('immoCorpAmort', null, p => d.actifAmort[27][p]);
+  set('stocks', g('actif', /^stocks$/), p => A(42, p));
+  set('clients', null, p => A(49, p));
+  set('cash', g('synth', /^cash/), p => ind[p].cash);
+  set('fdr', g('actif', /^fonds de roulement/), p => ind[p].fdr);
+  set('bfr', g('actif', /^besoin en fonds de roulement/), p => ind[p].bfr);
+  set('tn', g('actif', /^tresorerie nette/), p => ind[p].tn);
+  set('endBrut', g('synth', /^total endettement financier brut$/), p => ind[p].endBrut);
+  set('endNet', g('synth', /^endettement net \(inc\. intragroupe\)$/), p => ind[p].endNet);
+  set('horsBilan', g('synth', /^engagement hors-bilan/), () => 0);
+  /* Ratios (onglet de synthèse ; « NA » : recalcul) */
+  set('gearing', g('synth', /^total endettement financier brut \/ rp/), p => ind[p].gearing);
+  set('leverage', g('synth', /^total endettement financier brut \/ ebe/), p => ind[p].leverage);
+  set('couverture', g('synth', /^ebe \/ frais financiers/), p => ind[p].couvertureFF);
+  set('current', g('synth', /^current ratio/), p => ind[p].currentRatio);
+  set('quick', g('synth', /^quick ratio/), p => ind[p].quickRatio);
+  set('dio', g('synth', /^stocks \/ ca/), p => ind[p].dio);
+  set('dso', g('synth', /^cptes clients \/ ca/), p => ind[p].dso);
+  set('dpo', g('synth', /^cptes fournisseurs \/ achats/), p => ind[p].dpo);
+  /* Flux de trésorerie : un exercice n'a de flux que si l'exercice précédent est renseigné */
+  const prev = { N:'N1', N1:'N2', N2:null };
+  const okFlux = p => prev[p] && d.hasData[prev[p]] && d.hasData[p];
+  const fx = (key, re, fb) => {
+    const tv = re ? g('flux', re) : null;
+    set(key, tv, p => okFlux(p) ? fb(p) : null);
+    for (const p of AN_PERIODS) if (!okFlux(p)) M[p][key] = null;
+  };
+  fx('dBfr', /variation de bfr/, p => -(M[p].bfr - M[prev[p]].bfr));
+  fx('capex', /- capex/, p => -((B(41, p) - B(41, prev[p])) > 0 ? (B(41, p) - B(41, prev[p])) : 0));
+  fx('fcf', /flux de tresorerie disponible/, p => M[p].mba + M[p].dBfr + M[p].capex);
+  fx('dDettes', /dettes financieres$/, p => M[p].endBrut - M[prev[p]].endBrut);
+  fx('dCapital', /capital social/, p => M[p].capital - M[prev[p]].capital);
+  fx('dividendes', /versements de dividendes/, () => null);
+  return { M, ind, src, tabs: T ? T.names : [], has: d.hasData };
+}
+
+/* ---------- 3. Mise en forme ---------- */
+function anFmt(d){
+  const mult = d.info.multiplier, y = d.years;
+  const X = v => v == null ? 'n/d' : paXof(v, mult);
+  const XS = v => v == null ? 'n/d' : (v < 0 ? '-' : '') + paXof(Math.abs(v), mult);
+  const pct = v => v == null || !isFinite(v) ? 'n/d' : paNum(Math.round(v * 1000) / 10, 1) + ' %';
+  const ratio = v => v == null || !isFinite(v) ? 'n/d' : paNum(Math.round(v * 100) / 100, 2);
+  const fois = v => v == null || !isFinite(v) ? 'n/d' : paNum(Math.round(v * 10) / 10, 1) + ' fois';
+  const jours = v => v == null || !isFinite(v) ? 'n/d' : paNum(Math.round(v), 0) + ' jours';
+  const div = (a, b) => (a == null || !b ? null : a / b);
+  // « en hausse de 12 % », « en baisse de 4 % », « stable »
+  const evo = (a, b) => {
+    if (a == null || b == null) return '';
+    if (!a) return b ? 'nouveau poste' : 'nul';
+    const g = (b - a) / Math.abs(a);
+    if (Math.abs(g) < 0.02) return 'quasi stable';
+    if (g >= 4 && a > 0 && b > 0) return `multiplié par ${paNum(Math.round(b / a * 10) / 10, 1)}`;
+    return `en ${g > 0 ? 'hausse' : 'baisse'} de ${paNum(Math.round(Math.abs(g) * 100), 0)} %`;
+  };
+  const pts = (a, b) => (a == null || b == null) ? null : Math.round((b - a) * 1000) / 10;
+  const ptsTxt = (a, b) => { const v = pts(a, b); if (v == null) return ''; if (Math.abs(v) < 0.5) return 'stable'; return `${v > 0 ? 'en amélioration' : 'en recul'} de ${paNum(Math.abs(v), 1)} point${Math.abs(v) >= 2 ? 's' : ''}`; };
+  return { X, XS, pct, ratio, fois, jours, div, evo, pts, ptsTxt, y };
+}
+// Lignes principales d'une note annexe, si la note se rapproche bien du poste (montants de la note en FCFA)
+function anNoteLines(notes, key, posteNF, mult, k = 3){
+  const note = paFindNote(notes || [], key);
+  if (!note || !posteNF) return null;
+  const ref = Math.abs(posteNF * mult);
+  const close = x => x && Math.abs(Math.abs(x) - ref) <= Math.max(0.03 * ref, 1e6);
+  if (!note.rows.some(r => close(r.n))) return null;
+  // libellés de détail (les intertitres et sous-totaux sont imprimés en capitales), un seul par libellé
+  const detail = l => { const all = l.replace(/[^A-Za-zÀ-ÿ]/g, ''), low = l.replace(/[^a-zà-ÿ]/g, ''); return all.length >= 3 && low.length >= 0.5 * all.length; };
+  const seen = new Set();
+  const rows = note.rows.filter(r => !r.total && r.label && /^[A-ZÀ-Ý]/.test(r.label) && detail(r.label) && r.n > 0 && r.n < ref * 1.02)
+    .sort((a, b) => b.n - a.n).filter(r => { const key = anNorm(r.label); if (seen.has(key)) return false; seen.add(key); return true; })
+    .slice(0, k).filter(r => r.n >= 0.08 * ref);
+  return rows.length ? { id: note.id, rows: rows.map(r => ({ label: paLc(r.label), n: r.n, share: r.n / ref })) } : null;
+}
+const anJoin = l => l.length > 1 ? l.slice(0, -1).join(', ') + ' et ' + l[l.length - 1] : (l[0] || '');
+
+/* ---------- 4. Analyse économique ---------- */
+function anEconomic(d, data, ctx){
+  const { M } = data, F = anFmt(d), { X, XS, pct, div, evo, ptsTxt, y } = F;
+  const N = M.N, N1 = M.N1, N2 = M.N2, h1 = d.hasData.N1, h2 = d.hasData.N2;
+  const mult = d.info.multiplier, notes = (ctx.ef && ctx.ef.notes) || [];
+  const secs = [];
+  const add = (key, title, paras) => secs.push({ key, title, text: paras.filter(Boolean).join('\n\n') });
+
+  /* Activité */
+  {
+    const p = [];
+    let s = `En ${y.N}, le chiffre d’affaires s’établit à ${X(N.ca)}`;
+    if (h1) s += `, ${evo(N1.ca, N.ca)} par rapport à ${y.N1} (${X(N1.ca)})`;
+    p.push(s + '.');
+    if (h2 && h1 && N2.ca){
+      const cagr = N2.ca > 0 && N.ca > 0 ? Math.pow(N.ca / N2.ca, 0.5) - 1 : null;
+      p.push(`Sur la période ${y.N2} à ${y.N}, il passe de ${X(N2.ca)} à ${X(N.ca)}${cagr != null ? `, soit une évolution annuelle moyenne de ${cagr < 0 ? '-' : '+'}${paNum(Math.round(Math.abs(cagr) * 1000) / 10, 1)} %` : ''}${(N1.ca - N2.ca) * (N.ca - N1.ca) < 0 ? `, avec un ${N1.ca > N2.ca ? 'pic' : 'creux'} en ${y.N1}` : ''}.`);
+    }
+    const nl = anNoteLines(notes, 'ca', N.ca, mult);
+    if (nl) p.push(`Il se compose principalement de ${anJoin(nl.rows.map(r => `${Q(r.label)} (${paXofRaw(r.n)}, ${pct(r.share)})`))}, d’après la note ${nl.id}.`);
+    if (N.production != null && N.ca && Math.abs(N.production - N.ca) >= 0.03 * Math.abs(N.ca))
+      p.push(`La production de l’exercice atteint ${X(N.production)}, l’écart avec le chiffre d’affaires (${XS(N.production - N.ca)}) correspondant à la production stockée ou immobilisée et aux autres produits d’activité.`);
+    add('activite', 'Évolution de l’activité', p);
+  }
+  /* Marges et valeur ajoutée */
+  {
+    const p = [], mb = div(N.margeBrute, N.ca), mb1 = h1 ? div(N1.margeBrute, N1.ca) : null;
+    if (N.margeBrute != null) p.push(`La marge brute ressort à ${X(N.margeBrute)}, soit ${pct(mb)} du chiffre d’affaires${mb1 != null ? ` contre ${pct(mb1)} en ${y.N1} (${ptsTxt(mb1, mb)})` : ''}.`);
+    const ach = div(N.achats, N.ca), ach1 = h1 ? div(N1.achats, N1.ca) : null;
+    if (N.achats) p.push(`Les achats représentent ${pct(ach)} du chiffre d’affaires${ach1 != null ? ` (${pct(ach1)} en ${y.N1})` : ''}.`);
+    if (N.chargesExt) p.push(`Les charges externes s’élèvent à ${X(N.chargesExt)}${h1 ? `, ${evo(N1.chargesExt, N.chargesExt)}` : ''}, soit ${pct(div(N.chargesExt, N.ca))} du chiffre d’affaires.`);
+    const va = div(N.va, N.ca), va1 = h1 ? div(N1.va, N1.ca) : null;
+    p.push(`La valeur ajoutée atteint ${X(N.va)}${h1 ? `, ${evo(N1.va, N.va)}` : ''}, soit un taux de valeur ajoutée de ${pct(va)}${va1 != null ? ` contre ${pct(va1)} en ${y.N1}` : ''}.`);
+    add('marges', 'Marges et valeur ajoutée', p);
+  }
+  /* Personnel et fiscalité */
+  {
+    const p = [], tp = div(N.personnel, N.va), tp1 = h1 ? div(N1.personnel, N1.va) : null;
+    if (N.personnel){
+      let s = `Les charges de personnel s’élèvent à ${X(N.personnel)}${h1 ? `, ${evo(N1.personnel, N.personnel)}` : ''}, et absorbent ${pct(tp)} de la valeur ajoutée${tp1 != null ? ` (${pct(tp1)} en ${y.N1})` : ''}`;
+      if (tp != null && tp > 0.7) s += ', ce qui laisse peu de marge pour couvrir les autres charges';
+      p.push(s + '.');
+    }
+    if (N.impots) p.push(`Les impôts et taxes représentent ${X(N.impots)}, soit ${pct(div(N.impots, N.ca))} du chiffre d’affaires.`);
+    if (p.length) add('personnel', 'Charges de personnel et fiscalité', p);
+  }
+  /* EBE et résultat d'exploitation */
+  {
+    const p = [], m = div(N.ebe, N.ca), m1 = h1 ? div(N1.ebe, N1.ca) : null;
+    const niveau = m == null ? '' : m < 0 ? 'négative' : m < 0.08 ? 'faible' : m < 0.15 ? 'correcte' : 'confortable';
+    p.push(`L’excédent brut d’exploitation s’établit à ${XS(N.ebe)}${h1 ? `, ${evo(N1.ebe, N.ebe)}` : ''}, soit une marge de ${pct(m)}${m1 != null ? ` contre ${pct(m1)} en ${y.N1}` : ''}${niveau ? ` : la rentabilité d’exploitation est ${niveau}` : ''}.`);
+    if (N.dotAmort) p.push(`Après dotations aux amortissements de ${X(N.dotAmort)}${h1 ? ` (${X(N1.dotAmort)} en ${y.N1})` : ''}, le résultat d’exploitation ressort à ${XS(N.re)}, soit ${pct(div(N.re, N.ca))} du chiffre d’affaires.`);
+    add('ebe', 'Excédent brut d’exploitation et résultat d’exploitation', p);
+  }
+  /* Résultat financier et net */
+  {
+    const p = [];
+    if (N.ff){
+      let s = `Les frais financiers atteignent ${X(N.ff)}${h1 ? `, ${evo(N1.ff, N.ff)}` : ''}, soit ${pct(div(N.ff, N.ca))} du chiffre d’affaires`;
+      if (N.ebe > 0) s += ` et ${pct(div(N.ff, N.ebe))} de l’excédent brut d’exploitation`;
+      p.push(s + '.');
+    }
+    if (N.prodFin && Math.abs(N.prodFin) >= 0.005 * Math.abs(N.ca)) p.push(`Les produits financiers s’élèvent à ${X(N.prodFin)}.`);
+    if (N.hao && Math.abs(N.hao) >= 0.005 * Math.abs(N.ca)) p.push(`Le résultat hors activités ordinaires s’établit à ${XS(N.hao)}.`);
+    const mn = div(N.rn, N.ca);
+    p.push(`${N.is ? `Après un impôt sur le résultat de ${X(N.is)}, l` : 'L'}e résultat net ${N.rn < 0 ? 'est déficitaire' : 'ressort'} à ${XS(N.rn)}${h1 ? ` contre ${XS(N1.rn)} en ${y.N1}` : ''}, soit une marge nette de ${pct(mn)}.`);
+    if (N.mba != null) p.push(`La marge brute d’autofinancement atteint ${XS(N.mba)}${h1 ? `, ${evo(N1.mba, N.mba)}` : ''}, soit ${pct(div(N.mba, N.ca))} du chiffre d’affaires.`);
+    add('resultat', 'Résultat financier et résultat net', p);
+  }
+  /* Appréciation */
+  {
+    const p = [], parts = [];
+    const g = h1 ? paGrowth(N1.ca, N.ca) : null;
+    if (g != null) parts.push(Math.abs(g) < 0.02 ? 'une activité stable' : g > 0 ? `une progression de l’activité (+${paNum(Math.round(g * 100), 0)} %)` : `un repli de l’activité (-${paNum(Math.round(-g * 100), 0)} %)`);
+    const m = div(N.ebe, N.ca), m1 = h1 ? div(N1.ebe, N1.ca) : null;
+    if (m != null && m1 != null) parts.push(Math.abs(m - m1) < 0.005 ? `une marge d’EBE maintenue à ${pct(m)}` : m > m1 ? `une amélioration de la marge d’EBE (${pct(m)} contre ${pct(m1)})` : `une érosion de la marge d’EBE (${pct(m)} contre ${pct(m1)})`);
+    if (parts.length) p.push(`L’exercice ${y.N} se caractérise par ${anJoin(parts)}.`);
+    const mn = div(N.rn, N.ca);
+    if (N.rn < 0) p.push(`L’exercice est déficitaire : la capacité de l’entreprise à revenir à l’équilibre est un point clé du dossier.`);
+    else if (mn != null){
+      let s = `La rentabilité nette est ${mn < 0.02 ? 'faible' : mn < 0.05 ? 'modérée' : 'satisfaisante'} (${pct(mn)} du chiffre d’affaires)`;
+      if (N.ebe > 0 && N.ff / N.ebe > 0.3) s += `, pénalisée par des frais financiers qui absorbent ${pct(N.ff / N.ebe)} de l’EBE`;
+      p.push(s + '.');
+    }
+    add('appreciation', 'Appréciation', p);
+  }
+  /* Points en attente de réponse du client */
+  anPendingSection(secs, ctx.questions, ['activite'], 'Points en attente de réponse du client');
+  return { title: 'Analyse économique', sections: secs, table: anEcoTable(d, data) };
+}
+
+/* ---------- 5. Analyse financière ---------- */
+function anFinancial(d, data, ctx){
+  const { M } = data, F = anFmt(d), { X, XS, pct, ratio, fois, jours, div, evo, ptsTxt, y } = F;
+  const N = M.N, N1 = M.N1, h1 = d.hasData.N1;
+  const mult = d.info.multiplier, notes = (ctx.ef && ctx.ef.notes) || [];
+  const secs = [];
+  const add = (key, title, paras) => secs.push({ key, title, text: paras.filter(Boolean).join('\n\n') });
+
+  /* Structure financière */
+  {
+    const p = [], c = div(N.rp, N.totalBilan), c1 = h1 ? div(N1.rp, N1.totalBilan) : null;
+    p.push(`Le total du bilan s’élève à ${X(N.totalBilan)} à fin ${y.N}${h1 ? ` (${X(N1.totalBilan)} à fin ${y.N1})` : ''}.`);
+    const niveau = c == null ? '' : N.rp < 0 ? 'négatifs' : c < 0.15 ? 'faible' : c < 0.3 ? 'moyenne' : 'solide';
+    p.push(N.rp < 0
+      ? `Les ressources propres sont négatives à ${XS(N.rp)} : la situation nette doit être reconstituée.`
+      : `Les ressources propres atteignent ${X(N.rp)}${h1 ? `, ${evo(N1.rp, N.rp)}` : ''}, soit ${pct(c)} du total du bilan${c1 != null ? ` contre ${pct(c1)} en ${y.N1}` : ''} : la capitalisation est ${niveau}.`);
+    const comp = [];
+    if (N.capital) comp.push(`du capital social (${X(N.capital)})`);
+    if (N.reserves) comp.push(`des réserves et primes (${X(N.reserves)})`);
+    if (N.ran) comp.push(`du report à nouveau (${XS(N.ran)})`);
+    if (N.rnBilan) comp.push(`du résultat de l’exercice (${XS(N.rnBilan)})`);
+    if (comp.length > 1) p.push(`Elles se composent ${anJoin(comp)}.`);
+    if (N.capital > 0 && N.rp < N.capital / 2) p.push(`Les capitaux propres sont inférieurs à la moitié du capital social : l’assemblée générale doit statuer sur la poursuite de l’activité et les capitaux propres doivent être reconstitués dans les délais prévus par l’Acte uniforme OHADA.`);
+    if (h1 && N.rn != null){
+      const dRp = N.rp - N1.rp, gap = dRp - N.rn - (N.capital - N1.capital);
+      if (Math.abs(gap) >= Math.max(0.01 * Math.abs(N.totalBilan), 0.1 * Math.abs(N.rn)))
+        p.push(`La variation des ressources propres (${XS(dRp)}) ne s’explique pas par le seul résultat de l’exercice et les mouvements de capital : un écart de ${XS(gap)} reste à justifier (distribution de dividendes, imputation directe ou reclassement).`);
+    }
+    add('structure', 'Structure financière et fonds propres', p);
+  }
+  /* Endettement */
+  {
+    const p = [];
+    if (!N.endBrut) p.push(`L’entreprise ne présente pas d’endettement financier à fin ${y.N}.`);
+    else {
+      const ct = (N.banques || 0) + (N.partCT || 0), shareCT = div(ct, N.endBrut);
+      p.push(`L’endettement financier brut s’élève à ${X(N.endBrut)}${h1 ? `, ${evo(N1.endBrut, N.endBrut)} par rapport à ${y.N1} (${X(N1.endBrut)})` : ''}, dont ${X(N.dettesMLT)} de dettes à moyen et long terme et ${X(N.banques)} de concours bancaires courants${shareCT != null ? ` (${pct(shareCT)} de l’endettement à court terme)` : ''}.`);
+      const extra = [];
+      if (N.creditBail) extra.push(`${X(N.creditBail)} de dettes de location-acquisition`);
+      if (N.cca) extra.push(`${X(N.cca)} de comptes courants d’associés`);
+      if (extra.length) p.push(`Il comprend ${anJoin(extra)}.`);
+      const nl = anNoteLines(notes, 'dettesFin', N.dettesMLT, mult);
+      if (nl) p.push(`Les principales dettes financières sont ${anJoin(nl.rows.map(r => `${Q(r.label)} (${paXofRaw(r.n)})`))}, d’après la note ${nl.id}.`);
+      p.push(`Net de la trésorerie disponible (${X(N.cash)}), l’endettement ressort à ${XS(N.endNet)}.`);
+      const gq = N.gearing == null ? '' : N.gearing > 2 ? 'élevé' : N.gearing > 1 ? 'significatif' : 'maîtrisé';
+      const lq = N.leverage == null || N.ebe <= 0 ? '' : N.leverage > 4 ? 'élevé' : N.leverage > 3 ? 'à surveiller' : 'soutenable';
+      if (N.rp > 0) p.push(`Il représente ${fois(N.gearing)} les ressources propres${h1 && N1.gearing != null ? ` (${fois(N1.gearing)} en ${y.N1})` : ''}, un niveau d’endettement ${gq}.`);
+      if (N.ebe > 0) p.push(`L’endettement brut représente ${fois(N.leverage)} l’excédent brut d’exploitation${h1 && N1.leverage != null && N1.ebe > 0 ? ` (${fois(N1.leverage)} en ${y.N1})` : ''}, un niveau ${lq}. L’EBE couvre ${fois(N.couverture)} les frais financiers.`);
+      else p.push(`L’excédent brut d’exploitation étant ${N.ebe < 0 ? 'négatif' : 'nul'}, l’exploitation ne permet pas d’assurer le service de la dette.`);
+      if (N.partCT && N.mba != null && N.partCT > N.mba) p.push(`Les échéances à moins d’un an des emprunts (${X(N.partCT)}) dépassent la marge brute d’autofinancement de l’exercice (${XS(N.mba)}).`);
+    }
+    if (N.horsBilan) p.push(`Les engagements hors bilan s’élèvent à ${X(N.horsBilan)}.`);
+    add('endettement', 'Endettement', p);
+  }
+  /* Équilibre financier */
+  {
+    const p = [];
+    p.push(`Le fonds de roulement s’établit à ${XS(N.fdr)}${h1 ? ` (${XS(N1.fdr)} en ${y.N1})` : ''} pour un besoin en fonds de roulement de ${XS(N.bfr)}${h1 ? ` (${XS(N1.bfr)} en ${y.N1})` : ''}.`);
+    if (N.fdr < 0) p.push(`Le fonds de roulement négatif traduit le financement d’une partie des immobilisations par des ressources à court terme.`);
+    p.push(N.tn < 0
+      ? `La trésorerie nette est négative à ${X(Math.abs(N.tn))} : le besoin en fonds de roulement est financé en partie par des concours bancaires courants.`
+      : `La trésorerie nette est positive à ${X(N.tn)}.`);
+    const bfrJ = N.ca ? N.bfr / N.ca * 365 : null, bfrJ1 = h1 && N1.ca ? N1.bfr / N1.ca * 365 : null;
+    if (bfrJ != null) p.push(`Le besoin en fonds de roulement représente ${jours(bfrJ)} de chiffre d’affaires${bfrJ1 != null ? ` contre ${jours(bfrJ1)} en ${y.N1}` : ''}.`);
+    const parts = [];
+    if (N.dio != null && N.stocks) parts.push(`les stocks ${jours(N.dio)} de chiffre d’affaires${h1 && N1.dio != null ? ` (${jours(N1.dio)} en ${y.N1})` : ''}`);
+    if (N.dso != null && N.clients) parts.push(`les créances clients ${jours(N.dso)} de chiffre d’affaires${h1 && N1.dso != null ? ` (${jours(N1.dso)})` : ''}`);
+    if (N.dpo != null && N.fournisseurs) parts.push(`les dettes fournisseurs ${jours(N.dpo)} d’achats${h1 && N1.dpo != null ? ` (${jours(N1.dpo)})` : ''}`);
+    if (parts.length) p.push(`${anJoin(parts).replace(/^les stocks /, 'Les stocks représentent ').replace(/^les créances clients /, 'Les créances clients représentent ').replace(/^les dettes fournisseurs /, 'Les dettes fournisseurs représentent ')}.`);
+    add('equilibre', 'Équilibre financier et besoin en fonds de roulement', p);
+  }
+  /* Liquidité */
+  {
+    const p = [];
+    if (N.current != null){
+      let s = `Le ratio de liquidité générale ressort à ${ratio(N.current)}${h1 && N1.current != null ? ` (${ratio(N1.current)} en ${y.N1})` : ''} et la liquidité réduite, hors stocks, à ${ratio(N.quick)}`;
+      s += N.current < 1 ? ' : les actifs circulants ne couvrent pas les dettes à court terme.' : N.quick != null && N.quick < 0.5 ? ' : la liquidité repose largement sur l’écoulement des stocks.' : '.';
+      p.push(s);
+    }
+    if (p.length) add('liquidite', 'Liquidité', p);
+  }
+  /* Flux de trésorerie */
+  {
+    const p = [];
+    if (N.dBfr != null){
+      p.push(`En ${y.N}, la marge brute d’autofinancement de ${XS(N.mba)} ${N.dBfr < 0 ? `a été en partie absorbée par la hausse du besoin en fonds de roulement (${X(-N.dBfr)})` : `a été complétée par une baisse du besoin en fonds de roulement (${X(N.dBfr)})`}${N.capex ? ` et a financé des investissements de ${X(Math.abs(N.capex))}` : ''}.`);
+      p.push(`Le flux de trésorerie disponible ressort ainsi à ${XS(N.fcf)}${N.fcf < 0 && N.dDettes > 0 ? `, déficit couvert par une hausse de l’endettement financier de ${X(N.dDettes)}` : N.fcf > 0 && N.dDettes < 0 ? `, ce qui a permis de réduire l’endettement financier de ${X(-N.dDettes)}` : ''}.`);
+      if (N.dCapital > 0 && N.dCapital >= 0.01 * Math.abs(N.rp || 0)) p.push(`Les fonds propres ont été renforcés par un apport en capital de ${X(N.dCapital)}.`);
+      if (N.dividendes) p.push(`Des dividendes de ${X(Math.abs(N.dividendes))} ont été versés.`);
+    } else p.push(`Les flux de trésorerie ne peuvent être estimés sans l’exercice ${y.N1} dans la NF.`);
+    const tft = ctx.ef && ctx.ef.tft;
+    if (tft && tft.cafg != null) p.push(`Le tableau des flux de trésorerie de l’état financier fait ressortir une capacité d’autofinancement globale de ${XS(tft.cafg)}${tft.acquisitions != null ? ` et des décaissements d’investissement de ${X(Math.abs(tft.acquisitions))}` : ''}.`);
+    add('flux', 'Flux de trésorerie', p);
+  }
+  /* Appréciation */
+  {
+    const p = [], parts = [];
+    const c = div(N.rp, N.totalBilan);
+    if (N.rp < 0) parts.push('des fonds propres négatifs');
+    else if (c != null) parts.push(c < 0.15 ? `une capitalisation faible (${pct(c)} du bilan)` : c < 0.3 ? `une capitalisation moyenne (${pct(c)} du bilan)` : `une capitalisation solide (${pct(c)} du bilan)`);
+    if (N.endBrut){
+      if (N.ebe > 0 && N.leverage != null) parts.push(`un endettement représentant ${fois(N.leverage)} l’EBE`);
+      else parts.push('un endettement non couvert par l’exploitation');
+    }
+    if (N.tn != null) parts.push(N.tn < 0 ? 'une trésorerie nette négative' : 'une trésorerie nette positive');
+    if (parts.length) p.push(`La situation financière à fin ${y.N} se caractérise par ${anJoin(parts)}.`);
+    if (h1 && N.endBrut && N1.endBrut){
+      const g = paGrowth(N1.endBrut, N.endBrut);
+      if (g != null && Math.abs(g) >= 0.1) p.push(`L’endettement ${g > 0 ? 'progresse' : 'recule'} de ${paNum(Math.round(Math.abs(g) * 100), 0)} % sur l’exercice${g > 0 && N.ebe < N1.ebe ? ', alors que l’EBE se replie' : ''}.`);
+    }
+    add('appreciation', 'Appréciation', p);
+  }
+  anPendingSection(secs, ctx.questions, ['actif', 'passif', 'coherences'], 'Points en attente de réponse du client');
+  return { title: 'Analyse financière', sections: secs, table: anFinTable(d, data) };
+}
+
+// Questions du questionnaire de pré-analyse reprises dans l'analyse (numérotation du questionnaire)
+function anPendingSection(secs, q, keys, title){
+  if (!q) return;
+  const order = ['activite', 'actif', 'passif', 'coherences'];
+  let n = 0; const lines = [];
+  for (const k of order) for (const t of (q[k] || [])){
+    const txt = String(t).trim(); if (!txt) continue;
+    n++;
+    if (keys.includes(k)) lines.push(`- Question ${n} : ${txt}`);
+  }
+  if (lines.length) secs.push({ key:'attente', title, text: lines.join('\n') });
+}
+
+/* ---------- 6. Tableaux de synthèse ---------- */
+function anTable(d, data, rows){
+  const P = AN_PERIODS.filter(p => d.hasData[p]);
+  const dev = d.info.devise || 'XOF', mu = d.info.multiplier;
+  const unit = mu === 1e6 ? `millions de ${dev}` : mu === 1e3 ? `milliers de ${dev}` : dev;
+  const F = anFmt(d);
+  const fmt = (v, k) => v == null || !isFinite(v) ? 'n/d' : k === '%' ? F.pct(v) : k === 'x' ? F.ratio(v) : k === 'j' ? paNum(Math.round(v), 0) : paNum(Math.round(v), 0);
+  const head = [`En ${unit}`, ...P.map(p => String(d.years[p]))];
+  const body = rows.map(([label, f, k]) => [label, ...P.map(p => fmt(f(data.M[p], p), k))]);
+  return { head, body };
+}
+function anEcoTable(d, data){
+  const div = (a, b) => (a == null || !b ? null : a / b);
+  const prev = { N:'N1', N1:'N2' };
+  return anTable(d, data, [
+    ['Chiffre d’affaires', m => m.ca],
+    ['Variation du chiffre d’affaires', (m, p) => prev[p] && d.hasData[prev[p]] ? paGrowth(data.M[prev[p]].ca, m.ca) : null, '%'],
+    ['Marge brute', m => m.margeBrute], ['Taux de marge brute', m => div(m.margeBrute, m.ca), '%'],
+    ['Valeur ajoutée', m => m.va], ['Taux de valeur ajoutée', m => div(m.va, m.ca), '%'],
+    ['Charges de personnel', m => m.personnel],
+    ['Excédent brut d’exploitation', m => m.ebe], ['Marge d’EBE', m => div(m.ebe, m.ca), '%'],
+    ['Résultat d’exploitation', m => m.re], ['Frais financiers', m => m.ff],
+    ['Résultat net', m => m.rn], ['Marge nette', m => div(m.rn, m.ca), '%'],
+    ['Marge brute d’autofinancement', m => m.mba],
+  ]);
+}
+function anFinTable(d, data){
+  const div = (a, b) => (a == null || !b ? null : a / b);
+  return anTable(d, data, [
+    ['Total du bilan', m => m.totalBilan], ['Ressources propres', m => m.rp], ['Ressources propres / total du bilan', m => div(m.rp, m.totalBilan), '%'],
+    ['Endettement financier brut', m => m.endBrut], ['Endettement financier net', m => m.endNet],
+    ['Endettement brut / ressources propres', m => m.gearing, 'x'], ['Endettement brut / EBE', m => m.ebe > 0 ? m.leverage : null, 'x'], ['EBE / frais financiers', m => m.couverture, 'x'],
+    ['Fonds de roulement', m => m.fdr], ['Besoin en fonds de roulement', m => m.bfr], ['Trésorerie nette', m => m.tn],
+    ['Stocks (jours de CA)', m => m.dio, 'j'], ['Clients (jours de CA)', m => m.dso, 'j'], ['Fournisseurs (jours d’achats)', m => m.dpo, 'j'],
+    ['Liquidité générale', m => m.current, 'x'], ['Flux de trésorerie disponible', m => m.fcf],
+  ]);
+}
+
+/* ---------- 7. Document Word (généré sans modèle) ---------- */
+const AN_RPR = (o = {}) => `<w:rPr><w:rFonts w:ascii="Aptos" w:hAnsi="Aptos" w:cs="Aptos"/>${o.b ? '<w:b/><w:bCs/>' : ''}${o.u ? '<w:u w:val="single"/>' : ''}${o.color ? `<w:color w:val="${o.color}"/>` : ''}<w:sz w:val="${o.sz || 20}"/><w:szCs w:val="${o.sz || 20}"/></w:rPr>`;
+const anRun = (t, o) => `<w:r>${AN_RPR(o)}<w:t xml:space="preserve">${xmlEsc(t)}</w:t></w:r>`;
+const anPara = (t, o = {}, ppr = '') => `<w:p><w:pPr>${ppr}<w:spacing w:before="${o.before || 0}" w:after="${o.after == null ? 120 : o.after}" w:line="300" w:lineRule="auto"/>${o.jc ? `<w:jc w:val="${o.jc}"/>` : '<w:jc w:val="both"/>'}${AN_RPR(o)}</w:pPr>${t ? anRun(t, o) : ''}</w:p>`;
+function anDocxTable(t){
+  const W = 9638, first = 3838, other = Math.floor((W - first) / Math.max(1, t.head.length - 1));
+  const widths = [first, ...t.head.slice(1).map(() => other)];
+  const b = '<w:top w:val="single" w:sz="4" w:space="0" w:color="808080"/><w:left w:val="single" w:sz="4" w:space="0" w:color="808080"/><w:bottom w:val="single" w:sz="4" w:space="0" w:color="808080"/><w:right w:val="single" w:sz="4" w:space="0" w:color="808080"/><w:insideH w:val="single" w:sz="4" w:space="0" w:color="808080"/><w:insideV w:val="single" w:sz="4" w:space="0" w:color="808080"/>';
+  const cell = (txt, w, head, right) => `<w:tc><w:tcPr><w:tcW w:w="${w}" w:type="dxa"/>${head ? '<w:shd w:val="clear" w:color="auto" w:fill="C00000"/>' : ''}<w:vAlign w:val="center"/></w:tcPr><w:p><w:pPr><w:spacing w:before="20" w:after="20"/><w:jc w:val="${right ? 'right' : 'left'}"/><w:rPr><w:sz w:val="17"/><w:szCs w:val="17"/></w:rPr></w:pPr>${anRun(txt, { sz:17, b:head, color: head ? 'FFFFFF' : null })}</w:p></w:tc>`;
+  const row = (cells, head) => `<w:tr>${head ? '<w:trPr><w:tblHeader/></w:trPr>' : ''}${cells.map((c, i) => cell(c, widths[i], head, i > 0)).join('')}</w:tr>`;
+  return `<w:tbl><w:tblPr><w:tblW w:w="${W}" w:type="dxa"/><w:tblBorders>${b}</w:tblBorders><w:tblCellMar><w:left w:w="80" w:type="dxa"/><w:right w:w="80" w:type="dxa"/></w:tblCellMar></w:tblPr><w:tblGrid>${widths.map(w => `<w:gridCol w:w="${w}"/>`).join('')}</w:tblGrid>`
+    + row(t.head, true) + t.body.map(r => row(r, false)).join('') + '</w:tbl>' + anPara('', { after:120 });
+}
+function anDocBody(doc){
+  let x = anPara(doc.title.toUpperCase(), { b:true, sz:28, color:'E9041E', jc:'center', after:200 });
+  x += anPara(`Nom de l’entité : ${doc.entite}`, { b:true, after:40, jc:'left' });
+  x += anPara(`Exercice analysé : ${doc.exercice}`, { after:40, jc:'left' });
+  x += anPara(`Sources : ${doc.sources}`, { after:240, jc:'left', color:'595959', sz:18 });
+  x += anPara('Chiffres clés', { b:true, sz:22, color:'1F3864', after:80 }, '<w:keepNext/>');
+  x += anDocxTable(doc.table);
+  doc.sections.forEach((s, i) => {
+    x += anPara(`${i + 1}. ${s.title}`, { b:true, sz:22, color:'1F3864', before:200, after:100 }, '<w:keepNext/>');
+    for (const block of String(s.text || '').split(/\n\s*\n/)){
+      const lines = block.split('\n').map(l => l.trim()).filter(Boolean);
+      if (!lines.length) continue;
+      if (lines.every(l => /^-\s+/.test(l))) lines.forEach(l => { x += `<w:p><w:pPr><w:numPr><w:ilvl w:val="0"/><w:numId w:val="1"/></w:numPr><w:spacing w:after="60" w:line="300" w:lineRule="auto"/><w:ind w:left="567" w:hanging="283"/><w:jc w:val="both"/></w:pPr>${anRun(l.replace(/^-\s+/, ''), {})}</w:p>`; });
+      else x += anPara(lines.join(' '), {});
+    }
+  });
+  x += anPara(`DOSSIER - ${doc.entite}`, { b:true, before:240, jc:'left', sz:18 });
+  return x;
+}
+async function anBuildDocx(doc){
+  const zip = new JSZip();
+  zip.file('[Content_Types].xml', '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types"><Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/><Default Extension="xml" ContentType="application/xml"/><Override PartName="/word/document.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.document.main+xml"/><Override PartName="/word/styles.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.styles+xml"/><Override PartName="/word/numbering.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.numbering+xml"/></Types>');
+  zip.file('_rels/.rels', '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="word/document.xml"/></Relationships>');
+  zip.file('word/_rels/document.xml.rels', '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/styles" Target="styles.xml"/><Relationship Id="rId2" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/numbering" Target="numbering.xml"/></Relationships>');
+  zip.file('word/styles.xml', '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><w:styles xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main"><w:docDefaults><w:rPrDefault><w:rPr><w:rFonts w:ascii="Aptos" w:hAnsi="Aptos" w:cs="Aptos" w:eastAsia="Aptos"/><w:sz w:val="20"/><w:szCs w:val="20"/><w:lang w:val="fr-FR"/></w:rPr></w:rPrDefault><w:pPrDefault><w:pPr><w:spacing w:after="120"/></w:pPr></w:pPrDefault></w:docDefaults><w:style w:type="paragraph" w:default="1" w:styleId="Normal"><w:name w:val="Normal"/></w:style><w:style w:type="table" w:default="1" w:styleId="TableNormal"><w:name w:val="Normal Table"/><w:tblPr><w:tblInd w:w="0" w:type="dxa"/><w:tblCellMar><w:top w:w="0" w:type="dxa"/><w:left w:w="108" w:type="dxa"/><w:bottom w:w="0" w:type="dxa"/><w:right w:w="108" w:type="dxa"/></w:tblCellMar></w:tblPr></w:style></w:styles>');
+  zip.file('word/numbering.xml', '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><w:numbering xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main"><w:abstractNum w:abstractNumId="0"><w:multiLevelType w:val="singleLevel"/><w:lvl w:ilvl="0"><w:start w:val="1"/><w:numFmt w:val="bullet"/><w:lvlText w:val="-"/><w:lvlJc w:val="left"/><w:pPr><w:ind w:left="567" w:hanging="283"/></w:pPr><w:rPr><w:rFonts w:ascii="Aptos" w:hAnsi="Aptos"/></w:rPr></w:lvl></w:abstractNum><w:num w:numId="1"><w:abstractNumId w:val="0"/></w:num></w:numbering>');
+  zip.file('word/document.xml', `<?xml version="1.0" encoding="UTF-8" standalone="yes"?><w:document xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"><w:body>${anDocBody(doc)}<w:sectPr><w:pgSz w:w="11906" w:h="16838"/><w:pgMar w:top="1134" w:right="1134" w:bottom="1134" w:left="1134" w:header="567" w:footer="567" w:gutter="0"/></w:sectPr></w:body></w:document>`);
+  return zip.generateAsync({ type:'blob', mimeType:'application/vnd.openxmlformats-officedocument.wordprocessingml.document', compression:'DEFLATE' });
+}
+
+/* ---------- 8. Aperçu et impression (même contenu que le Word) ---------- */
+const AN_PRINT_CSS = `@page{ size:A4; margin:18mm 18mm 18mm; }
+  body{ margin:0; -webkit-print-color-adjust:exact; print-color-adjust:exact; }
+  .av-page{ font-family:Aptos, Calibri, 'Segoe UI', Arial, sans-serif; font-size:10.5pt; line-height:1.5; color:#000; }
+  .av-title{ text-align:center; color:#E9041E; font-weight:700; font-size:14pt; margin-bottom:12pt; }
+  .av-id{ margin:0 0 2pt; }
+  .av-src{ color:#595959; font-size:9pt; margin:0 0 14pt; }
+  .av-h{ color:#1F3864; font-weight:700; font-size:11pt; margin:14pt 0 5pt; break-after:avoid; page-break-after:avoid; }
+  .av-p{ text-align:justify; margin:0 0 6pt; }
+  .av-ul{ margin:0 0 6pt; padding-left:22pt; list-style:'-  '; }
+  .av-ul li{ margin-bottom:3pt; text-align:justify; }
+  .av-t{ border-collapse:collapse; width:100%; font-size:8.5pt; margin:4pt 0 10pt; }
+  .av-t th{ background:#C00000; color:#fff; font-weight:700; padding:2pt 5pt; text-align:right; border:1px solid #808080; }
+  .av-t th:first-child, .av-t td:first-child{ text-align:left; }
+  .av-t td{ padding:2pt 5pt; text-align:right; border:1px solid #808080; }
+  .av-foot{ margin-top:18pt; font-weight:700; font-size:9pt; }`;
+function anDocHtml(doc){
+  const e = escapeHtml;
+  let h = `<div class="av-page"><div class="av-title">${e(doc.title.toUpperCase())}</div>
+    <p class="av-id"><b>Nom de l’entité : ${e(doc.entite)}</b></p><p class="av-id">Exercice analysé : ${e(String(doc.exercice))}</p>
+    <p class="av-src">Sources : ${e(doc.sources)}</p>
+    <div class="av-h">Chiffres clés</div>
+    <table class="av-t"><thead><tr>${doc.table.head.map(c => `<th>${e(c)}</th>`).join('')}</tr></thead><tbody>${doc.table.body.map(r => `<tr>${r.map(c => `<td>${e(c)}</td>`).join('')}</tr>`).join('')}</tbody></table>`;
+  doc.sections.forEach((s, i) => {
+    h += `<div class="av-h">${i + 1}. ${e(s.title)}</div>`;
+    for (const block of String(s.text || '').split(/\n\s*\n/)){
+      const lines = block.split('\n').map(l => l.trim()).filter(Boolean);
+      if (!lines.length) continue;
+      if (lines.every(l => /^-\s+/.test(l))) h += `<ul class="av-ul">${lines.map(l => `<li>${e(l.replace(/^-\s+/, ''))}</li>`).join('')}</ul>`;
+      else h += `<p class="av-p">${e(lines.join(' '))}</p>`;
+    }
+  });
+  return h + `<div class="av-foot">DOSSIER - ${e(doc.entite)}</div></div>`;
+}
+/* @@ANALYSE_ENGINE_END */
+/* @@ANALYSE_UI_START */
+/* ============================================================
+   MODULES 3 ET 4 : interface de l'analyse économique et de l'analyse financière
+   ============================================================ */
+const AN_KINDS = {
+  eco: { title:'Analyse économique', build:(d, data, ctx) => anEconomic(d, data, ctx), file:'ANALYSE ECONOMIQUE' },
+  fin: { title:'Analyse financière', build:(d, data, ctx) => anFinancial(d, data, ctx), file:'ANALYSE FINANCIERE' },
+};
+// nfFrom : 'upload' (déposée dans un des deux modules), 'preanalyse' (NF de la pré-analyse), 'etape1' (NF remplie par l'outil)
+const anState = { wb:null, d:null, nfName:'', nfFrom:null, sig:null, out:{}, edited:{} };
+
+function anAlert(k, html, kind){
+  const el = document.getElementById(`an-${k}-alerts`);
+  if (!html){ el.innerHTML = ''; return; }
+  el.innerHTML += `<div class="pa-alert ${kind || ''}">${html}</div>`;
+}
+
+async function anLoadNfFile(file, k){
+  try {
+    const wb = await readXlsxWorkbook(await file.arrayBuffer());
+    const d = extractNfData(wb);
+    if (!d.hasData.N && !d.hasData.N1){ anAlert(k, 'Aucune donnée chiffrée trouvée dans la feuille de saisie de ce classeur.', 'err'); return; }
+    Object.assign(anState, { wb, d, nfName:file.name, nfFrom:'upload', sig:null, edited:{} });
+    for (const kk of Object.keys(AN_KINDS)) anAlert(kk, '');
+    anRenderSources();
+  } catch (err){
+    console.error(err);
+    anAlert(k, 'Lecture impossible de la Notice Financière : ' + escapeHtml(err.message || String(err)), 'err');
+  }
+}
+
+// NF de l'analyse : déposée ici, sinon celle de la pré-analyse, sinon celle remplie à l'étape Notice Financière
+async function anResolveNf(){
+  if (anState.nfFrom === 'upload' && anState.d) return;
+  if (paState.data && paState.wb){
+    if (anState.d !== paState.data) Object.assign(anState, { wb:paState.wb, d:paState.data, nfName:paState.nfName, nfFrom:'preanalyse', sig:null });
+    return;
+  }
+  if (paStep1Available()){
+    try {
+      const nf = await buildCompletedNf();
+      if (anState.nfFrom === 'etape1' && anState.sig === nf.signature && anState.d) return;
+      const wb = await readXlsxWorkbook(await nf.blob.arrayBuffer());
+      Object.assign(anState, { wb, d:extractNfData(wb), nfName:nf.name, nfFrom:'etape1', sig:nf.signature });
+      window._lastGeneratedNf = { blob:nf.blob, name:nf.name };
+    } catch (err){ console.error(err); }
+    return;
+  }
+  if (anState.nfFrom !== 'upload') Object.assign(anState, { wb:null, d:null, nfName:'', nfFrom:null });
+}
+
+// État financier de l'exercice N : celui de la pré-analyse, sinon celui de l'étape Notice Financière (même client)
+function anEf(d){
+  const mult = d.info.multiplier;
+  const wrap = (src, name) => ({ ef:{ byCode:src.byCode, notes:src.notes || [], ocr:!!src.ocr, tft:tftFromByCode(src.byCode, mult) }, name });
+  if (paState.efSource === 'upload' && paState.ef && (!paState.efYear || paState.efYear === d.years.N)) return wrap(paState.ef, paState.efName);
+  const same = x => anState.nfFrom !== 'upload' || paSameClient(d, x.name) || (x.lines || []).some(l => paSameClient(d, l.text || ''));
+  const doc = paStep1Docs().find(x => x.year === d.years.N && same(x));
+  return doc ? wrap(doc, doc.name) : null;
+}
+
+// Questions : celles du questionnaire de pré-analyse (avec les modifications de l'analyste), sinon établies ici
+function anQuestions(d, ef){
+  const res = document.getElementById('pa-result');
+  const shown = res && res.style.display !== 'none' && PA_ANALYSIS_KEYS.some(k => paState.sections[k] && paState.sections[k].length);
+  const sameNf = anState.nfFrom === 'preanalyse' || (anState.nfFrom === 'etape1' && paState.nfSource === 'etape1');
+  if (shown && sameNf){
+    const q = {}; for (const k of PA_ANALYSIS_KEYS) q[k] = (paState.sections[k] || []).map(t => String(t).trim()).filter(Boolean);
+    return { q, from:'pre' };
+  }
+  const r = generatePreanalyseQuestions(d, {}, ef ? ef.ef : null);
+  const q = {}; for (const k of PA_ANALYSIS_KEYS) q[k] = r.questions[k].map(x => x.text);
+  return { q, from:'auto' };
+}
+const anCountQ = q => PA_ANALYSIS_KEYS.reduce((s, k) => s + (q[k] || []).length, 0);
+
+// Nom de l'entité et exercice : ceux de la pré-analyse (saisis une seule fois) ; à défaut, lus dans l'EF ou la NF
+function anIdent(){
+  const d = anState.d;
+  const own = anState.nfFrom !== 'upload';
+  const val = id => { const el = document.getElementById(id); return el ? el.value.trim() : ''; };
+  let entite = own ? val('pa-entite') : '', exercice = own ? val('pa-exercice') : '';
+  if (!entite && d){
+    const ef = anEf(d), doc = ef && paStep1Docs().find(x => x.name === ef.name);
+    entite = (doc && (doc.entity || detectEntityName(doc.lines))) || (paState.ef && paState.ef.entity) || d.info.client || '';
+  }
+  if (!exercice && d) exercice = String(d.years.N || '');
+  return { entite, exercice };
+}
+
+function anRenderSources(){
+  const d = anState.d;
+  const ef = d ? anEf(d) : null;
+  const qs = d ? anQuestions(d, ef) : null;
+  const tabs = anState.wb ? Object.values(AN_TAB_PATTERNS).filter(re => anState.wb.SheetNames.some(n => re.test(n))).length : 0;
+  const yrs = d ? PA_PERIODS.filter(p => d.hasData[p]).map(p => d.years[p]).join(', ') : '';
+  const id = d ? anIdent() : null;
+  const rows = [
+    ['Dossier', id && (id.entite || id.exercice) ? `${id.entite || 'Entité non renseignée'} · exercice ${id.exercice}` : null],
+    ['Notice Financière', d ? `${anState.nfName} · exercices ${yrs} · ${tabs ? `${tabs} onglets de calcul` : 'feuille de saisie seule'}` : null],
+    ['État financier', ef ? `${ef.name} · ${(ef.ef.notes || []).length} notes annexes${ef.ef.tft ? ' · tableau des flux' : ''}` : null],
+    ['Questionnaire', qs ? `${qs.from === 'pre' ? 'Questionnaire de pré-analyse' : 'Questions établies depuis la NF'} · ${anCountQ(qs.q)} questions` : null],
+  ];
+  for (const k of [...Object.keys(AN_KINDS), 'credap']){
+    const host = document.getElementById(`an-${k}-sources`); if (!host) continue;
+    host.innerHTML = rows.map(([label, val]) => `<div class="an-src"><span class="an-src-k">${label}</span>${val ? `<span class="file-chip">${escapeHtml(val)}</span>` : '<span class="an-src-none">Non disponible</span>'}</div>`).join('');
+    document.getElementById(`an-${k}-generate`).disabled = !d;
+    document.getElementById(`an-${k}-num-1`).classList.toggle('done', !!d);
+    if (d){
+      if (!anState.edited[k + 'unit']) document.getElementById(`an-${k}-unit`).value = d.info.unite;
+    }
+  }
+  if (typeof cdAfterSources === 'function') cdAfterSources(d);
+}
+
+async function anOnShow(k){
+  await anResolveNf();
+  anRenderSources();
+}
+
+async function anGenerate(k){
+  await anResolveNf();
+  anRenderSources();
+  if (!anState.d) return;
+  anAlert(k, '');
+  // unité choisie dans le module (la NF peut indiquer une unité erronée) : copie des données, la NF chargée n'est pas modifiée
+  const unite = document.getElementById(`an-${k}-unit`).value;
+  const d = { ...anState.d, info:{ ...anState.d.info, unite, multiplier: unite === 'Millions' ? 1e6 : unite === 'Milliers' ? 1e3 : 1 } };
+  const ef = anEf(d), qs = anQuestions(d, ef);
+  const data = anBuildData(anState.wb, d);
+  const r = AN_KINDS[k].build(d, data, { ef: ef ? ef.ef : null, questions: qs.q });
+  const src = [data.tabs.length ? 'Notice Financière (feuille de saisie et onglets de calcul)' : 'Notice Financière (feuille de saisie)'];
+  if (ef) src.push(`états financiers ${d.years.N}`);
+  src.push(qs.from === 'pre' ? 'questionnaire de pré-analyse' : 'questions établies depuis la NF');
+  anState.out[k] = { ...r, sources: anJoin(src), dRef: anState.d, unite };
+  const gaps = PA_PERIODS.filter(p => d.hasData[p] && Math.abs(d.balance[p].actif - d.balance[p].passif) > 1).map(p => d.years[p]);
+  if (gaps.length) anAlert(k, `Bilan déséquilibré dans la NF (${gaps.join(', ')}) : vérifiez la NF avant d’utiliser l’analyse.`, 'warn');
+  const caXof = Math.abs(data.M.N.ca || 0) * d.info.multiplier;
+  if (caXof > 0 && caXof < 5e7) anAlert(k, `Chiffre d’affaires ${d.years.N} = ${paXof(data.M.N.ca, d.info.multiplier)} avec l’unité « ${unite} » : vérifiez l’unité des montants de la NF puis régénérez.`, 'warn');
+  else if (caXof > 5e13) anAlert(k, `Chiffre d’affaires ${d.years.N} = ${paXof(data.M.N.ca, d.info.multiplier)} avec l’unité « ${unite} » : montant improbable, vérifiez l’unité des montants de la NF.`, 'warn');
+  if (!data.tabs.length) anAlert(k, 'Onglets de calcul absents du classeur : agrégats recalculés depuis la feuille de saisie.', 'warn');
+  document.getElementById(`an-${k}-result`).style.display = 'block';
+  anRenderResult(k);
+  document.getElementById(`an-${k}-result`).scrollIntoView({ behavior:'smooth', block:'start' });
+}
+
+function anRenderResult(k){
+  const o = anState.out[k]; if (!o) return;
+  const t = o.table;
+  document.getElementById(`an-${k}-table`).innerHTML = `<div class="pa-table-wrap"><table class="review pa-synth"><thead><tr>${t.head.map((h, i) => `<th${i ? ' class="num"' : ''}>${escapeHtml(h)}</th>`).join('')}</tr></thead>
+    <tbody>${t.body.map(r => `<tr>${r.map((c, i) => `<td${i ? ' class="num"' : ''}>${escapeHtml(c)}</td>`).join('')}</tr>`).join('')}</tbody></table></div>`;
+  const host = document.getElementById(`an-${k}-sections`);
+  host.innerHTML = o.sections.map((s, i) => `<div class="pa-sec an-sec" data-i="${i}">
+      <div class="pa-sec-head"><h4>${i + 1}. ${escapeHtml(s.title)}</h4></div>
+      <textarea class="an-text" rows="3" aria-label="${escapeHtml(s.title)}">${escapeHtml(s.text)}</textarea>
+    </div>`).join('');
+  const fit = ta => { ta.style.height = 'auto'; ta.style.height = ta.scrollHeight + 2 + 'px'; };
+  host.querySelectorAll('.an-sec textarea').forEach(ta => {
+    fit(ta);
+    ta.addEventListener('input', () => { o.sections[+ta.closest('.an-sec').dataset.i].text = ta.value; fit(ta); });
+  });
+}
+
+function anDoc(k){
+  const o = anState.out[k]; if (!o) return null;
+  return { title:o.title, table:o.table, sources:o.sources,
+    entite: anIdent().entite, exercice: anIdent().exercice,
+    sections: o.sections.map(s => ({ title:s.title, text:String(s.text || '').trim() })).filter(s => s.text) };
+}
+async function anDownload(k){
+  const doc = anDoc(k); if (!doc) return;
+  const btns = document.querySelectorAll(`#an-${k}-download, #an-preview-download`);
+  btns.forEach(b => b.disabled = true);
+  try {
+    const blob = await anBuildDocx(doc);
+    const safe = String(doc.entite).replace(/[\\/:*?"<>|]+/g, '').trim() || 'CLIENT';
+    downloadBlob(blob, `${AN_KINDS[k].file} - ${safe} ${doc.exercice}.docx`);
+    markModuleDone(k);
+  } catch (err){ console.error(err); alert('Échec : ' + (err.message || err)); }
+  finally { btns.forEach(b => b.disabled = false); }
+}
+function anPrint(k){
+  const doc = anDoc(k); if (!doc) return;
+  let frame = document.getElementById('an-print-frame');
+  if (frame) frame.remove();
+  frame = document.createElement('iframe');
+  frame.id = 'an-print-frame';
+  frame.setAttribute('aria-hidden', 'true');
+  frame.style.cssText = 'position:fixed; right:0; bottom:0; width:0; height:0; border:0; visibility:hidden;';
+  document.body.appendChild(frame);
+  const fd = frame.contentDocument;
+  fd.open();
+  fd.write(`<!doctype html><html lang="fr"><head><meta charset="utf-8"><title>${escapeHtml(`${AN_KINDS[k].file} - ${doc.entite} ${doc.exercice}`)}</title><style>${AN_PRINT_CSS}</style></head><body>${anDocHtml(doc)}</body></html>`);
+  fd.close();
+  const go = () => { try { frame.contentWindow.focus(); frame.contentWindow.print(); } catch (e){ console.error(e); window.print(); } };
+  if (fd.fonts && fd.fonts.ready) fd.fonts.ready.then(() => setTimeout(go, 50)); else setTimeout(go, 200);
+  markModuleDone(k);
+}
+function anOpenPreview(k){
+  const doc = anDoc(k); if (!doc) return;
+  let m = document.getElementById('an-preview');
+  if (!m){
+    m = document.createElement('div');
+    m.id = 'an-preview'; m.className = 'pa-preview';
+    m.innerHTML = `<div class="pa-preview-card" role="dialog" aria-modal="true" aria-labelledby="an-preview-title">
+      <div class="pa-preview-head"><h3 id="an-preview-title"></h3><span class="pa-preview-meta"></span><button type="button" class="app-modal-x" id="an-preview-x" aria-label="Fermer">×</button></div>
+      <div class="pa-preview-body" id="an-preview-body"></div>
+      <div class="pa-preview-foot">
+        <button type="button" class="action pa-secondary" id="an-preview-edit"><span class="ico ico-back" aria-hidden="true"></span>Revenir à l’analyse</button>
+        <button type="button" class="action pa-secondary" id="an-preview-print"><span class="ico ico-print" aria-hidden="true"></span>Imprimer</button>
+        <button type="button" class="action amber" id="an-preview-download"><span class="ico ico-download" aria-hidden="true"></span>Télécharger le Word</button>
+      </div></div>`;
+    document.body.appendChild(m);
+    const close = () => { m.classList.remove('open'); document.body.style.overflow = ''; };
+    m.querySelector('#an-preview-x').addEventListener('click', close);
+    m.querySelector('#an-preview-edit').addEventListener('click', close);
+    m.querySelector('#an-preview-download').addEventListener('click', () => anDownload(m.dataset.kind));
+    m.querySelector('#an-preview-print').addEventListener('click', () => anPrint(m.dataset.kind));
+    m.addEventListener('click', ev => { if (ev.target === m) close(); });
+    document.addEventListener('keydown', ev => { if (ev.key === 'Escape' && m.classList.contains('open')) close(); });
+  }
+  m.dataset.kind = k;
+  m.querySelector('#an-preview-title').textContent = `Aperçu : ${AN_KINDS[k].title.toLowerCase()}`;
+  m.querySelector('#an-preview-body').innerHTML = anDocHtml(doc);
+  m.querySelector('#an-preview-body').scrollTop = 0;
+  m.classList.add('open');
+  document.body.style.overflow = 'hidden';
+  m.querySelector('#an-preview-download').focus();
+}
+
+function initAnalyseModules(){
+  // styles de l'aperçu : ceux du document imprimé, sans les règles de page
+  const st = document.createElement('style');
+  st.textContent = AN_PRINT_CSS.replace(/@page\{[^}]*\}/, '').replace(/\bbody\{[^}]*\}/, '') + `
+    .pa-preview-body .av-page{ background:#fff; max-width:794px; margin:0 auto; padding:44px 52px; box-shadow:0 4px 18px rgba(0,0,0,0.12); }
+    @media (max-width:640px){ .pa-preview-body .av-page{ padding:24px 16px; } }`;
+  document.head.appendChild(st);
+  for (const k of Object.keys(AN_KINDS)){
+    paWireDrop(`an-${k}-drop`, `an-${k}-input`, f => anLoadNfFile(f, k));
+    document.getElementById(`an-${k}-generate`).addEventListener('click', () => anGenerate(k));
+    document.getElementById(`an-${k}-preview`).addEventListener('click', () => anOpenPreview(k));
+    document.getElementById(`an-${k}-download`).addEventListener('click', () => anDownload(k));
+    document.getElementById(`an-${k}-print`).addEventListener('click', () => anPrint(k));
+    ['unit'].forEach(f => { const el = document.getElementById(`an-${k}-${f}`); el.addEventListener(el.tagName === 'SELECT' ? 'change' : 'input', () => { anState.edited[k + f] = true; }); });
+  }
+}
+initAnalyseModules();
+/* @@ANALYSE_UI_END */
+/* @@CREDAP_ENGINE_START */
+/* ============================================================
+   MODULE 5 : SYNTHÈSE DU DOSSIER ET CREDAP (demande de crédit)
+   Reprend la NF (onglets de calcul), l'état financier, le questionnaire et les analyses
+   économique et financière ; propose une grille d'appréciation et un avis, que l'analyste valide.
+   ============================================================ */
+const CD_AVIS = ['Favorable', 'Favorable sous conditions', 'Réservé', 'Défavorable'];
+
+/* ---------- 1. Grille d'appréciation ---------- */
+// s : +1 point fort, 0 neutre, -1 point de vigilance, -2 point critique
+function cdScore(d, data, ctx){
+  const { M } = data, N = M.N, N1 = M.N1, h1 = d.hasData.N1, F = anFmt(d);
+  const div = (a, b) => (a == null || !b ? null : a / b);
+  const out = [];
+  const add = (key, label, constat, s, force, vigil) => out.push({ key, label, constat, s, force, vigil });
+  // Activité
+  const g = h1 ? paGrowth(N1.ca, N.ca) : null;
+  if (g != null) add('activite', 'Évolution de l’activité', `Chiffre d’affaires de ${F.X(N.ca)}, ${F.evo(N1.ca, N.ca)}`,
+    g > 0.05 ? 1 : g < -0.05 ? -1 : 0, `Activité en progression (${F.evo(N1.ca, N.ca)})`, `Activité en repli (${F.evo(N1.ca, N.ca)})`);
+  // Rentabilité d'exploitation
+  const m = div(N.ebe, N.ca), m1 = h1 ? div(N1.ebe, N1.ca) : null;
+  if (m != null) add('ebe', 'Rentabilité d’exploitation', `Marge d’EBE de ${F.pct(m)}${m1 != null ? ` (${F.pct(m1)} en ${d.years.N1})` : ''}`,
+    m < 0 ? -2 : m < 0.08 ? -1 : m < 0.15 ? 0 : 1, `Rentabilité d’exploitation confortable (marge d’EBE de ${F.pct(m)})`, m < 0 ? 'Excédent brut d’exploitation négatif' : `Rentabilité d’exploitation faible (marge d’EBE de ${F.pct(m)})`);
+  // Rentabilité nette
+  const mn = div(N.rn, N.ca);
+  if (mn != null) add('rn', 'Rentabilité nette', `Résultat net de ${F.XS(N.rn)}, soit ${F.pct(mn)} du chiffre d’affaires`,
+    N.rn < 0 ? (N.ebe <= 0 ? -2 : -1) : mn < 0.02 ? 0 : 1, `Résultat net positif (${F.pct(mn)} du chiffre d’affaires)`, N.rn < 0 ? `Exercice déficitaire (${F.XS(N.rn)})` : 'Rentabilité nette faible');
+  // Fonds propres
+  const c = div(N.rp, N.totalBilan);
+  if (c != null){
+    const ohada = N.capital > 0 && N.rp < N.capital / 2;
+    add('rp', 'Structure financière', N.rp < 0 ? `Ressources propres négatives (${F.XS(N.rp)})` : `Ressources propres de ${F.X(N.rp)}, soit ${F.pct(c)} du total du bilan`,
+      N.rp < 0 || ohada ? -2 : c < 0.15 ? -1 : c < 0.3 ? 0 : 1, `Bonne capitalisation (${F.pct(c)} du total du bilan)`,
+      N.rp < 0 ? 'Fonds propres négatifs' : ohada ? 'Capitaux propres inférieurs à la moitié du capital social (OHADA)' : `Capitalisation faible (${F.pct(c)} du total du bilan)`);
+  }
+  // Endettement
+  if (!N.endBrut) add('dette', 'Endettement', 'Aucun endettement financier', 1, 'Absence d’endettement financier', '');
+  else if (N.ebe <= 0) add('dette', 'Endettement', `Endettement brut de ${F.X(N.endBrut)} pour un EBE ${N.ebe < 0 ? 'négatif' : 'nul'}`, -2, '', 'Endettement non couvert par l’exploitation');
+  else add('dette', 'Endettement', `Endettement brut de ${F.X(N.endBrut)}, soit ${F.fois(N.leverage)} l’EBE et ${F.fois(N.gearing)} les ressources propres`,
+    N.leverage > 4 ? -1 : N.leverage > 3 ? 0 : 1, `Endettement soutenable (${F.fois(N.leverage)} l’EBE)`, `Endettement élevé (${F.fois(N.leverage)} l’EBE)`);
+  // Couverture des frais financiers
+  if (N.ff > 0 && N.ebe > 0) add('ff', 'Couverture des frais financiers', `EBE égal à ${F.fois(N.couverture)} les frais financiers`,
+    N.couverture < 1.5 ? -1 : N.couverture < 3 ? 0 : 1, `Frais financiers bien couverts (${F.fois(N.couverture)})`, `Couverture des frais financiers limitée (${F.fois(N.couverture)})`);
+  // Capacité de remboursement
+  if (N.endBrut > 0){
+    if (!(N.mba > 0)) add('remb', 'Capacité de remboursement', `Marge brute d’autofinancement ${N.mba < 0 ? 'négative' : 'nulle'}`, -2, '', 'Aucune capacité d’autofinancement pour rembourser la dette');
+    else {
+      const yrs = N.endBrut / N.mba;
+      let s = yrs < 4 ? 1 : yrs < 7 ? 0 : -1;
+      if (N.partCT && N.partCT > N.mba) s = Math.min(s, -1);
+      add('remb', 'Capacité de remboursement', `Endettement brut égal à ${paNum(Math.round(yrs * 10) / 10, 1)} années de MBA${N.partCT ? `, échéances à moins d’un an de ${F.X(N.partCT)}` : ''}`,
+        s, `Capacité de remboursement satisfaisante (${paNum(Math.round(yrs * 10) / 10, 1)} années de MBA)`,
+        N.partCT && N.partCT > N.mba ? 'Échéances à moins d’un an supérieures à la MBA' : `Capacité de remboursement tendue (${paNum(Math.round(yrs * 10) / 10, 1)} années de MBA)`);
+    }
+  }
+  // Trésorerie et liquidité
+  if (N.tn != null) add('treso', 'Trésorerie et liquidité', `Trésorerie nette de ${F.XS(N.tn)}, liquidité générale de ${F.ratio(N.current)}`,
+    N.tn >= 0 ? 1 : (N.current != null && N.current >= 1 ? 0 : -1), 'Trésorerie nette positive', N.tn < 0 && N.current != null && N.current < 1 ? 'Trésorerie nette négative et liquidité insuffisante' : 'Trésorerie nette négative');
+  // Qualité de l'information
+  const audite = /^oui|^yes/i.test(String(d.info.audite || '').trim());
+  const gaps = PA_PERIODS.filter(p => d.hasData[p] && Math.abs(d.balance[p].actif - d.balance[p].passif) > 1);
+  const nq = ctx.questions ? anCountQ(ctx.questions) : 0;
+  add('info', 'Qualité de l’information financière', `${audite ? 'États financiers audités' : 'États financiers non audités'}${nq ? `, ${nq} question(s) en attente de réponse` : ''}${gaps.length ? ', bilan déséquilibré dans la NF' : ''}`,
+    gaps.length ? -1 : audite ? 1 : 0, 'États financiers audités', gaps.length ? 'Bilan déséquilibré dans la NF' : '');
+  return out;
+}
+function cdAvisPropose(crit){
+  const total = crit.reduce((s, c) => s + c.s, 0);
+  const critical = crit.filter(c => c.s <= -2).length;
+  let avis;
+  if (critical >= 2 || (critical && total < 0)) avis = 'Défavorable';
+  else if (critical) avis = 'Réservé';
+  else if (total >= 3) avis = 'Favorable';
+  else if (total >= 0) avis = 'Favorable sous conditions';
+  else avis = 'Réservé';
+  return { avis, total, critical };
+}
+const cdNote = s => s >= 1 ? 'Favorable' : s === 0 ? 'Neutre' : s === -1 ? 'Vigilance' : 'Critique';
+
+/* ---------- 2. Demande de crédit ---------- */
+function cdParseMontant(v){
+  const s = String(v == null ? '' : v).replace(/[\s  ]/g, '').replace(',', '.');
+  const n = parseFloat(s); return Number.isFinite(n) ? n : null;
+}
+function cdLignes(req){ return (req.lignes || []).filter(l => (l.nature || '').trim() || cdParseMontant(l.montant)); }
+function cdTotalDemande(req){ return cdLignes(req).reduce((s, l) => s + (cdParseMontant(l.montant) || 0), 0); }   // en millions de XOF
+
+/* ---------- 3. Sections rédigées du CREDAP ---------- */
+function cdFirstParas(text, n = 1){ return String(text || '').split(/\n\s*\n/).map(x => x.trim()).filter(x => x && !/^- /.test(x)).slice(0, n); }
+function cdGenerate(d, data, ctx, req){
+  const { M } = data, N = M.N, F = anFmt(d), y = d.years;
+  const eco = ctx.eco, fin = ctx.fin;
+  const sec = k => (o => o ? o.sections.find(s => s.key === k) : null);
+  const ecoS = k => sec(k)(eco), finS = k => sec(k)(fin);
+  const crit = cdScore(d, data, ctx);
+  const prop = cdAvisPropose(crit);
+  const secs = [];
+  const add = (key, title, paras) => { const t = paras.filter(Boolean).join('\n\n'); if (t) secs.push({ key, title, text:t }); };
+
+  // Présentation et activité
+  add('presentation', 'Présentation de la contrepartie et activité', [
+    req.secteur ? `${req.entite} exerce dans le secteur suivant : ${req.secteur}.` : '',
+    req.groupe ? `La société appartient au groupe ${req.groupe}.` : '',
+    ...(ecoS('activite') ? cdFirstParas(ecoS('activite').text, 3) : []),
+  ]);
+  // Synthèse économique
+  add('eco', 'Synthèse de l’analyse économique', [
+    ...(ecoS('ebe') ? cdFirstParas(ecoS('ebe').text, 1) : []),
+    ...(ecoS('resultat') ? cdFirstParas(ecoS('resultat').text, 4).filter(p => /résultat net|frais financiers/.test(p)) : []),
+    ...(ecoS('appreciation') ? cdFirstParas(ecoS('appreciation').text, 3) : []),
+  ]);
+  // Synthèse financière
+  add('fin', 'Synthèse de l’analyse financière', [
+    ...(finS('structure') ? cdFirstParas(finS('structure').text, 3).filter(p => /ressources propres|capitaux propres|OHADA/i.test(p)).slice(0, 2) : []),
+    ...(finS('endettement') ? cdFirstParas(finS('endettement').text, 6).filter(p => /^L’endettement financier brut s’élève|fois|ne présente pas/.test(p)).slice(0, 3) : []),
+    ...(finS('equilibre') ? cdFirstParas(finS('equilibre').text, 2) : []),
+    ...(finS('appreciation') ? cdFirstParas(finS('appreciation').text, 2) : []),
+  ]);
+  // Capacité de remboursement
+  {
+    const p = [];
+    const totalM = cdTotalDemande(req), totalNf = totalM * 1e6 / d.info.multiplier;
+    const lignes = cdLignes(req);
+    if (lignes.length) p.push(`La demande porte sur ${lignes.length} ligne(s) pour un montant total de ${paXofRaw(totalM * 1e6)}${req.nature ? ` (${req.nature.toLowerCase()})` : ''}.`);
+    if (N.mba > 0){
+      p.push(`La marge brute d’autofinancement de l’exercice ${y.N} s’élève à ${F.X(N.mba)}${N.endBrut ? `, et l’endettement financier brut représente ${paNum(Math.round(N.endBrut / N.mba * 10) / 10, 1)} années de MBA` : ''}.`);
+      if (totalNf && /^nouvelle/i.test(req.nature || '')){
+        const newDebt = N.endBrut + totalNf;
+        p.push(`Après mise en place des concours sollicités, l’endettement brut atteindrait ${F.X(newDebt)}, soit ${N.ebe > 0 ? `${F.fois(newDebt / N.ebe)} l’EBE et ` : ''}${paNum(Math.round(newDebt / N.mba * 10) / 10, 1)} années de MBA.`);
+      }
+    } else if (N.endBrut) p.push(`La marge brute d’autofinancement de l’exercice ${y.N} est ${N.mba < 0 ? 'négative' : 'nulle'} : le remboursement des concours repose sur des ressources autres que l’exploitation, à identifier.`);
+    if (N.partCT) p.push(`Les échéances à moins d’un an des emprunts s’élèvent à ${F.X(N.partCT)}${N.mba > 0 ? (N.partCT > N.mba ? ', au-delà de la MBA de l’exercice' : ', couvertes par la MBA de l’exercice') : ''}.`);
+    if (N.fcf != null) p.push(`Le flux de trésorerie disponible de l’exercice ressort à ${F.XS(N.fcf)}.`);
+    add('remboursement', 'Capacité de remboursement', p);
+  }
+  // Forces et vigilances
+  const forces = crit.filter(c => c.s >= 1 && c.force).map(c => `- ${c.force}`);
+  const vig = crit.filter(c => c.s <= -1 && c.vigil).map(c => `- ${c.vigil}${c.s <= -2 ? ' (point critique)' : ''}`);
+  add('forces', 'Points forts', [forces.join('\n')]);
+  add('vigilance', 'Points de vigilance', [vig.join('\n')]);
+  // Points en suspens : questions au client et documents
+  {
+    const q = ctx.questions || {}, p = [];
+    const lines = [];
+    let n = 0;
+    for (const k of PA_ANALYSIS_KEYS) for (const t of (q[k] || [])){ n++; const constat = String(t).split(/\.\s+(?=Pourriez|Merci|Quels?|Quelles?)/)[0].trim(); lines.push(`- Question ${n} : ${constat.replace(/\.?$/, '.')}`); }
+    if (lines.length) p.push(`${n} question(s) ont été adressées au client et restent en attente de réponse :`, lines.join('\n'));
+    if (ctx.docs && ctx.docs.length) p.push('Documents demandés :', ctx.docs.map(t => `- ${String(t).replace(/\.?$/, '.')}`).join('\n'));
+    add('suspens', 'Points en suspens', p);
+  }
+  return { sections: secs, crit, prop };
+}
+// Conclusion selon l'avis retenu (régénérée quand l'avis change, sauf modification par l'analyste)
+function cdConclusion(d, data, req, avis, conditions){
+  const totalM = cdTotalDemande(req);
+  const objet = totalM ? `la demande ${req.nature ? `de ${req.nature.toLowerCase()} ` : ''}portant sur ${paXofRaw(totalM * 1e6)}` : 'la demande';
+  let t = `Au regard de l’analyse de l’activité, de la rentabilité, de la structure financière et de la capacité de remboursement de ${req.entite || 'la contrepartie'}, nous émettons un avis ${avis.toLowerCase()} sur ${objet}.`;
+  if (avis === 'Favorable sous conditions' || (conditions && conditions.trim())) t += conditions && conditions.trim() ? ` Cet avis est assorti des conditions suivantes : ${conditions.trim().replace(/\.?$/, '.')}` : ' Les conditions de mise en place sont précisées ci-dessous.';
+  if (avis === 'Réservé') t += ' Les réponses du client aux points en suspens conditionnent la suite donnée au dossier.';
+  if (avis === 'Défavorable') t += ' Les points critiques relevés ne permettent pas, en l’état, d’accompagner la demande.';
+  return t;
+}
+
+/* ---------- 4. Tableaux du CREDAP ---------- */
+function cdSynthTable(d, data){
+  const div = (a, b) => (a == null || !b ? null : a / b);
+  const t = anTable(d, data, [
+    ['Chiffre d’affaires', m => m.ca], ['Excédent brut d’exploitation', m => m.ebe], ['Frais financiers', m => m.ff], ['Résultat net', m => m.rn], ['Marge brute d’autofinancement', m => m.mba],
+    ['Total du bilan', m => m.totalBilan], ['Immobilisations corporelles nettes', (m, p) => d.actifNet[27][p]], ['Ressources propres', m => m.rp], ['Endettement financier brut', m => m.endBrut],
+    ['Fonds de roulement', m => m.fdr], ['Besoin en fonds de roulement', m => m.bfr], ['Trésorerie nette', m => m.tn],
+    ['Ressources propres / total du bilan', m => div(m.rp, m.totalBilan), '%'], ['Endettement brut / ressources propres', m => m.gearing, 'x'],
+    ['Endettement brut / EBE', m => m.ebe > 0 ? m.leverage : null, 'x'], ['EBE / chiffre d’affaires', m => div(m.ebe, m.ca), '%'],
+    ['EBE / frais financiers', m => m.couverture, 'x'], ['Résultat net / chiffre d’affaires', m => div(m.rn, m.ca), '%'],
+  ]);
+  // variation du dernier exercice (montants seulement)
+  if (d.hasData.N1 && d.hasData.N){
+    t.head.push('Var.');
+    const keys = ['ca','ebe','ff','rn','mba','totalBilan',null,'rp','endBrut','fdr','bfr','tn'];
+    t.body.forEach((r, i) => {
+      const k = keys[i];
+      let a = null, b = null;
+      if (k){ a = data.M.N1[k]; b = data.M.N[k]; } else if (i === 6){ a = d.actifNet[27].N1; b = d.actifNet[27].N; }
+      const g = i < 12 && a ? (b - a) / Math.abs(a) : null;
+      r.push(g == null ? '' : `${g > 0 ? '+' : g < 0 ? '-' : ''}${paNum(Math.round(Math.abs(g) * 100), 0)} %`);
+    });
+  }
+  return t;
+}
+function cdFluxTable(d, data){
+  const P = AN_PERIODS.filter(p => data.M[p].dBfr != null);
+  if (!P.length) return null;
+  const t = anTable(d, data, [
+    ['Marge brute d’autofinancement', m => m.mba], ['Variation du besoin en fonds de roulement', m => m.dBfr], ['Investissements', m => m.capex],
+    ['Flux de trésorerie disponible', m => m.fcf], ['Variation de l’endettement financier', m => m.dDettes], ['Dividendes versés', m => m.dividendes],
+  ]);
+  const keep = AN_PERIODS.filter(p => d.hasData[p]).map(p => P.includes(p));
+  t.head = t.head.filter((_, i) => i === 0 || keep[i - 1]);
+  t.body = t.body.map(r => r.filter((_, i) => i === 0 || keep[i - 1]));
+  return t;
+}
+
+/* ---------- 5. Document : blocs communs au Word, à l'aperçu et à l'impression ---------- */
+function cdBlocks(doc){
+  const B = [];
+  B.push({ t:'title', text:'CREDAP - DEMANDE DE CRÉDIT' });
+  B.push({ t:'subtitle', text:doc.entite });
+  B.push({ t:'h', text:'1. Identification de la contrepartie' });
+  B.push({ t:'kv', rows: doc.ident.filter(r => r[1] !== '' && r[1] != null) });
+  B.push({ t:'h', text:'2. Objet de la demande' });
+  if (doc.lignes.length){
+    const rows = doc.lignes.map(l => [l.nature || '', l.montant != null ? paNum(l.montant, l.montant % 1 ? 1 : 0) : '', l.duree || '', l.garanties || '']);
+    if (doc.lignes.length > 1) rows.push(['Total', paNum(doc.total, doc.total % 1 ? 1 : 0), '', '']);
+    B.push({ t:'table', head:['Nature de la ligne', 'Montant (MXOF)', 'Durée', 'Garanties'], body:rows, widths:[3300, 1700, 1500, 3138], align:['l', 'r', 'l', 'l'] });
+  } else B.push({ t:'p', text:'Lignes à préciser.' });
+  if (doc.garanties) B.push({ t:'p', text:`Garanties : ${doc.garanties}` });
+  let n = 3;
+  const textSec = s => { B.push({ t:'h', text:`${n++}. ${s.title}` }); B.push({ t:'text', text:s.text }); };
+  const by = k => doc.sections.find(s => s.key === k);
+  if (by('presentation')) textSec(by('presentation'));
+  B.push({ t:'h', text:`${n++}. Synthèse financière` });
+  B.push({ t:'table', head:doc.synth.head, body:doc.synth.body });
+  if (doc.flux){ B.push({ t:'sub', text:'Flux de trésorerie' }); B.push({ t:'table', head:doc.flux.head, body:doc.flux.body }); }
+  for (const k of ['eco', 'fin', 'remboursement', 'forces', 'vigilance', 'suspens']) if (by(k)) textSec(by(k));
+  B.push({ t:'h', text:`${n++}. Appréciation du dossier` });
+  B.push({ t:'table', head:['Critère', 'Constat', 'Appréciation'], body:doc.grille.map(c => [c.label, c.constat, cdNote(c.s)]), widths:[2600, 5338, 1700], align:['l', 'l', 'l'] });
+  B.push({ t:'avis', text:`Avis : ${doc.avis}` });
+  if (doc.conclusion) B.push({ t:'text', text:doc.conclusion });
+  B.push({ t:'sign', rows:[['Chargé d’affaires', 'Analyste crédit', 'Décision'], ['', '', ''], ['Date :', 'Date :', 'Date :']] });
+  return B;
+}
+function cdDocxBody(B){
+  let x = '';
+  const kv = rows => {
+    const b = '<w:top w:val="single" w:sz="4" w:space="0" w:color="808080"/><w:left w:val="single" w:sz="4" w:space="0" w:color="808080"/><w:bottom w:val="single" w:sz="4" w:space="0" w:color="808080"/><w:right w:val="single" w:sz="4" w:space="0" w:color="808080"/><w:insideH w:val="single" w:sz="4" w:space="0" w:color="808080"/><w:insideV w:val="single" w:sz="4" w:space="0" w:color="808080"/>';
+    const cell = (t, w, bold, fill) => `<w:tc><w:tcPr><w:tcW w:w="${w}" w:type="dxa"/>${fill ? `<w:shd w:val="clear" w:color="auto" w:fill="${fill}"/>` : ''}</w:tcPr><w:p><w:pPr><w:spacing w:before="30" w:after="30"/><w:rPr><w:sz w:val="18"/><w:szCs w:val="18"/></w:rPr></w:pPr>${anRun(String(t), { sz:18, b:bold })}</w:p></w:tc>`;
+    return `<w:tbl><w:tblPr><w:tblW w:w="9638" w:type="dxa"/><w:tblBorders>${b}</w:tblBorders><w:tblCellMar><w:left w:w="80" w:type="dxa"/><w:right w:w="80" w:type="dxa"/></w:tblCellMar></w:tblPr><w:tblGrid><w:gridCol w:w="3200"/><w:gridCol w:w="6438"/></w:tblGrid>`
+      + rows.map(r => `<w:tr>${cell(r[0], 3200, true, 'F2F2F2')}${cell(r[1], 6438, false)}</w:tr>`).join('') + '</w:tbl>' + anPara('', { after:80 });
+  };
+  const table = blk => {
+    const W = 9638, n = blk.head.length;
+    const widths = blk.widths || (() => { const f = n > 4 ? 3600 : 4200, o = Math.floor((W - f) / Math.max(1, n - 1)); return [f, ...Array(n - 1).fill(o)]; })();
+    const align = blk.align || blk.head.map((_, i) => i ? 'r' : 'l');
+    const b = '<w:top w:val="single" w:sz="4" w:space="0" w:color="808080"/><w:left w:val="single" w:sz="4" w:space="0" w:color="808080"/><w:bottom w:val="single" w:sz="4" w:space="0" w:color="808080"/><w:right w:val="single" w:sz="4" w:space="0" w:color="808080"/><w:insideH w:val="single" w:sz="4" w:space="0" w:color="808080"/><w:insideV w:val="single" w:sz="4" w:space="0" w:color="808080"/>';
+    const cell = (t, i, head, bold) => `<w:tc><w:tcPr><w:tcW w:w="${widths[i]}" w:type="dxa"/>${head ? '<w:shd w:val="clear" w:color="auto" w:fill="C00000"/>' : ''}<w:vAlign w:val="center"/></w:tcPr><w:p><w:pPr><w:spacing w:before="20" w:after="20"/><w:jc w:val="${align[i] === 'r' ? 'right' : 'left'}"/><w:rPr><w:sz w:val="17"/><w:szCs w:val="17"/></w:rPr></w:pPr>${anRun(String(t), { sz:17, b:head || bold, color: head ? 'FFFFFF' : null })}</w:p></w:tc>`;
+    const row = (r, head) => `<w:tr><w:trPr><w:cantSplit/>${head ? '<w:tblHeader/>' : ''}${blk.tall && !head && r.every(c => !c) ? '<w:trHeight w:val="900"/>' : ''}</w:trPr>${r.map((c, i) => cell(c, i, head, !head && r[0] === 'Total')).join('')}</w:tr>`;
+    return `<w:tbl><w:tblPr><w:tblW w:w="${W}" w:type="dxa"/><w:tblBorders>${b}</w:tblBorders><w:tblCellMar><w:left w:w="80" w:type="dxa"/><w:right w:w="80" w:type="dxa"/></w:tblCellMar></w:tblPr><w:tblGrid>${widths.map(w => `<w:gridCol w:w="${w}"/>`).join('')}</w:tblGrid>`
+      + row(blk.head, true) + blk.body.map(r => row(r, false)).join('') + '</w:tbl>' + anPara('', { after:80 });
+  };
+  const text = t => {
+    let o = '';
+    for (const block of String(t || '').split(/\n\s*\n/)){
+      const lines = block.split('\n').map(l => l.trim()).filter(Boolean);
+      if (!lines.length) continue;
+      if (lines.every(l => /^-\s+/.test(l))) lines.forEach(l => { o += `<w:p><w:pPr><w:numPr><w:ilvl w:val="0"/><w:numId w:val="1"/></w:numPr><w:spacing w:after="60" w:line="300" w:lineRule="auto"/><w:ind w:left="567" w:hanging="283"/><w:jc w:val="both"/></w:pPr>${anRun(l.replace(/^-\s+/, ''), {})}</w:p>`; });
+      else o += anPara(lines.join(' '), {});
+    }
+    return o;
+  };
+  for (const b of B){
+    if (b.t === 'title') x += anPara(b.text, { b:true, sz:28, color:'E9041E', jc:'center', after:60 });
+    else if (b.t === 'subtitle') x += anPara(b.text, { b:true, sz:24, jc:'center', after:240 });
+    else if (b.t === 'h') x += anPara(b.text, { b:true, sz:22, color:'1F3864', before:200, after:100 }, '<w:keepNext/>');
+    else if (b.t === 'sub') x += anPara(b.text, { b:true, sz:20, color:'C00000', before:80, after:60 }, '<w:keepNext/>');
+    else if (b.t === 'kv') x += kv(b.rows);
+    else if (b.t === 'table') x += table(b);
+    else if (b.t === 'p') x += anPara(b.text, {});
+    else if (b.t === 'text') x += text(b.text);
+    else if (b.t === 'avis') x += `<w:p><w:pPr><w:pBdr><w:top w:val="single" w:sz="8" w:space="4" w:color="C00000"/><w:left w:val="single" w:sz="8" w:space="4" w:color="C00000"/><w:bottom w:val="single" w:sz="8" w:space="4" w:color="C00000"/><w:right w:val="single" w:sz="8" w:space="4" w:color="C00000"/></w:pBdr><w:spacing w:before="160" w:after="160"/><w:jc w:val="center"/></w:pPr>${anRun(b.text, { b:true, sz:24, color:'C00000' })}</w:p>`;
+    else if (b.t === 'sign') x += anPara('', { after:120 }) + table({ head:b.rows[0], body:b.rows.slice(1), widths:[3212, 3213, 3213], align:['l', 'l', 'l'], tall:true });
+  }
+  return x;
+}
+async function cdBuildDocx(doc){
+  // même enveloppe que les analyses, corps du CREDAP
+  const zip = new JSZip();
+  const tmp = await JSZip.loadAsync(await (await anBuildDocx({ title:'x', entite:'', exercice:'', sources:'', table:{ head:['x'], body:[] }, sections:[] })).arrayBuffer());
+  for (const name of Object.keys(tmp.files)) if (!tmp.files[name].dir && name !== 'word/document.xml') zip.file(name, await tmp.file(name).async('string'));
+  zip.file('word/document.xml', `<?xml version="1.0" encoding="UTF-8" standalone="yes"?><w:document xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"><w:body>${cdDocxBody(cdBlocks(doc))}<w:sectPr><w:pgSz w:w="11906" w:h="16838"/><w:pgMar w:top="1134" w:right="1134" w:bottom="1134" w:left="1134" w:header="567" w:footer="567" w:gutter="0"/></w:sectPr></w:body></w:document>`);
+  return zip.generateAsync({ type:'blob', mimeType:'application/vnd.openxmlformats-officedocument.wordprocessingml.document', compression:'DEFLATE' });
+}
+const CD_PRINT_CSS = AN_PRINT_CSS + `
+  .av-sub{ text-align:center; font-weight:700; font-size:12pt; margin:-6pt 0 14pt; }
+  .av-h2{ color:#C00000; font-weight:700; margin:8pt 0 4pt; }
+  .av-kv{ border-collapse:collapse; width:100%; font-size:9pt; margin:2pt 0 8pt; }
+  .av-kv th{ background:#F2F2F2; text-align:left; width:33%; padding:3pt 6pt; border:1px solid #808080; }
+  .av-kv td{ padding:3pt 6pt; border:1px solid #808080; }
+  .av-t td.l, .av-t th.l{ text-align:left; }
+  .av-avis{ border:1.5pt solid #C00000; color:#C00000; font-weight:700; font-size:12pt; text-align:center; padding:6pt; margin:10pt 0; }
+  .av-sign td{ height:46pt; vertical-align:top; text-align:left; }`;
+function cdDocHtml(doc){
+  const e = escapeHtml;
+  const table = b => {
+    const align = b.align || b.head.map((_, i) => i ? 'r' : 'l');
+    return `<table class="av-t${b.sign ? ' av-sign' : ''}"><thead><tr>${b.head.map((c, i) => `<th class="${align[i]}">${e(c)}</th>`).join('')}</tr></thead><tbody>${b.body.map(r => `<tr>${r.map((c, i) => `<td class="${align[i]}"${r[0] === 'Total' ? ' style="font-weight:700"' : ''}>${e(c)}</td>`).join('')}</tr>`).join('')}</tbody></table>`;
+  };
+  const text = t => String(t || '').split(/\n\s*\n/).map(block => {
+    const lines = block.split('\n').map(l => l.trim()).filter(Boolean);
+    if (!lines.length) return '';
+    if (lines.every(l => /^-\s+/.test(l))) return `<ul class="av-ul">${lines.map(l => `<li>${e(l.replace(/^-\s+/, ''))}</li>`).join('')}</ul>`;
+    return `<p class="av-p">${e(lines.join(' '))}</p>`;
+  }).join('');
+  let h = '<div class="av-page">';
+  for (const b of cdBlocks(doc)){
+    if (b.t === 'title') h += `<div class="av-title">${e(b.text)}</div>`;
+    else if (b.t === 'subtitle') h += `<div class="av-sub">${e(b.text)}</div>`;
+    else if (b.t === 'h') h += `<div class="av-h">${e(b.text)}</div>`;
+    else if (b.t === 'sub') h += `<div class="av-h2">${e(b.text)}</div>`;
+    else if (b.t === 'kv') h += `<table class="av-kv">${b.rows.map(r => `<tr><th>${e(r[0])}</th><td>${e(String(r[1]))}</td></tr>`).join('')}</table>`;
+    else if (b.t === 'table') h += table(b);
+    else if (b.t === 'p') h += `<p class="av-p">${e(b.text)}</p>`;
+    else if (b.t === 'text') h += text(b.text);
+    else if (b.t === 'avis') h += `<div class="av-avis">${e(b.text)}</div>`;
+    else if (b.t === 'sign') h += table({ head:b.rows[0], body:b.rows.slice(1), align:['l', 'l', 'l'], sign:true });
+  }
+  return h + '</div>';
+}
+/* @@CREDAP_ENGINE_END */
+/* @@CREDAP_UI_START */
+/* ============================================================
+   MODULE 5 : interface de la synthèse du dossier et du CREDAP
+   ============================================================ */
+const cdState = { lignes:[{ nature:'', montant:'', duree:'', garanties:'' }], out:null, conclEdited:false };
+
+function cdUnit(){ return document.getElementById('an-credap-unit').value; }
+function cdD(){
+  if (!anState.d) return null;
+  const unite = cdUnit();
+  return { ...anState.d, info:{ ...anState.d.info, unite, multiplier: unite === 'Millions' ? 1e6 : unite === 'Milliers' ? 1e3 : 1 } };
+}
+// Analyse économique ou financière : celle rédigée dans son module (même NF, même unité), sinon établie ici
+function cdAnalysis(k, d, data, ctx){
+  const o = anState.out[k];
+  if (o && o.dRef === anState.d && o.unite === d.info.unite) return { out:o, from:'module' };
+  return { out: AN_KINDS[k].build(d, data, ctx), from:'auto' };
+}
+function cdAfterSources(d){
+  const host = document.getElementById('an-credap-sources'); if (!host) return;
+  const st = k => { const o = anState.out[k]; return o && o.dRef === anState.d ? `${AN_KINDS[k].title} rédigée dans son module` : `${AN_KINDS[k].title} établie à la génération`; };
+  if (d) host.insertAdjacentHTML('beforeend', `<div class="an-src"><span class="an-src-k">Analyses</span><span class="file-chip">${escapeHtml(st('eco'))}</span><span class="file-chip">${escapeHtml(st('fin'))}</span></div>`);
+  if (d){
+    const clean = v => { const t = String(v || '').trim(); return /^(xxx|adg12345)$/i.test(t) ? '' : t; };
+    const g = document.getElementById('cd-groupe'), r = document.getElementById('cd-rct');
+    if (!anState.edited.cdgroupe) g.value = clean(d.info.groupe);
+    if (!anState.edited.cdrct) r.value = clean(d.info.rct);
+    const nat = document.getElementById('cd-nature'), pr = document.getElementById('pa-renouv');
+    if (!anState.edited.cdnature && pr && pr.value) nat.value = pr.value;
+    const gar = document.getElementById('cd-garanties'), pg = document.getElementById('pa-garanties');
+    if (!anState.edited.cdgaranties && pg && pg.value && !gar.value) gar.value = pg.value;
+  }
+}
+
+/* ---------- Lignes demandées ---------- */
+function cdRenderLignes(){
+  const host = document.getElementById('cd-lignes');
+  host.innerHTML = `<div class="pa-table-wrap"><table class="review cd-lignes"><thead><tr><th>Nature de la ligne</th><th class="num">Montant (MXOF)</th><th>Durée</th><th>Garanties</th><th></th></tr></thead><tbody>
+    ${cdState.lignes.map((l, i) => `<tr data-i="${i}">
+      <td><input type="text" data-f="nature" value="${escapeHtml(l.nature)}" aria-label="Nature de la ligne ${i + 1}"></td>
+      <td><input type="text" inputmode="decimal" data-f="montant" class="num" value="${escapeHtml(l.montant)}" aria-label="Montant ${i + 1}"></td>
+      <td><input type="text" data-f="duree" value="${escapeHtml(l.duree)}" aria-label="Durée ${i + 1}"></td>
+      <td><input type="text" data-f="garanties" value="${escapeHtml(l.garanties)}" aria-label="Garanties ${i + 1}"></td>
+      <td><button type="button" class="cd-del" aria-label="Supprimer la ligne" ${cdState.lignes.length < 2 ? 'disabled' : ''}>×</button></td></tr>`).join('')}
+    </tbody></table></div><div class="cd-total" id="cd-total"></div>`;
+  host.querySelectorAll('input').forEach(inp => inp.addEventListener('input', () => { cdState.lignes[+inp.closest('tr').dataset.i][inp.dataset.f] = inp.value; cdRenderTotal(); }));
+  host.querySelectorAll('.cd-del').forEach(b => b.addEventListener('click', () => { cdState.lignes.splice(+b.closest('tr').dataset.i, 1); cdRenderLignes(); }));
+  cdRenderTotal();
+}
+function cdRenderTotal(){
+  const t = cdTotalDemande({ lignes: cdState.lignes });
+  const bad = cdState.lignes.filter(l => String(l.montant).trim() && cdParseMontant(l.montant) == null).length;
+  document.getElementById('cd-total').innerHTML = (t ? `Total demandé : <b>${escapeHtml(paXofRaw(t * 1e6))}</b>` : '') + (bad ? ` <span class="cd-bad">${bad} montant(s) illisible(s)</span>` : '');
+}
+function cdRequest(){
+  const v = id => document.getElementById(id).value.trim();
+  const id = anIdent();
+  return { entite: id.entite, exercice: id.exercice, groupe: v('cd-groupe'), rct: v('cd-rct'), secteur: v('cd-secteur'),
+    notation: v('cd-notation'), nature: v('cd-nature'), garanties: v('cd-garanties'), lignes: cdState.lignes.map(l => ({ ...l })) };
+}
+
+/* ---------- Génération ---------- */
+async function cdGenerateUi(){
+  await anResolveNf();
+  anRenderSources();
+  if (!anState.d) return;
+  anAlert('credap', '');
+  const d = cdD();
+  const ef = anEf(d), qs = anQuestions(d, ef);
+  const data = anBuildData(anState.wb, d);
+  const ctx0 = { ef: ef ? ef.ef : null, questions: qs.q };
+  const eco = cdAnalysis('eco', d, data, ctx0), fin = cdAnalysis('fin', d, data, ctx0);
+  // documents demandés : ceux du questionnaire de pré-analyse, sinon ceux établis depuis la NF
+  const docs = qs.from === 'pre' ? (paState.sections.docs || []).map(t => String(t).trim()).filter(Boolean)
+    : generatePreanalyseQuestions(d, {}, ef ? ef.ef : null).questions.docs.map(x => x.text);
+  const req = cdRequest();
+  const r = cdGenerate(d, data, { ...ctx0, eco: eco.out, fin: fin.out, docs }, req);
+  const src = [data.tabs.length ? 'Notice Financière (onglets de calcul)' : 'Notice Financière (feuille de saisie)'];
+  if (ef) src.push(`états financiers ${d.years.N}`);
+  src.push(qs.from === 'pre' ? 'questionnaire de pré-analyse' : 'questions établies depuis la NF');
+  src.push(eco.from === 'module' || fin.from === 'module' ? 'analyses économique et financière des modules 3 et 4' : 'analyses économique et financière établies à la génération');
+  cdState.out = { d, data, req, ...r, synth: cdSynthTable(d, data), flux: cdFluxTable(d, data), sources: anJoin(src) };
+  cdState.conclEdited = false;
+  const caXof = Math.abs(data.M.N.ca || 0) * d.info.multiplier;
+  if (caXof > 0 && caXof < 5e7) anAlert('credap', `Chiffre d’affaires ${d.years.N} = ${paXof(data.M.N.ca, d.info.multiplier)} avec l’unité « ${d.info.unite} » : vérifiez l’unité des montants de la NF puis régénérez.`, 'warn');
+  if (!cdLignes(req).length) anAlert('credap', 'Aucune ligne de crédit saisie : la demande figurera « à préciser » dans le CREDAP.', 'warn');
+  document.getElementById('an-credap-result').style.display = 'block';
+  cdRenderResult();
+  document.getElementById('an-credap-result').scrollIntoView({ behavior:'smooth', block:'start' });
+}
+
+function cdRenderResult(){
+  const o = cdState.out; if (!o) return;
+  const tag = s => `<span class="cd-note cd-n${s >= 1 ? 'p' : s === 0 ? 'z' : s === -1 ? 'm' : 'c'}">${cdNote(s)}</span>`;
+  document.getElementById('cd-grille').innerHTML = `<div class="pa-table-wrap"><table class="review cd-grille"><thead><tr><th>Critère</th><th>Constat</th><th>Appréciation</th></tr></thead>
+    <tbody>${o.crit.map(c => `<tr><td>${escapeHtml(c.label)}</td><td>${escapeHtml(c.constat)}</td><td>${tag(c.s)}</td></tr>`).join('')}</tbody></table></div>`;
+  const sel = document.getElementById('cd-avis');
+  sel.value = o.prop.avis;
+  document.getElementById('cd-avis-prop').textContent = `Avis proposé : ${o.prop.avis}`;
+  cdRefreshConclusion(true);
+  const host = document.getElementById('cd-sections');
+  host.innerHTML = o.sections.map((s, i) => `<div class="pa-sec an-sec" data-i="${i}">
+      <div class="pa-sec-head"><h4>${escapeHtml(s.title)}</h4></div>
+      <textarea class="an-text" rows="3" aria-label="${escapeHtml(s.title)}">${escapeHtml(s.text)}</textarea></div>`).join('');
+  host.querySelectorAll('.an-sec textarea').forEach(ta => {
+    cdFit(ta);
+    ta.addEventListener('input', () => { o.sections[+ta.closest('.an-sec').dataset.i].text = ta.value; cdFit(ta); });
+  });
+}
+function cdFit(ta){ ta.style.height = 'auto'; ta.style.height = ta.scrollHeight + 2 + 'px'; }
+function cdRefreshConclusion(force){
+  const o = cdState.out; if (!o) return;
+  const ta = document.getElementById('cd-conclusion');
+  if (force || !cdState.conclEdited){
+    ta.value = cdConclusion(o.d, o.data, cdRequest(), document.getElementById('cd-avis').value, document.getElementById('cd-conditions').value);
+    if (force) cdState.conclEdited = false;
+  }
+  cdFit(ta);
+}
+
+function cdDoc(){
+  const o = cdState.out; if (!o) return null;
+  const req = cdRequest(), d = o.d;
+  const lignes = cdLignes(req).map(l => ({ nature:l.nature.trim(), montant:cdParseMontant(l.montant), duree:l.duree.trim(), garanties:l.garanties.trim() }));
+  const audite = String(d.info.audite || '').trim();
+  return {
+    entite: req.entite || d.info.client || '', exercice: req.exercice || d.years.N,
+    ident: [['Raison sociale', req.entite || d.info.client || ''], ['Groupe', req.groupe], ['Code RCT', req.rct], ['Secteur d’activité', req.secteur], ['Notation interne', req.notation],
+      ['Nature de la demande', req.nature], ['Exercice de référence', String(req.exercice || d.years.N)],
+      ['États financiers', [audite ? (/^oui|^yes/i.test(audite) ? 'audités' : 'non audités') : '', d.info.norme || '', d.info.consolide || ''].filter(Boolean).join(', ')],
+      ['Sources', o.sources]],
+    lignes, total: lignes.reduce((s, l) => s + (l.montant || 0), 0), garanties: req.garanties,
+    synth: o.synth, flux: o.flux, sections: o.sections.map(s => ({ ...s, text:String(s.text || '').trim() })).filter(s => s.text),
+    grille: o.crit, avis: document.getElementById('cd-avis').value,
+    conclusion: document.getElementById('cd-conclusion').value.trim(),
+  };
+}
+async function cdDownload(){
+  const doc = cdDoc(); if (!doc) return;
+  const btns = document.querySelectorAll('#an-credap-download, #cd-preview-download');
+  btns.forEach(b => b.disabled = true);
+  try {
+    const blob = await cdBuildDocx(doc);
+    const safe = String(doc.entite).replace(/[\\/:*?"<>|]+/g, '').trim() || 'CLIENT';
+    downloadBlob(blob, `CREDAP - ${safe} ${doc.exercice}.docx`);
+    markModuleDone('credap');
+  } catch (err){ console.error(err); alert('Échec : ' + (err.message || err)); }
+  finally { btns.forEach(b => b.disabled = false); }
+}
+function cdPrint(){
+  const doc = cdDoc(); if (!doc) return;
+  let frame = document.getElementById('cd-print-frame');
+  if (frame) frame.remove();
+  frame = document.createElement('iframe');
+  frame.id = 'cd-print-frame'; frame.setAttribute('aria-hidden', 'true');
+  frame.style.cssText = 'position:fixed; right:0; bottom:0; width:0; height:0; border:0; visibility:hidden;';
+  document.body.appendChild(frame);
+  const fd = frame.contentDocument;
+  fd.open();
+  fd.write(`<!doctype html><html lang="fr"><head><meta charset="utf-8"><title>${escapeHtml(`CREDAP - ${doc.entite} ${doc.exercice}`)}</title><style>${CD_PRINT_CSS}</style></head><body>${cdDocHtml(doc)}</body></html>`);
+  fd.close();
+  const go = () => { try { frame.contentWindow.focus(); frame.contentWindow.print(); } catch (e){ console.error(e); window.print(); } };
+  if (fd.fonts && fd.fonts.ready) fd.fonts.ready.then(() => setTimeout(go, 50)); else setTimeout(go, 200);
+  markModuleDone('credap');
+}
+function cdOpenPreview(){
+  const doc = cdDoc(); if (!doc) return;
+  let m = document.getElementById('cd-preview');
+  if (!m){
+    m = document.createElement('div');
+    m.id = 'cd-preview'; m.className = 'pa-preview';
+    m.innerHTML = `<div class="pa-preview-card" role="dialog" aria-modal="true" aria-labelledby="cd-preview-title">
+      <div class="pa-preview-head"><h3 id="cd-preview-title">Aperçu du CREDAP</h3><span class="pa-preview-meta"></span><button type="button" class="app-modal-x" id="cd-preview-x" aria-label="Fermer">×</button></div>
+      <div class="pa-preview-body" id="cd-preview-body"></div>
+      <div class="pa-preview-foot">
+        <button type="button" class="action pa-secondary" id="cd-preview-edit"><span class="ico ico-back" aria-hidden="true"></span>Revenir au CREDAP</button>
+        <button type="button" class="action pa-secondary" id="cd-preview-print"><span class="ico ico-print" aria-hidden="true"></span>Imprimer</button>
+        <button type="button" class="action amber" id="cd-preview-download"><span class="ico ico-download" aria-hidden="true"></span>Télécharger le CREDAP</button>
+      </div></div>`;
+    document.body.appendChild(m);
+    const close = () => { m.classList.remove('open'); document.body.style.overflow = ''; };
+    m.querySelector('#cd-preview-x').addEventListener('click', close);
+    m.querySelector('#cd-preview-edit').addEventListener('click', close);
+    m.querySelector('#cd-preview-download').addEventListener('click', cdDownload);
+    m.querySelector('#cd-preview-print').addEventListener('click', cdPrint);
+    m.addEventListener('click', ev => { if (ev.target === m) close(); });
+    document.addEventListener('keydown', ev => { if (ev.key === 'Escape' && m.classList.contains('open')) close(); });
+  }
+  m.querySelector('#cd-preview-body').innerHTML = cdDocHtml(doc);
+  m.querySelector('#cd-preview-body').scrollTop = 0;
+  m.classList.add('open');
+  document.body.style.overflow = 'hidden';
+  m.querySelector('#cd-preview-download').focus();
+}
+
+function initCredapModule(){
+  const st = document.createElement('style');
+  st.textContent = CD_PRINT_CSS.replace(/@page\{[^}]*\}/, '').replace(/\bbody\{[^}]*\}/, '');
+  document.head.appendChild(st);
+  paWireDrop('an-credap-drop', 'an-credap-input', f => anLoadNfFile(f, 'credap'));
+  document.getElementById('an-credap-generate').addEventListener('click', cdGenerateUi);
+  document.getElementById('an-credap-preview').addEventListener('click', cdOpenPreview);
+  document.getElementById('an-credap-download').addEventListener('click', cdDownload);
+  document.getElementById('an-credap-print').addEventListener('click', cdPrint);
+  document.getElementById('cd-add-ligne').addEventListener('click', () => { cdState.lignes.push({ nature:'', montant:'', duree:'', garanties:'' }); cdRenderLignes(); });
+  ['unit'].forEach(f => { const el = document.getElementById(`an-credap-${f}`); el.addEventListener(el.tagName === 'SELECT' ? 'change' : 'input', () => { anState.edited['credap' + f] = true; }); });
+  ['groupe', 'rct', 'nature', 'garanties'].forEach(f => { const el = document.getElementById(`cd-${f}`); el.addEventListener(el.tagName === 'SELECT' ? 'change' : 'input', () => { anState.edited['cd' + f] = true; }); });
+  document.getElementById('cd-avis').addEventListener('change', () => cdRefreshConclusion(false));
+  document.getElementById('cd-conditions').addEventListener('input', () => cdRefreshConclusion(false));
+  document.getElementById('cd-conclusion').addEventListener('input', e => { cdState.conclEdited = true; cdFit(e.target); });
+  cdRenderLignes();
+}
+initCredapModule();
+/* @@CREDAP_UI_END */
 
 /* ============================================================
    9. ASSISTANT DOCUMENTS : questions sur les fichiers chargés
