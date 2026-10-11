@@ -2024,17 +2024,42 @@ inputTemplate.addEventListener('change', ()=>{ if (inputTemplate.files.length) s
 // financiers : tous les montants (exercice N comme N-1) seront convertis dans cette unité.
 let templateUnit = null;   // { divisor, label, source:'modele'|'choix' }
 const NF_UNIT_LABELS = { 1e3:'milliers de FCFA', 1e6:'millions de FCFA', 1:'francs CFA' };
-function readNfUnit(ws){
-  const text = ws && ws['C11'] ? String(ws['C11'].v == null ? '' : ws['C11'].v).trim() : '';
-  const raw = text.toLowerCase();
-  if (raw.includes('million')) return { divisor:1e6, text };
-  if (raw.includes('millier')) return { divisor:1e3, text };
-  return { divisor:null, text };
+// Unité des montants du modèle de NF, toujours lue dans le classeur (jamais demandée) :
+// 1) cellule C11 (valeur, ou formule recalculée) ; 2) libellé « Milliers / Millions » ou « Unité » de la
+// feuille de saisie (colonne des valeurs) ; 3) à défaut, milliers (unité standard de la NF), écrits en C11 à l'export.
+function nfUnitOf(text){
+  const raw = String(text == null ? '' : text).toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '');
+  if (/million|\bmio\b|\bmxof\b|000 ?000/.test(raw)) return 1e6;
+  if (/millier|thousand|\bkxof\b|\bk ?fcfa\b|\b000\b/.test(raw)) return 1e3;
+  if (/^(unites?|units?|fcfa|xof|francs?( cfa)?)$/.test(raw.trim())) return 1;
+  return null;
+}
+function readNfUnit(wb, sheetName){
+  const ws = wb && wb.Sheets[sheetName];
+  if (!ws) return { divisor:null, text:'', how:'' };
+  let ev = null;
+  const val = (sh, a) => {
+    const c = wb.Sheets[sh] && wb.Sheets[sh][a]; if (!c) return null;
+    if (c.v !== undefined && c.v !== null && c.v !== '') return c.v;
+    if (c.f){ try { ev = ev || makeEvaluator(wb); return ev.value(sh, a); } catch (e){ return null; } }
+    return null;
+  };
+  const c11 = val(sheetName, 'C11');
+  let u = nfUnitOf(c11);
+  if (u) return { divisor:u, text:String(c11), how:'cellule de l’unité' };
+  // libellé de la ligne de l'unité, où qu'elle soit dans l'en-tête de la feuille de saisie
+  for (let r = 1; r <= 30; r++){
+    const lab = String(val(sheetName, 'B' + r) || '').toLowerCase();
+    if (!/millier|million|unit[eé]|monnaie|devise/.test(lab) || /devise\s*$/.test(lab)) continue;
+    const v = val(sheetName, 'C' + r); u = nfUnitOf(v);      // colonne des valeurs (la colonne D porte la liste de choix du modèle)
+    if (u) return { divisor:u, text:String(v), how:'en-tête de la feuille de saisie' };
+  }
+  return { divisor:null, text: c11 == null ? '' : String(c11), how:'' };
 }
 function renderTemplateUnit(){
   const box = document.getElementById('template-unit');
   if (!templateFile || !templateUnit){ box.style.display = 'none'; box.innerHTML = ''; return; }
-  if (templateUnit.source === 'modele'){ box.style.display = 'none'; box.innerHTML = ''; return; }   // unité lue : rien à afficher
+  box.style.display = 'none'; box.innerHTML = ''; return;   // l'unité est toujours prise dans le modèle : rien à demander
   box.style.display = '';
   box.className = 'unit-check warn';
   box.innerHTML = `${templateUnit.text ? `Unité du modèle non reconnue (« ${escapeHtml(templateUnit.text)} »)` : 'Unité du modèle non renseignée'} : choisissez l'unité des montants de la NF avant l'analyse.
@@ -2051,8 +2076,11 @@ async function setTemplate(file){
   document.getElementById('sub-1').textContent = 'chargé';
   try {
     await loadTemplateWorkbook();
-    const u = readNfUnit(templateWb.Sheets[targetSheetName]);
-    templateUnit = { divisor: u.divisor, text: u.text, source: u.divisor ? 'modele' : 'choix' };
+    const u = readNfUnit(templateWb, targetSheetName);
+    // unité introuvable dans le classeur : milliers, unité standard de la NF (écrite en C11 à l'export)
+    templateUnit = u.divisor ? { divisor: u.divisor, text: u.text, source:'modele' } : { divisor: 1e3, text: u.text, source:'choix' };
+    if (u.divisor && u.how !== 'cellule de l’unité') log('native', `Unité du modèle lue dans ${u.how} : ${NF_UNIT_LABELS[u.divisor]}.`);
+    if (!u.divisor) log('native', `Unité absente du modèle${u.text ? ` (« ${u.text} »)` : ''} : montants reportés en milliers de FCFA, unité standard de la NF, et indiquée dans la NF générée.`);
   } catch (err){
     console.error(err);
     templateUnit = null;
@@ -2238,9 +2266,9 @@ async function runExtraction(){
   await loadTemplateWorkbook();
   let ws = templateWb.Sheets[targetSheetName];
   // unité de la NF : celle du modèle, ou celle choisie quand le modèle ne la précise pas
-  if (!templateUnit){ const u = readNfUnit(ws); templateUnit = { divisor: u.divisor || 1, text: u.text, source: u.divisor ? 'modele' : 'choix' }; }
+  if (!templateUnit){ const u = readNfUnit(templateWb, targetSheetName); templateUnit = { divisor: u.divisor || 1e3, text: u.text, source: u.divisor ? 'modele' : 'choix' }; }
   const divisor = templateUnit.divisor;
-  log('native', `Unité de la Notice Financière : ${NF_UNIT_LABELS[divisor]}${templateUnit.source === 'choix' ? ' (choisie, le modèle ne la précise pas)' : ''}.`);
+  log('native', `Unité de la Notice Financière : ${NF_UNIT_LABELS[divisor]}${templateUnit.source === 'choix' ? ' (unité standard, le modèle ne la précise pas)' : ''}.`);
   const docs = [];
 
   for (const d of docsQueue){
@@ -6667,10 +6695,10 @@ function lookupCodeValue(code){
           const v = f.inputValue !== undefined ? parseReviewInput(f.inputValue) : f.detected;
           if (v == null || Number.isNaN(v)) continue;
           const a = am ? (am.inputValue !== undefined ? parseReviewInput(am.inputValue) : am.detected) : null;
-          rows.push([years[p], am && a ? v - a : v, am && a ? `brut ${fmt(v)}, amortissements ${fmt(a)}` : '']);
+          rows.push([years[p], am && a ? v - a : v, am && a ? `brut ${fmt(v)}, ${it.row >= 42 ? 'dépréciations' : 'amortissements'} ${fmt(a)}` : '']);
         }
       }
-      if (rows.length) return { label: it.rowLabel || it.label, rows, source: it.source };
+      if (rows.length) return { label: (CODES[code] && CODES[code].label) || it.rowLabel || it.label, rows, source: it.source };
     }
   }
   if (extraction && extraction.periodData){
@@ -6682,14 +6710,64 @@ function lookupCodeValue(code){
   }
   return null;
 }
+/* ---- Réponses rédigées : montants en clair, article, comparaison entre exercices ---- */
+// Montant en francs CFA -> « 31,6 milliards de FCFA », « 437 millions de FCFA »
+function chatAmount(v){
+  if (v == null || !isFinite(v)) return 'non disponible';
+  const a = Math.abs(v), s = v < 0 ? '-' : '';
+  const r1 = x => paNum(Math.round(x * 10) / 10, 1);
+  if (a >= 1e9) return `${s}${r1(a / 1e9)} milliard${a >= 2e9 ? 's' : ''} de FCFA`;
+  if (a >= 1e6) return `${s}${a >= 1e7 ? paNum(Math.round(a / 1e6), 0) : r1(a / 1e6)} million${a >= 2e6 ? 's' : ''} de FCFA`;
+  if (a >= 1e3) return `${s}${paNum(Math.round(a / 1e3), 0)} mille FCFA`;
+  return `${s}${paNum(Math.round(a), 0)} FCFA`;
+}
+const chatPct = v => paNum(Math.round(Math.abs(v) * 1000) / 10, 1) + ' %';
+// « en hausse de 4,2 % », « en baisse de 12 % », « stable »
+function chatEvo(a, b){
+  if (a == null || b == null || !isFinite(a) || !isFinite(b)) return '';
+  if (!a) return b ? 'alors qu’il était nul' : '';
+  const g = (b - a) / Math.abs(a);
+  if (Math.abs(g) < 0.01) return 'stable';
+  if (g >= 4 && a > 0) return `multiplié par ${paNum(Math.round(b / a * 10) / 10, 1)}`;
+  return `en ${g > 0 ? 'hausse' : 'baisse'} de ${chatPct(g)}`;
+}
+// Article d'un libellé de poste : « Le chiffre d'affaires », « La valeur ajoutée », « Les stocks », « L'excédent… »
+const CHAT_FEM = /^(valeur|tresorerie|variation|production|marge|provision|reprise|subvention|prime|reserve|participation|perte|dotation|creance|dette|charge|immobilisation|vente|avance|ecart|disponibilite|autre|plus-value|moins-value)/;
+function chatSubject(label){
+  const l = String(label || '').trim();
+  const first = normalizeQuery(l.split(/[\s,(]/)[0] || '');
+  const low = l.charAt(0).toLowerCase() + l.slice(1);
+  const plural = /[sx]$/.test(first) && !/^(fonds|sous|bois|prix)$/.test(first);
+  if (plural) return { s:`Les ${low}`, pl:true, fem:CHAT_FEM.test(first) };
+  if (/^[aeiouyh]/.test(first)) return { s:`L’${low}`, pl:false, fem:CHAT_FEM.test(first) };
+  return { s:`${CHAT_FEM.test(first) ? 'La' : 'Le'} ${low}`, pl:false, fem:CHAT_FEM.test(first) };
+}
+const chatDivisor = () => (typeof extraction !== 'undefined' && extraction && extraction.unitDivisor) || 1;
+// rows : [[année, valeur dans l'unité de la NF, détail]] du plus récent au plus ancien
+function chatSentence(label, rows, mult){
+  const sub = chatSubject(label);
+  const verb = sub.pl ? 's’élèvent' : 's’élève';
+  const [y0, v0, x0] = rows[0];
+  let t = `${sub.s} ${verb} à ${chatAmount(v0 * mult)} en ${y0 || 'N'}`;
+  if (x0) t += ` (${x0})`;
+  if (rows.length > 1){
+    const [y1, v1] = rows[1];
+    const evo = chatEvo(v1, v0);
+    const tail = !evo ? '' : evo === 'stable' ? ', un niveau stable' : /^multipli/.test(evo) ? `, soit un montant ${evo}` : `, soit une ${evo.replace(/^en /, '')}`;
+    t += `, contre ${chatAmount(v1 * mult)} en ${y1}${tail}`;
+  }
+  if (rows.length > 2){ const [y2, v2] = rows[2]; t += `. En ${y2}, ${sub.pl ? (sub.fem ? 'elles' : 'ils') : (sub.fem ? 'elle' : 'il')} ${sub.pl ? 'atteignaient' : 'atteignait'} ${chatAmount(v2 * mult)}`; }
+  return t + '.';
+}
 function formatCodeAnswer(code){
   const val = lookupCodeValue(code);
   if (!val) return null;
-  const lines = val.rows.map(([y, v, extra]) => `${y || '?'} : ${fmt(v)}${extra ? ` (${extra})` : ''}`);
-  return { text: `${val.label}${chatUnit()}\n${lines.join('\n')}`, source: val.source };
+  const mult = chatDivisor();
+  const rows = val.rows.map(([y, v, extra]) => [y, v, extra ? extra.replace(/brut ([\d\s ,.-]+), (amortissements|dépréciations) ([\d\s ,.-]+)/, (m, b, k, a) => `valeur brute de ${chatAmount(parseAmount(b) * mult)}, ${k} de ${chatAmount(parseAmount(a) * mult)}`) : '']);
+  return { text: chatSentence(val.label, rows, mult), source: val.source };
 }
 
-// Lignes des notes annexes qui correspondent à la question (montants imprimés en FCFA)
+// Lignes des notes annexes qui correspondent à la question (montants imprimés en FCFA), regroupées par note
 function searchNotes(q){
   const qWords = normalizeWords(q);
   if (!qWords.length || !extraction || !extraction.docs) return [];
@@ -6700,26 +6778,109 @@ function searchNotes(q){
       if (r.total) continue;
       const own = chatScore(qWords, normalizeWords(r.label));
       if (own < Math.min(qWords.length, 2)) continue;                 // tous les mots de la question (2 au moins)
-      const score = own + titleScore * 0.5;
-      hits.push({ score, text: `Note ${n.id} (${n.title.toLowerCase()}) : ${r.label} : ${fmt(r.n)} FCFA en ${n.year || d.year}${Number.isFinite(r.n1) ? `, ${fmt(r.n1)} FCFA l'exercice précédent` : ''}`, source: d.name });
+      hits.push({ score: own + titleScore * 0.5, own, n, r, d });
     }
   }
-  return hits.sort((a, b) => b.score - a.score).slice(0, 5);
+  if (!hits.length) return [];
+  const best = Math.max(...hits.map(h => h.own));
+  // libellé contenant la question mot pour mot : seules ces lignes sont retenues
+  const phrase = normalizeQuery(q).replace(/[?!.]+$/, '').replace(/^(quel(le)?s? (est|sont) (le|la|les) |montant (du|de la|des) )/, '').trim();
+  const exact = hits.filter(h => phrase.length >= 6 && normalizeQuery(h.r.label).includes(phrase));
+  const keep = (exact.length ? exact : hits.filter(h => h.own === best)).sort((a, b) => b.score - a.score).slice(0, 4);
+  const groups = new Map();
+  for (const h of keep){ const k = h.d.name + '|' + h.n.id; if (!groups.has(k)) groups.set(k, { n:h.n, d:h.d, rows:[] }); groups.get(k).rows.push(h.r); }
+  return [...groups.values()].map(g => {
+    const y = g.n.year || g.d.year;
+    const one = r => `« ${r.label} » pour ${chatAmount(r.n)}${y ? ` en ${y}` : ''}${Number.isFinite(r.n1) && r.n1 ? ` (${chatAmount(r.n1)} l’exercice précédent${chatEvo(r.n1, r.n) && chatEvo(r.n1, r.n) !== 'stable' ? `, ${chatEvo(r.n1, r.n)}` : ''})` : Number.isFinite(r.n1) ? ' (nul l’exercice précédent)' : ''}`;
+    const list = g.rows.map(one);
+    return { text: `D’après la note ${g.n.id} (${g.n.title.toLowerCase()}), ${g.rows.length > 1 ? 'les lignes correspondantes sont' : 'la ligne correspondante est'} ${list.length > 1 ? list.slice(0, -1).join(', ') + ' et ' + list[list.length - 1] : list[0]}.${g.rows.length > 1 && new Set(g.rows.map(r => normalizeQuery(r.label))).size < g.rows.length ? ' Un même libellé apparaît dans plusieurs rubriques de la note.' : ''}`, source: g.d.name };
+  });
 }
 
-function answerQuestion(raw){
+/* ---- Indicateurs de la Notice Financière, rédigés ---- */
+function chatNfData(){
+  if (typeof anState !== 'undefined' && anState && anState.d) return anState.d;
+  if (typeof paState !== 'undefined' && paState && paState.data) return paState.data;
+  return null;
+}
+const CHAT_IND = [
+  { re:/endettement|dette financiere|gearing|leverage|solvabilit/, keys:['endBrut', 'gearing', 'leverage'] },
+  { re:/couverture|frais financiers/, keys:['ff', 'couvertureFF'] },
+  { re:/rentabilit|marge/, keys:['margeEbe', 'margeNette'] },
+  { re:/liquidit/, keys:['currentRatio', 'quickRatio'] },
+  { re:/equilibre financier|structure du bilan/, keys:['fdr', 'bfr', 'tn'] },
+  { re:/tresorerie nette/, keys:['tn'] },
+  { re:/\bbfr\b|besoin en fonds/, keys:['bfr'] },
+  { re:/fonds de roulement|\bfdr\b/, keys:['fdr'] },
+  { re:/mba|autofinancement|cafg|caf\b/, keys:['mba'] },
+  { re:/delai|rotation|jours/, keys:['dso', 'dio', 'dpo'] },
+  { re:/fonds propres|capitaux propres|ressources propres|capitalisation/, keys:['rp', 'rpSurBilan'] },
+  { re:/ratio|indicateur|synthese|situation financiere|sante financiere/, keys:['margeEbe', 'gearing', 'leverage', 'tn'] },
+];
+function chatIndicatorSentence(key, d, ind){
+  const y = d.years, mult = d.info.multiplier, N = ind.N, N1 = d.hasData.N1 ? ind.N1 : null;
+  const amt = (v) => chatAmount(v * mult);
+  const fois = v => v == null || !isFinite(v) ? null : paNum(Math.round(v * 10) / 10, 1) + ' fois';
+  const pct = v => v == null || !isFinite(v) ? null : paNum(Math.round(v * 1000) / 10, 1) + ' %';
+  const days = v => v == null || !isFinite(v) ? null : paNum(Math.round(v), 0) + ' jours';
+  const prev = (f, v) => N1 && v != null && isFinite(v) ? ` (${f(v)} en ${y.N1})` : '';
+  switch (key){
+    case 'endBrut': return `L’endettement financier brut s’élève à ${amt(N.endBrut)} à fin ${y.N}${N1 ? `, contre ${amt(N1.endBrut)} à fin ${y.N1}${chatEvo(N1.endBrut, N.endBrut) ? ` (${chatEvo(N1.endBrut, N.endBrut)})` : ''}` : ''}.`;
+    case 'gearing': return N.gearing == null ? null : `Il représente ${fois(N.gearing)} les ressources propres${prev(fois, N1 && N1.gearing)}, un niveau ${N.gearing > 2 ? 'élevé' : N.gearing > 1 ? 'significatif' : 'maîtrisé'}.`;
+    case 'leverage': return N.ebe > 0 ? `Rapporté à l’excédent brut d’exploitation, il représente ${fois(N.leverage)}${prev(fois, N1 && N1.ebe > 0 ? N1.leverage : null)}, ce qui est ${N.leverage > 4 ? 'élevé' : N.leverage > 3 ? 'à surveiller' : 'soutenable'}.` : `L’excédent brut d’exploitation étant ${N.ebe < 0 ? 'négatif' : 'nul'}, l’exploitation ne couvre pas l’endettement.`;
+    case 'ff': return `Les frais financiers s’élèvent à ${amt(N.ff)} en ${y.N}${N1 ? `, contre ${amt(N1.ff)} en ${y.N1}` : ''}.`;
+    case 'couvertureFF': return N.couvertureFF == null ? null : `L’excédent brut d’exploitation couvre ${fois(N.couvertureFF)} les frais financiers${prev(fois, N1 && N1.couvertureFF)}.`;
+    case 'margeEbe': return N.margeEbe == null ? null : `La marge d’EBE ressort à ${pct(N.margeEbe)} du chiffre d’affaires en ${y.N}${prev(pct, N1 && N1.margeEbe)}, une rentabilité d’exploitation ${N.margeEbe < 0 ? 'négative' : N.margeEbe < 0.08 ? 'faible' : N.margeEbe < 0.15 ? 'correcte' : 'confortable'}.`;
+    case 'margeNette': return N.margeNette == null ? null : `La marge nette atteint ${pct(N.margeNette)}${prev(pct, N1 && N1.margeNette)}, pour un résultat net de ${amt(N.rn)}.`;
+    case 'currentRatio': return N.currentRatio == null ? null : `Le ratio de liquidité générale est de ${paNum(Math.round(N.currentRatio * 100) / 100, 2)}${N1 && N1.currentRatio != null ? ` (${paNum(Math.round(N1.currentRatio * 100) / 100, 2)} en ${y.N1})` : ''} : ${N.currentRatio < 1 ? 'les actifs circulants ne couvrent pas les dettes à court terme' : 'les actifs circulants couvrent les dettes à court terme'}.`;
+    case 'quickRatio': return N.quickRatio == null ? null : `Hors stocks, la liquidité réduite est de ${paNum(Math.round(N.quickRatio * 100) / 100, 2)}.`;
+    case 'fdr': return `Le fonds de roulement s’établit à ${amt(N.fdr)} en ${y.N}${N1 ? ` (${amt(N1.fdr)} en ${y.N1})` : ''}.`;
+    case 'bfr': return `Le besoin en fonds de roulement atteint ${amt(N.bfr)} en ${y.N}${N1 ? `, contre ${amt(N1.bfr)} en ${y.N1}` : ''}${N.ca ? `, soit ${days(N.bfr / N.ca * 365)} de chiffre d’affaires` : ''}.`;
+    case 'tn': return `La trésorerie nette est ${N.tn < 0 ? 'négative' : 'positive'} à ${chatAmount(Math.abs(N.tn) * mult)} à fin ${y.N}${N.tn < 0 ? ' : une partie du besoin en fonds de roulement est financée par des concours bancaires courants' : ''}.`;
+    case 'mba': return `La marge brute d’autofinancement s’élève à ${amt(N.mba)} en ${y.N}${N1 ? `, contre ${amt(N1.mba)} en ${y.N1}` : ''}${N.ca ? `, soit ${pct(N.mba / N.ca)} du chiffre d’affaires` : ''}.`;
+    case 'dso': return N.dso == null ? null : `Les créances clients représentent ${days(N.dso)} de chiffre d’affaires${prev(days, N1 && N1.dso)}.`;
+    case 'dio': return N.dio == null ? null : `Les stocks représentent ${days(N.dio)} de chiffre d’affaires${prev(days, N1 && N1.dio)}.`;
+    case 'dpo': return N.dpo == null ? null : `Les dettes fournisseurs représentent ${days(N.dpo)} d’achats${prev(days, N1 && N1.dpo)}.`;
+    case 'rp': return `Les ressources propres s’élèvent à ${amt(N.rp)} à fin ${y.N}${N1 ? `, contre ${amt(N1.rp)} à fin ${y.N1}` : ''}.`;
+    case 'rpSurBilan': return N.rpSurBilan == null ? null : `Elles représentent ${pct(N.rpSurBilan)} du total du bilan, une capitalisation ${N.rp < 0 ? 'négative' : N.rpSurBilan < 0.15 ? 'faible' : N.rpSurBilan < 0.3 ? 'moyenne' : 'solide'}.`;
+  }
+  return null;
+}
+
+async function answerQuestion(raw){
   const q = normalizeQuery(raw);
   const hasExtraction = typeof extraction !== 'undefined' && extraction && extraction.docs && extraction.docs.length;
-  const hasNf = typeof paState !== 'undefined' && paState && paState.data;
+  // NF : celle des onglets d'analyse ou de la pré-analyse, sinon celle remplie à l'étape Notice Financière
+  if (!chatNfData() && typeof anResolveNf === 'function' && typeof paStep1Available === 'function' && paStep1Available()){ try { await anResolveNf(); } catch (e){ console.error(e); } }
+  const nf = chatNfData();
 
   // Documents chargés
-  if (/combien de (document|fichier|page)|quels? (document|fichier)|liste des (document|fichier)|fichiers? charges?/.test(q)){
-    const list = docsQueue.map(d => `- ${d.file.name}${d.detectedYear || d.yearOverride ? `, exercice ${d.yearOverride || d.detectedYear}` : ''} (${d.status})`);
-    const tpl = templateFile ? `\nModèle de Notice Financière : ${templateFile.name}` : '';
-    return { text: `${docsQueue.length} document(s) chargé(s)${list.length ? ' :\n' + list.join('\n') : ''}${tpl}` };
+  if (/combien de (document|fichier|page)|quels? (document|fichier)|liste des (document|fichier)|fichiers? charges?|documents? charges?/.test(q)){
+    if (!docsQueue.length && !templateFile) return { text: 'Aucun document n’est chargé pour l’instant.' };
+    const list = docsQueue.map(d => `« ${d.file.name} »${d.detectedYear || d.yearOverride ? ` (exercice ${d.yearOverride || d.detectedYear})` : ''}`);
+    let t = docsQueue.length ? `${docsQueue.length === 1 ? 'Un état financier est chargé' : `${docsQueue.length} états financiers sont chargés`} : ${list.length > 1 ? list.slice(0, -1).join(', ') + ' et ' + list[list.length - 1] : list[0]}.` : 'Aucun état financier n’est chargé.';
+    if (templateFile) t += ` Le modèle de Notice Financière utilisé est « ${templateFile.name} ».`;
+    return { text: t };
   }
-  if (!hasExtraction && !hasNf){
-    return { text: "Aucun document analysé pour l'instant. Chargez le modèle et les états financiers dans l'onglet Notice Financière, puis cliquez sur « Analyser les documents »." };
+  // Questionnaire, analyses et avis
+  if (/questionnaire|questions? (au|pour le) client|combien de questions/.test(q) && typeof paState !== 'undefined'){
+    const n = PA_ANALYSIS_KEYS.reduce((s, k) => s + (paState.sections[k] || []).filter(x => String(x).trim()).length, 0);
+    if (!n) return { text: 'Le questionnaire n’a pas encore été généré : ouvrez l’onglet Pré-analyse et cliquez sur « Générer le questionnaire ».' };
+    const by = { activite:'l’activité et le compte de résultat', actif:'l’actif', passif:'le passif et le financement', coherences:'les cohérences' };
+    const parts = PA_ANALYSIS_KEYS.map(k => [k, (paState.sections[k] || []).filter(x => String(x).trim()).length]).filter(([, c]) => c).map(([k, c]) => `${c} sur ${by[k]}`);
+    const docs = (paState.sections.docs || []).filter(x => String(x).trim()).length;
+    return { text: `Le questionnaire compte ${n} question${n > 1 ? 's' : ''} d’analyse : ${parts.length > 1 ? parts.slice(0, -1).join(', ') + ' et ' + parts[parts.length - 1] : parts[0]}.${docs ? ` ${docs} document${docs > 1 ? 's' : ''} complémentaire${docs > 1 ? 's sont demandés' : ' est demandé'}.` : ''}` };
+  }
+  if (/\bavis\b|appreciation du dossier|credap|recommandation/.test(q)){
+    if (typeof cdState !== 'undefined' && cdState.out){
+      const sel = document.getElementById('cd-avis');
+      const vig = cdState.out.crit.filter(c => c.s <= -1).map(c => c.label.toLowerCase());
+      return { text: `L’outil propose un avis ${cdState.out.prop.avis.toLowerCase()}${sel && sel.value !== cdState.out.prop.avis ? ` ; l’avis retenu dans le CREDAP est ${sel.value.toLowerCase()}` : ''}.${vig.length ? ` Les points de vigilance portent sur ${vig.length > 1 ? vig.slice(0, -1).join(', ') + ' et ' + vig[vig.length - 1] : vig[0]}.` : ' Aucun point de vigilance n’est relevé.'}` };
+    }
+    return { text: 'L’appréciation du dossier n’est pas encore établie : ouvrez l’onglet CREDAP et cliquez sur « Générer la synthèse et le CREDAP ».' };
+  }
+  if (!hasExtraction && !nf){
+    return { text: "Aucun document n’a encore été analysé. Chargez le modèle et les états financiers dans l’onglet Notice Financière, puis cliquez sur « Analyser les documents »." };
   }
 
   // Cohérence et équilibre
@@ -6727,33 +6888,44 @@ function answerQuestion(raw){
     const parts = [];
     if (hasExtraction){
       for (const c of computeBalanceChecks(extraction.docs, extraction.unitDivisor)){
-        parts.push(`${c.year} (${c.doc}) : actif ${fmt(Math.round(c.actif || 0))} FCFA, passif ${fmt(Math.round(c.passif || 0))} FCFA, ${c.status}`);
+        if (c.status === 'équilibré') parts.push(`En ${c.year}, le bilan de « ${c.doc} » est équilibré : l’actif et le passif s’élèvent chacun à ${chatAmount(c.actif)}.`);
+        else if (c.status === 'déséquilibré') parts.push(`En ${c.year}, le bilan de « ${c.doc} » est déséquilibré : l’actif s’élève à ${chatAmount(c.actif)} et le passif à ${chatAmount(c.passif)}, soit un écart de ${chatAmount(Math.abs(c.diff))}.`);
+        else parts.push(`En ${c.year}, les totaux du bilan de « ${c.doc} » n’ont pas pu être lus en entier.`);
       }
       const mism = (window._reviewItems || []).filter(it => it.kind === 'crosscheck' && it.validation && Object.values(it.validation).some(v => v && v.status === 'mismatch'));
-      parts.push(mism.length ? `Écart entre total et détail sur : ${mism.map(m => m.rowLabel || m.label).join(', ')}.` : 'Aucun écart entre les totaux et le détail des lignes lues.');
-      if (suspiciousLines && suspiciousLines.length) parts.push(`${suspiciousLines.length} ligne(s) non reconnue(s), à vérifier dans la relecture.`);
+      parts.push(mism.length ? `Le détail des lignes ne correspond pas au total pour ${mism.map(m => `« ${m.rowLabel || m.label} »`).join(', ')} : à vérifier dans la relecture.` : 'Les totaux concordent avec le détail des lignes lues.');
+      if (suspiciousLines && suspiciousLines.length) parts.push(`${suspiciousLines.length} ligne${suspiciousLines.length > 1 ? 's n’ont' : ' n’a'} pas été reconnue${suspiciousLines.length > 1 ? 's' : ''} et ${suspiciousLines.length > 1 ? 'sont' : 'est'} à vérifier dans la relecture.`);
+    } else if (nf){
+      for (const p of PA_PERIODS) if (nf.hasData[p]){
+        const b = nf.balance[p], gap = b.actif - b.passif;
+        parts.push(Math.abs(gap) <= 1 ? `En ${nf.years[p]}, le bilan de la NF est équilibré à ${chatAmount(b.actif * nf.info.multiplier)}.` : `En ${nf.years[p]}, le bilan de la NF présente un écart de ${chatAmount(Math.abs(gap) * nf.info.multiplier)} entre l’actif et le passif.`);
+      }
     }
-    return { text: parts.join('\n') || "Aucune information de contrôle disponible pour l'instant." };
+    return { text: parts.join(' ') || 'Aucune information de contrôle n’est disponible pour l’instant.' };
   }
 
   // Liste des postes lus
   if (/tous les postes|liste des postes|tout ce qui a ete (detecte|lu)|liste complete/.test(q) && hasExtraction){
     const labels = [...new Set(extraction.docs.flatMap(d => [...d.byCode.keys()]))].filter(c => CODES[c]).map(c => CODES[c].label);
-    return { text: `${labels.length} poste(s) lu(s) dans les états financiers :\n${labels.join(', ')}` };
+    return { text: `J’ai lu ${labels.length} postes dans les états financiers : ${labels.join(', ')}.` };
   }
 
-  // Indicateurs et ratios (Notice Financière de la pré-analyse)
-  if (/ratio|rentabilit|endettement|gearing|leverage|liquidit|solvabilit|marge|fonds de roulement|\bbfr\b|\bfdr\b|cafg|mba|autofinancement|delai|tresorerie nette/.test(q)){
-    if (!hasNf) return { text: "Les indicateurs sont calculés à partir de la Notice Financière : ouvrez l'onglet Pré-analyse (la NF de l'étape Notice Financière y est reprise) puis reposez la question." };
-    const ind = computeNfIndicators(paState.data);
-    const t = paIndicatorTable(paState.data, ind);
-    const qWords = normalizeWords(q);
-    const best = t.body.map(r => ({ r, s: chatScore(qWords, normalizeWords(r[0])) })).filter(x => x.s > 0).sort((a, b) => b.s - a.s).slice(0, 3);
-    const unitTxt = (/\(([^)]*)\)/.exec(t.head[0]) || [])[1];
-    if (best.length) return { text: (unitTxt ? `Montants en ${unitTxt}\n\n` : '') + best.map(({ r }) => `${r[0]}\n${t.head.slice(1).map((y, i) => `${y} : ${r[i + 1]}`).join(' | ')}`).join('\n\n') };
+  // Indicateurs et ratios (Notice Financière)
+  const indRule = CHAT_IND.find(r => r.re.test(q));
+  if (indRule){
+    if (!nf) return { text: 'Les indicateurs sont calculés à partir de la Notice Financière : ouvrez l’onglet Pré-analyse, qui reprend la NF de l’étape Notice Financière, puis reposez la question.' };
+    const ind = computeNfIndicators(nf);
+    const txt = indRule.keys.map(k => chatIndicatorSentence(k, nf, ind)).filter(Boolean).join(' ');
+    if (txt) return { text: txt, source: 'Notice Financière' };
   }
 
-  // Poste demandé par son nom
+  // Poste demandé par son nom (une question précise de plusieurs mots est d'abord cherchée dans les notes annexes)
+  const kwTerm = (() => { for (const e of [...CHAT_KEYWORDS].sort((a, b) => Math.max(...b.terms.map(t => t.length)) - Math.max(...a.terms.map(t => t.length)))) for (const t of e.terms) if (q.includes(normalizeQuery(t))) return t; return null; })();
+  const qn = normalizeWords(q).length;
+  if (hasExtraction && qn >= 2 && (!kwTerm || normalizeWords(kwTerm).length < qn)){
+    const notes = searchNotes(q);
+    if (notes.length) return { text: notes.map(n => n.text).join(' '), source: notes[0].source };
+  }
   if (hasExtraction){
     const typed = raw.match(/\b([A-Z]{2})\b/);
     const kw = (typed && CODES[typed[1]]) ? typed[1] : findByKeyword(q);
@@ -6762,20 +6934,20 @@ function answerQuestion(raw){
     const cands = findCodesByFreeText(q).filter(c => c.score >= (qCount <= 1 ? 1 : 2) && extraction.docs.some(d => d.byCode.has(c.code)));
     if (cands.length){
       const blocks = cands.slice(0, 3).map(c => formatCodeAnswer(c.code)).filter(Boolean);
-      if (blocks.length) return { text: blocks.map(b => b.text).join('\n\n'), source: blocks[0].source };
+      if (blocks.length) return { text: blocks.map(b => b.text).join(' '), source: blocks[0].source };
     }
     // Notes annexes
     const notes = searchNotes(q);
-    if (notes.length) return { text: notes.map(n => n.text).join('\n'), source: notes[0].source };
+    if (notes.length) return { text: notes.map(n => n.text).join(' '), source: notes[0].source };
   }
 
   // Texte des documents (dernier recours)
   if (window._allExtractedLines && window._allExtractedLines.length){
     const words = normalizeWords(q);
-    const scored = window._allExtractedLines.map(l => ({ ...l, score: chatScore(words, normalizeWords(l.text)) })).filter(l => l.score > 0).sort((a, b) => b.score - a.score).slice(0, 6);
-    if (scored.length) return { text: `Voici ce que j'ai trouvé dans les documents :\n${scored.map(l => `- ${stripPostCodes(l.text.replace(/\t/g, '  '))} (${l.source})`).join('\n')}` };
+    const scored = window._allExtractedLines.map(l => ({ ...l, score: chatScore(words, normalizeWords(l.text)) })).filter(l => l.score > 0).sort((a, b) => b.score - a.score).slice(0, 4);
+    if (scored.length) return { text: `Je n’ai pas trouvé de poste correspondant, mais ${scored.length > 1 ? 'ces passages des documents contiennent' : 'ce passage des documents contient'} les mots recherchés :\n${scored.map(l => `- ${stripPostCodes(l.text.replace(/\t/g, '  '))} (${l.source})`).join('\n')}` };
   }
-  return { text: "Je n'ai rien trouvé de correspondant dans les documents analysés. Essayez un poste (« chiffre d'affaires », « résultat net », « fournisseurs »), un indicateur (« endettement », « BFR ») ou « liste des postes »." };
+  return { text: "Je n’ai rien trouvé de correspondant dans les documents analysés. Vous pouvez demander un poste (« chiffre d’affaires », « résultat net », « fournisseurs »), un indicateur (« endettement », « BFR », « rentabilité »), l’équilibre du bilan ou l’avis sur le dossier." };
 }
 
 /* ---- Interface ---- */
@@ -6786,7 +6958,7 @@ const chatMessages = document.getElementById('chat-messages');
 const chatForm = document.getElementById('chat-form');
 const chatInput = document.getElementById('chat-input');
 const chatSuggestions = document.getElementById('chat-suggestions');
-const CHAT_SUGGESTIONS = ['Quel est le résultat net ?', 'Total bilan ?', 'Le bilan est-il équilibré ?', 'Endettement', 'Quels documents sont chargés ?'];
+const CHAT_SUGGESTIONS = ['Quel est le chiffre d’affaires ?', 'Quel est le résultat net ?', 'Le bilan est-il équilibré ?', 'Endettement', 'Trésorerie nette', 'Avis sur le dossier'];
 
 function addChatMessage(role, text, source){
   const div = document.createElement('div');
@@ -6805,7 +6977,7 @@ chatToggle.addEventListener('click', () => {
   const isOpen = chatPanel.classList.toggle('open');
   chatToggle.classList.toggle('open', isOpen);
   if (isOpen && chatMessages.children.length === 0){
-    addChatMessage('bot', "Bonjour. Posez-moi une question sur les documents chargés : montants d'un poste par exercice, équilibre du bilan, notes annexes, indicateurs de la Notice Financière. Tout reste sur votre poste, rien n'est envoyé à l'extérieur.");
+    addChatMessage('bot', "Bonjour. Posez-moi une question sur le dossier : montant d’un poste, équilibre du bilan, notes annexes, endettement, rentabilité, trésorerie, questionnaire ou avis. Tout reste sur votre poste, rien n’est envoyé à l’extérieur.");
     renderChatSuggestions();
   }
   if (isOpen) chatInput.focus();
@@ -6818,9 +6990,11 @@ chatForm.addEventListener('submit', e => {
   if (!q) return;
   addChatMessage('user', q);
   chatInput.value = '';
-  let ans;
-  try { ans = answerQuestion(q); } catch (err){ console.error(err); ans = { text: "Je n'ai pas pu traiter cette question." }; }
-  setTimeout(() => addChatMessage('bot', ans.text, ans.source), 120);
+  (async () => {
+    let ans;
+    try { ans = await answerQuestion(q); } catch (err){ console.error(err); ans = { text: 'Je n’ai pas pu traiter cette question.' }; }
+    setTimeout(() => addChatMessage('bot', ans.text, ans.source), 120);
+  })();
 });
 
 </script>
