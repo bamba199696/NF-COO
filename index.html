@@ -414,6 +414,29 @@
   .an-table{ margin-bottom:20px; }
   .an-sec textarea.an-text{ width:100%; border:1px solid var(--paper-line); border-radius:6px; padding:9px 11px; font-family:'Inter',sans-serif; font-size:0.86rem; line-height:1.6; resize:none; overflow:hidden; background:#fff; color:var(--ink); }
   @media (max-width:640px){ .an-src-k{ flex-basis:100%; } }
+  .an-doc-title{ border:1.5px solid #F00; text-align:center; font-weight:700; padding:4px 8px; margin:0 0 14px; font-size:0.9rem; }
+  .an-sub{ font-weight:700; text-decoration:underline; text-decoration-color:#F00; margin:4px 0 8px 14px; font-size:0.86rem; }
+  .an-sec-h3 .pa-sec-head{ border-bottom-width:1px; } .an-sec-h3 .pa-sec-head h4{ color:var(--ink); }
+  table.an-cx td{ font-size:0.74rem; padding:3px 6px; } table.an-cx td.num{ text-align:right; font-family:'JetBrains Mono',monospace; white-space:nowrap; } table.an-cx td.b{ font-weight:700; }
+  table.an-grid input, table.cd-rows input{ width:100%; min-width:90px; border:1px solid var(--paper-line); border-radius:4px; padding:6px 8px; font-size:0.82rem; background:#fff; text-align:left; }
+  table.cd-rows input.num{ text-align:right; font-family:'JetBrains Mono',monospace; }
+  .cd-rows .cd-del, .cd-line .cd-del{ border:0; background:none; font-size:1.1rem; color:var(--muted); cursor:pointer; }
+  .cd-line{ border:1px solid var(--paper-line); border-radius:6px; padding:10px 12px; margin-bottom:10px; background:#fff; }
+  .cd-line-head{ display:flex; justify-content:space-between; align-items:center; margin-bottom:6px; font-size:0.84rem; }
+  .cd-line-grid{ display:grid; grid-template-columns:repeat(auto-fit, minmax(150px, 1fr)); gap:8px; }
+  .cd-line label{ display:flex; flex-direction:column; gap:3px; font-size:0.74rem; color:var(--ink-soft); }
+  .cd-line input, .cd-line select{ border:1px solid var(--paper-line); border-radius:4px; padding:6px 8px; font-size:0.84rem; background:#fff; }
+  .cd-line input.num{ text-align:right; font-family:'JetBrains Mono',monospace; }
+  .cd-line-area{ margin-top:8px; }
+  .cd-checks{ display:flex; flex-wrap:wrap; gap:8px 18px; margin-top:10px; }
+  .cd-check{ display:flex; gap:8px; align-items:flex-start; font-size:0.82rem; line-height:1.4; }
+  .cd-utp{ display:flex; flex-direction:column; gap:6px; }
+  .cd-group{ margin-bottom:10px; }
+  .cd-swot{ display:flex; flex-direction:column; gap:10px; }
+  .cd-swot-row{ display:grid; grid-template-columns:200px 1fr 1fr; gap:10px; align-items:start; }
+  .cd-swot-row label{ display:flex; flex-direction:column; gap:3px; font-size:0.74rem; color:var(--ink-soft); }
+  .cd-swot-axe{ font-weight:600; font-size:0.84rem; padding-top:16px; }
+  @media (max-width:640px){ .cd-swot-row{ grid-template-columns:1fr; } .cd-swot-axe{ padding-top:0; } }
   .cd-lignes input{ width:100%; min-width:110px; border:1px solid var(--paper-line); border-radius:4px; padding:6px 8px; font-size:0.84rem; background:#fff; }
   .cd-lignes input{ text-align:left; }
   .cd-lignes input.num{ text-align:right; font-family:'JetBrains Mono',monospace; }
@@ -667,7 +690,7 @@
     </button>
     <button class="sidebar-item" data-module="credap">
       <span class="si-icon"><svg viewBox="0 0 24 24"><path d="M6 2h9l5 5v15a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1V3a1 1 0 0 1 1-1z"/><path d="M14 2v6h6"/><path d="M8.5 14.5l2.5 2.5 4.5-5"/></svg></span>
-      <span>CREDAP</span><span class="si-num">5</span>
+      <span>CREDAPP</span><span class="si-num">5</span>
     </button>
     <div class="sidebar-progress">
       <div class="spl" id="sidebar-progress-label">0 / 5 étapes</div>
@@ -887,11 +910,7 @@
         <div class="step-title">Générer</div>
       </div>
       <div class="step-body">
-        <div class="field-grid">
-          <div><label for="an-eco-unit">Unité des montants de la NF</label>
-            <select id="an-eco-unit"><option>Milliers</option><option>Millions</option><option value="Unités">Unités (FCFA)</option></select></div>
-        </div>
-        <button class="action primary" id="an-eco-generate" disabled style="margin-top:14px;">Générer l'analyse économique</button>
+        <button class="action primary" id="an-eco-generate" disabled>Générer l'analyse économique</button>
         <div id="an-eco-alerts"></div>
       </div>
     </div>
@@ -941,8 +960,8 @@
       </div>
       <div class="step-body">
         <div class="field-grid">
-          <div><label for="an-fin-unit">Unité des montants de la NF</label>
-            <select id="an-fin-unit"><option>Milliers</option><option>Millions</option><option value="Unités">Unités (FCFA)</option></select></div>
+          <div><label for="an-fin-audit">Cabinet d'audit</label><input type="text" id="an-fin-audit"></div>
+          <div><label for="an-fin-cca">CCA bloqués inscrits en emprunts (MXOF)</label><input type="text" id="an-fin-cca" inputmode="decimal"></div>
         </div>
         <button class="action primary" id="an-fin-generate" disabled style="margin-top:14px;">Générer l'analyse financière</button>
         <div id="an-fin-alerts"></div>
@@ -970,7 +989,7 @@
   <section class="module" id="module-credap">
     <header class="module-head">
       <div class="eyebrow">Dossier crédit · Module 5 / 5</div>
-      <h1>Synthèse du dossier et CREDAP</h1>
+      <h1>Synthèse du dossier et CREDAPP</h1>
     </header>
 
     <div class="step">
@@ -994,22 +1013,80 @@
         <div class="step-title">Demande de crédit</div>
       </div>
       <div class="step-body">
-        <div class="field-grid">
-          <div><label for="cd-groupe">Groupe</label><input type="text" id="cd-groupe"></div>
-          <div><label for="cd-rct">Code RCT</label><input type="text" id="cd-rct"></div>
-          <div><label for="cd-secteur">Secteur d'activité</label><input type="text" id="cd-secteur"></div>
-          <div><label for="cd-notation">Notation interne</label><input type="text" id="cd-notation"></div>
-          <div><label for="cd-nature">Nature de la demande</label>
-            <select id="cd-nature"><option value="">Choisissez un élément.</option><option>Renouvellement à l'identique</option><option>Réamenagement des lignes</option><option>Augmentation des lignes</option><option>Nouvelle demande</option></select></div>
-          <div><label for="an-credap-unit">Unité des montants de la NF</label>
-            <select id="an-credap-unit"><option>Milliers</option><option>Millions</option><option value="Unités">Unités (FCFA)</option></select></div>
-        </div>
-        <div class="pa-label" style="margin-top:16px;">Lignes demandées</div>
-        <div id="cd-lignes"></div>
-        <button type="button" class="action pa-add" id="cd-add-ligne">+ Ajouter une ligne</button>
-        <label class="pa-label" for="cd-garanties" style="margin-top:14px;">Garanties</label>
-        <textarea id="cd-garanties" class="pa-textarea" rows="2"></textarea>
-        <button class="action primary" id="an-credap-generate" disabled style="margin-top:14px;">Générer la synthèse et le CREDAP</button>
+        <details class="pa-details cd-group" open>
+          <summary>En-tête de la CREDAPP</summary>
+          <div class="field-grid" style="margin-top:10px;">
+            <div><label for="cd-groupe">Groupe</label><input type="text" id="cd-groupe"></div>
+            <div><label for="cd-rct">N° RCT</label><input type="text" id="cd-rct"></div>
+            <div><label for="cd-secteur">Secteur d'activité</label><input type="text" id="cd-secteur"></div>
+            <div><label for="cd-naer">NAER</label><input type="text" id="cd-naer"></div>
+            <div><label for="cd-filiale">Filiale</label><input type="text" id="cd-filiale" value="SGSN"></div>
+            <div><label for="cd-clientele">Clientèle</label><select id="cd-clientele"><option>GE</option><option>ME</option><option>PME</option><option>TPE</option><option>Institutionnel</option></select></div>
+            <div><label for="cd-segment">Segment</label><select id="cd-segment"><option>S1</option><option>S2</option><option>S3</option></select></div>
+            <div><label for="cd-dates">Date d'entrée S2 ou S3</label><input type="text" id="cd-dates"></div>
+            <div><label for="cd-kyc">KYC, risque LAB</label><select id="cd-kyc"><option value="">Choisissez un élément.</option><option>FAIBLE</option><option>MOYEN-FAIBLE</option><option>MOYEN</option><option>ELEVE</option></select></div>
+            <div><label for="cd-validite-kyc">Validité KYC</label><input type="text" id="cd-validite-kyc"></div>
+            <div><label for="cd-note">Note</label><input type="text" id="cd-note"></div>
+            <div><label for="cd-revue">Revue le</label><input type="text" id="cd-revue"></div>
+            <div><label for="cd-validite">Validité de la note</label><input type="text" id="cd-validite"></div>
+            <div><label for="cd-ca">Chargé d'affaires</label><input type="text" id="cd-ca"></div>
+            <div><label for="cd-analyste">Analyste</label><input type="text" id="cd-analyste"></div>
+          </div>
+          <div class="cd-checks">
+            <label class="cd-check"><input type="checkbox" id="cd-prospect"> Prospect</label>
+            <label class="cd-check"><input type="checkbox" id="cd-lod1" checked> Validation LoD1 (DCE)</label>
+            <label class="cd-check"><input type="checkbox" id="cd-lod2"> Validation LoD2 (CPLE)</label>
+            <label class="cd-check"><input type="checkbox" id="cd-hlt"> Client Leverage Lending ou HLT</label>
+          </div>
+        </details>
+        <details class="pa-details cd-group" open>
+          <summary>Objet du dossier et lignes</summary>
+          <div class="field-grid" style="margin-top:10px;">
+            <div><label for="cd-nature">Nature de la demande</label>
+              <select id="cd-nature"><option value="">Choisissez un élément.</option><option>Renouvellement à l'identique</option><option>Réamenagement des lignes</option><option>Renouvellement à la hausse</option><option>Renouvellement à la baisse</option><option>Nouvelle demande</option></select></div>
+            <div><label for="cd-plafond">Plafond ou commentaire</label><input type="text" id="cd-plafond"></div>
+            <div><label for="cd-reponse">Réponse souhaitée le</label><input type="text" id="cd-reponse" value="ASAP"></div>
+          </div>
+          <div id="cd-lignes" style="margin-top:12px;"></div>
+          <div class="cd-total" id="cd-total"></div>
+          <button type="button" class="action pa-add" id="cd-add-ligne">+ Ajouter une ligne</button>
+        </details>
+        <details class="pa-details cd-group">
+          <summary>Garanties</summary>
+          <div id="cd-garanties-rows" style="margin-top:10px;"></div>
+          <button type="button" class="action pa-add" id="cd-add-garantie">+ Ajouter une garantie</button>
+          <label class="pa-label" for="cd-gprendre" style="margin-top:12px;">Garanties à prendre</label>
+          <textarea id="cd-gprendre" class="pa-textarea" rows="2">Maintien des garanties</textarea>
+        </details>
+        <details class="pa-details cd-group">
+          <summary>Relations bancaires</summary>
+          <div class="field-grid" style="margin-top:10px;">
+            <div><label for="cd-depuis">Client SGSN depuis</label><input type="text" id="cd-depuis" inputmode="numeric"></div>
+            <div><label for="cd-flux1">Flux confiés N-1 (MXOF)</label><input type="text" id="cd-flux1" inputmode="decimal"></div>
+            <div><label for="cd-flux">Flux confiés N (MXOF)</label><input type="text" id="cd-flux" inputmode="decimal"></div>
+          </div>
+          <div class="pa-label" style="margin-top:12px;">Pool bancaire</div>
+          <div id="cd-pool-rows"></div>
+          <button type="button" class="action pa-add" id="cd-add-banque">+ Ajouter une banque</button>
+        </details>
+        <details class="pa-details cd-group">
+          <summary>Vérifications réglementaires</summary>
+          <div class="field-grid" style="margin-top:10px;">
+            <div><label for="cd-es-client">Evaluation E&amp;S client</label><select id="cd-es-client"><option>Non éligible</option><option>Eligible</option></select></div>
+            <div><label for="cd-es-trans">Evaluation E&amp;S transaction</label><select id="cd-es-trans"><option>Non éligible</option><option>Eligible</option></select></div>
+            <div><label for="cd-es-date">Date dernière revue E&amp;S</label><input type="text" id="cd-es-date"></div>
+            <div><label for="cd-ccvi-t">CCVI transition</label><select id="cd-ccvi-t"><option value="">Choisissez un élément.</option><option>Très négatif</option><option>Négatif</option><option>Neutre</option><option>Positif</option></select></div>
+            <div><label for="cd-ccvi-p">CCVI physique</label><select id="cd-ccvi-p"><option value="">Choisissez un élément.</option><option>Très négatif</option><option>Négatif</option><option>Neutre</option><option>Positif</option></select></div>
+          </div>
+          <div class="cd-checks">
+            <label class="cd-check"><input type="checkbox" id="cd-encadrement"> Encadrement CORISQ ou CORESP</label>
+            <label class="cd-check"><input type="checkbox" id="cd-concentration"> Suivi en concentration individuelle</label>
+            <label class="cd-check"><input type="checkbox" id="cd-politique"> Politique sectorielle applicable</label>
+          </div>
+          <div class="pa-label" style="margin-top:12px;">Critères UTP</div>
+          <div id="cd-utp" class="cd-utp"></div>
+        </details>
+        <button class="action primary" id="an-credap-generate" disabled style="margin-top:14px;">Générer la CREDAPP</button>
         <div id="an-credap-alerts"></div>
       </div>
     </div>
@@ -1026,17 +1103,17 @@
           </div>
           <label class="pa-label" for="cd-conditions" style="margin-top:12px;">Conditions</label>
           <textarea id="cd-conditions" class="pa-textarea" rows="2"></textarea>
-          <label class="pa-label" for="cd-conclusion" style="margin-top:12px;">Conclusion</label>
+          <label class="pa-label" for="cd-conclusion" style="margin-top:12px;">Conclusion RM/DCE</label>
           <textarea id="cd-conclusion" class="an-text cd-concl" rows="3"></textarea>
         </div>
       </div>
       <div class="step">
-        <div class="step-head"><div class="step-title">CREDAP</div></div>
+        <div class="step-head"><div class="step-title">CREDAPP</div></div>
         <div class="step-body">
           <div id="cd-sections"></div>
           <div class="pa-download-bar">
             <button type="button" class="action primary" id="an-credap-preview"><span class="ico ico-eye" aria-hidden="true"></span>Lire avant téléchargement</button>
-            <button type="button" class="action amber" id="an-credap-download"><span class="ico ico-download" aria-hidden="true"></span>Télécharger le CREDAP</button>
+            <button type="button" class="action amber" id="an-credap-download"><span class="ico ico-download" aria-hidden="true"></span>Télécharger la CREDAPP</button>
             <button type="button" class="action pa-secondary" id="an-credap-print"><span class="ico ico-print" aria-hidden="true"></span>Imprimer</button>
           </div>
         </div>
@@ -4135,7 +4212,8 @@ function computeNfIndicators(d){
   for (const p of PA_PERIODS){
     const ca = R(114,p), ebe = R(130,p), rn = R(156,p);
     const achats = R(108,p) + R(109,p) + R(115,p) + R(116,p) + R(117,p) + R(118,p);
-    const endBrut = P(83,p) + P(84,p) + P(85,p) + P(86,p) + P(95,p) + P(96,p) + P(97,p);
+    // endettement financier brut au sens de la NF : les CCA bloqués (quasi fonds propres) en sont exclus
+    const endBrut = P(83,p) + P(85,p) + P(86,p) + P(95,p) + P(96,p) + P(97,p);
     const cash = A(54,p) + A(55,p);
     const passifCT = P(94,p) + P(98,p), actifCT = A(52,p) + A(57,p);
     ind[p] = {
@@ -5324,6 +5402,186 @@ function initPreanalyseModule(){
 }
 initPreanalyseModule();
 /* @@PREANALYSE_UI_END */
+/* @@CREDAPP_DOC_START */
+/* ============================================================
+   DOCUMENTS AU STANDARD CREDAPP (Word et aperçu)
+   Mise en page reprise de la CREDAPP SGSN : Aptos 10, titres de partie encadrés de rouge,
+   intertitres rouges soulignés, rubriques en capitales soulignées d'un filet rouge,
+   tableaux de la NF, pied de page « Chargé d'affaires / Analyste / Date » et pagination.
+   Le texte accepte **gras**.
+   ============================================================ */
+const CX_RED = 'FF0000';
+const cxEsc = s => xmlEsc(String(s == null ? '' : s));
+// **gras** et !!rouge!! (le rouge est mis en gras, comme dans la CREDAPP)
+function cxRuns(text, o = {}){
+  return String(text == null ? '' : text).split(/(\*\*.+?\*\*|!!.+?!!)/g).map(t => {
+    if (!t) return '';
+    if (/^\*\*.+\*\*$/.test(t)) return cxRun(t.slice(2, -2), { ...o, b:true });
+    if (/^!!.+!!$/.test(t)) return cxRuns(t.slice(2, -2), { ...o, color: CX_RED, b:true });
+    return cxRun(t, o);
+  }).join('');
+}
+function cxRun(t, o = {}){
+  const sz = o.sz || 20;
+  const rpr = `<w:rPr><w:rFonts w:ascii="Aptos" w:hAnsi="Aptos" w:cs="Arial"/>${o.b ? '<w:b/><w:bCs/>' : ''}${o.i ? '<w:i/><w:iCs/>' : ''}${o.u ? `<w:u w:val="single"${o.uColor ? ` w:color="${o.uColor}"` : ''}/>` : ''}${o.color ? `<w:color w:val="${o.color}"/>` : ''}<w:sz w:val="${sz}"/><w:szCs w:val="${sz}"/></w:rPr>`;
+  return `<w:r>${rpr}<w:t xml:space="preserve">${cxEsc(t)}</w:t></w:r>`;
+}
+function cxP(text, o = {}){
+  const ppr = `<w:pPr>${o.style || ''}${o.border || ''}${o.keep ? '<w:keepNext/>' : ''}<w:spacing w:before="${o.before || 0}" w:after="${o.after == null ? 100 : o.after}" w:line="${o.line || 300}" w:lineRule="auto"/>${o.ind || ''}<w:jc w:val="${o.jc || 'both'}"/><w:rPr><w:sz w:val="${o.sz || 20}"/></w:rPr></w:pPr>`;
+  return `<w:p>${ppr}${cxRuns(text, o)}</w:p>`;
+}
+const CX_BORDERS = (c = '000000', sz = 4) => ['top','left','bottom','right','insideH','insideV'].map(k => `<w:${k} w:val="single" w:sz="${sz}" w:space="0" w:color="${c}"/>`).join('');
+// Tableau générique. cells : texte ou { text, b, fill, color, span, align, sz, vmerge }
+function cxTable(rows, o = {}){
+  const W = o.width || 10466;
+  const n = Math.max(...rows.map(r => r.reduce((s, c) => s + ((c && c.span) || 1), 0)));
+  const widths = o.widths || Array(n).fill(Math.floor(W / n));
+  const sz = o.sz || 16;
+  const cell = (c, ci, ri) => {
+    const x = (c && typeof c === 'object') ? c : { text: c };
+    const span = x.span || 1, w = widths.slice(ci, ci + span).reduce((a, b) => a + b, 0);
+    const fill = x.fill || (ri < (o.headRows || 0) ? o.headFill : null);
+    const color = x.color || (ri < (o.headRows || 0) ? o.headColor : null);
+    const al = x.align || (o.align ? o.align[ci] : 'l');
+    const lines = String(x.text == null ? '' : x.text).split('\n');
+    const paras = lines.map(l => `<w:p><w:pPr><w:spacing w:before="10" w:after="10" w:line="240" w:lineRule="auto"/><w:jc w:val="${al === 'r' ? 'right' : al === 'c' ? 'center' : 'left'}"/><w:rPr><w:sz w:val="${x.sz || sz}"/></w:rPr></w:pPr>${cxRuns(l, { sz: x.sz || sz, b: x.b || (ri < (o.headRows || 0)), color, i: x.i })}</w:p>`).join('');
+    return `<w:tc><w:tcPr><w:tcW w:w="${w}" w:type="dxa"/>${span > 1 ? `<w:gridSpan w:val="${span}"/>` : ''}${x.vmerge ? `<w:vMerge${x.vmerge === 'start' ? ' w:val="restart"' : ''}/>` : ''}${fill ? `<w:shd w:val="clear" w:color="auto" w:fill="${fill}"/>` : ''}<w:vAlign w:val="center"/></w:tcPr>${paras}</w:tc>`;
+  };
+  const tr = (r, ri) => { let ci = 0; return `<w:tr><w:trPr><w:cantSplit/>${ri < (o.headRows || 0) ? '<w:tblHeader/>' : ''}${o.minH ? `<w:trHeight w:val="${o.minH}"/>` : ''}</w:trPr>${r.map(c => { const h = cell(c, ci, ri); ci += (c && c.span) || 1; return h; }).join('')}</w:tr>`; };
+  return `<w:tbl><w:tblPr><w:tblW w:w="${W}" w:type="dxa"/><w:tblBorders>${CX_BORDERS(o.borderColor || '000000', o.borderSz || 4)}</w:tblBorders><w:tblLayout w:type="fixed"/><w:tblCellMar><w:left w:w="60" w:type="dxa"/><w:right w:w="60" w:type="dxa"/></w:tblCellMar></w:tblPr><w:tblGrid>${widths.map(w => `<w:gridCol w:w="${w}"/>`).join('')}</w:tblGrid>${rows.map(tr).join('')}</w:tbl>` + cxP('', { after: 60, sz: 8 });
+}
+const CX_BOX = `<w:pBdr><w:top w:val="single" w:sz="12" w:space="1" w:color="${CX_RED}"/><w:left w:val="single" w:sz="12" w:space="4" w:color="${CX_RED}"/><w:bottom w:val="single" w:sz="12" w:space="1" w:color="${CX_RED}"/><w:right w:val="single" w:sz="12" w:space="4" w:color="${CX_RED}"/></w:pBdr>`;
+// Lignes d'un texte rédigé : paragraphes séparés par une ligne vide ; « - » puce ; « -- » sous-puce ; « NB : » en gras italique
+function cxText(text, o = {}){
+  let x = '';
+  for (const block of String(text || '').split(/\n\s*\n/)){
+    const lines = block.split('\n').map(l => l.replace(/\s+$/, '')).filter(l => l.trim());
+    if (!lines.length) continue;
+    if (lines.every(l => /^\s*-{1,2}\s+/.test(l))){
+      for (const l of lines){
+        const lvl = /^\s*--\s+/.test(l) ? 1 : 0;
+        x += `<w:p><w:pPr><w:numPr><w:ilvl w:val="${lvl}"/><w:numId w:val="1"/></w:numPr><w:spacing w:after="60" w:line="${o.line || 360}" w:lineRule="auto"/><w:ind w:left="${lvl ? 1077 : 567}" w:hanging="283"/><w:jc w:val="both"/></w:pPr>${cxRuns(l.replace(/^\s*-{1,2}\s+/, ''), {})}</w:p>`;
+      }
+    } else {
+      const t = lines.join(' ');
+      x += /^NB\s*:/.test(t) ? cxP(t, { b: true, i: true, line: o.line || 360 }) : cxP(t, { line: o.line || 360 });
+    }
+  }
+  return x;
+}
+function cxBlocksXml(B){
+  let x = '';
+  for (const b of B){
+    switch (b.t){
+      case 'box': x += cxP(b.text, { border: CX_BOX, jc: 'center', b: true, before: 120, after: 160, color: b.red ? CX_RED : null, keep: true }); break;
+      case 'h1': x += cxP(b.text, { b: true, u: true, color: CX_RED, before: 160, after: 80, keep: true, jc: 'left' }); break;
+      case 'h2': x += cxP(b.text, { b: true, border: `<w:pBdr><w:bottom w:val="single" w:sz="12" w:space="1" w:color="${CX_RED}"/></w:pBdr>`, before: 160, after: 120, keep: true, jc: 'left' }); break;
+      case 'h3': x += `<w:p><w:pPr><w:keepNext/><w:numPr><w:ilvl w:val="0"/><w:numId w:val="2"/></w:numPr><w:spacing w:before="120" w:after="80"/><w:ind w:left="567" w:hanging="283"/></w:pPr>${cxRun(b.text, { b: true, u: true, uColor: CX_RED })}</w:p>`; break;
+      case 'p': x += cxP(b.text, { line: b.line || 300, i: b.i, jc: b.jc, sz: b.sz, color: b.color, b: b.b, u: b.u }); break;
+      case 'lines': for (const l of String(b.text || '').split('\n')) x += cxP(l, { after: 0, jc: 'left' }); x += cxP('', { after: 60 }); break;
+      case 'text': x += cxText(b.text, { line: b.line }); break;
+      case 'note': x += cxP(b.text, { i: true, sz: 16, after: 120, jc: b.jc || 'left', color: b.color }); break;
+      case 'table': x += cxTable(b.rows, b); break;
+      case 'pb': x += '<w:p><w:r><w:br w:type="page"/></w:r></w:p>'; break;
+      case 'space': x += cxP('', { after: b.h || 120 }); break;
+      case 'raw': x += b.xml; break;
+    }
+  }
+  return x;
+}
+function cxFooterXml(f){
+  const t = `Chargé d’affaires : ${f.ca || ''} / Analyste : ${f.analyste || ''} / Date : ${f.date || ''}`;
+  const fld = c => `<w:r><w:rPr><w:sz w:val="16"/></w:rPr><w:fldChar w:fldCharType="begin"/></w:r><w:r><w:rPr><w:sz w:val="16"/></w:rPr><w:instrText xml:space="preserve"> ${c} </w:instrText></w:r><w:r><w:rPr><w:sz w:val="16"/></w:rPr><w:fldChar w:fldCharType="separate"/></w:r><w:r><w:rPr><w:sz w:val="16"/></w:rPr><w:t>1</w:t></w:r><w:r><w:rPr><w:sz w:val="16"/></w:rPr><w:fldChar w:fldCharType="end"/></w:r>`;
+  return `<?xml version="1.0" encoding="UTF-8" standalone="yes"?><w:ftr xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"><w:p><w:pPr><w:tabs><w:tab w:val="right" w:pos="10466"/></w:tabs></w:pPr>${cxRuns(t.replace(/^(Chargé d’affaires)/, '**$1**').replace(/ \/ Analyste/, ' / **Analyste**').replace(/ \/ Date/, ' / **Date**'), { sz: 16 })}<w:r><w:rPr><w:sz w:val="16"/></w:rPr><w:tab/></w:r>${fld('PAGE')}<w:r><w:rPr><w:sz w:val="16"/></w:rPr><w:t>/</w:t></w:r>${fld('NUMPAGES')}</w:p></w:ftr>`;
+}
+async function cxBuildDocx(B, footer){
+  const zip = new JSZip();
+  zip.file('[Content_Types].xml', '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types"><Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/><Default Extension="xml" ContentType="application/xml"/><Override PartName="/word/document.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.document.main+xml"/><Override PartName="/word/styles.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.styles+xml"/><Override PartName="/word/numbering.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.numbering+xml"/><Override PartName="/word/footer1.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.footer+xml"/></Types>');
+  zip.file('_rels/.rels', '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="word/document.xml"/></Relationships>');
+  zip.file('word/_rels/document.xml.rels', '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/styles" Target="styles.xml"/><Relationship Id="rId2" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/numbering" Target="numbering.xml"/><Relationship Id="rId3" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/footer" Target="footer1.xml"/></Relationships>');
+  zip.file('word/styles.xml', '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><w:styles xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main"><w:docDefaults><w:rPrDefault><w:rPr><w:rFonts w:ascii="Aptos" w:hAnsi="Aptos" w:cs="Arial" w:eastAsia="Aptos"/><w:sz w:val="20"/><w:szCs w:val="20"/><w:lang w:val="fr-FR"/></w:rPr></w:rPrDefault><w:pPrDefault><w:pPr><w:spacing w:after="100"/></w:pPr></w:pPrDefault></w:docDefaults><w:style w:type="paragraph" w:default="1" w:styleId="Normal"><w:name w:val="Normal"/></w:style><w:style w:type="table" w:default="1" w:styleId="TableNormal"><w:name w:val="Normal Table"/><w:tblPr><w:tblInd w:w="0" w:type="dxa"/><w:tblCellMar><w:top w:w="0" w:type="dxa"/><w:left w:w="108" w:type="dxa"/><w:bottom w:w="0" w:type="dxa"/><w:right w:w="108" w:type="dxa"/></w:tblCellMar></w:tblPr></w:style></w:styles>');
+  const lvl = (i, txt, ind, font) => `<w:lvl w:ilvl="${i}"><w:start w:val="1"/><w:numFmt w:val="bullet"/><w:lvlText w:val="${txt}"/><w:lvlJc w:val="left"/><w:pPr><w:ind w:left="${ind}" w:hanging="283"/></w:pPr><w:rPr><w:rFonts w:ascii="${font}" w:hAnsi="${font}"/></w:rPr></w:lvl>`;
+  zip.file('word/numbering.xml', `<?xml version="1.0" encoding="UTF-8" standalone="yes"?><w:numbering xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main"><w:abstractNum w:abstractNumId="0"><w:multiLevelType w:val="multilevel"/>${lvl(0, '-', 567, 'Aptos')}${lvl(1, '–', 1077, 'Aptos')}</w:abstractNum><w:abstractNum w:abstractNumId="1"><w:multiLevelType w:val="singleLevel"/>${lvl(0, '•', 567, 'Aptos')}</w:abstractNum><w:num w:numId="1"><w:abstractNumId w:val="0"/></w:num><w:num w:numId="2"><w:abstractNumId w:val="1"/></w:num></w:numbering>`);
+  zip.file('word/footer1.xml', cxFooterXml(footer || {}));
+  zip.file('word/document.xml', `<?xml version="1.0" encoding="UTF-8" standalone="yes"?><w:document xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"><w:body>${cxBlocksXml(B)}<w:sectPr><w:footerReference w:type="default" r:id="rId3"/><w:pgSz w:w="11906" w:h="16838"/><w:pgMar w:top="720" w:right="720" w:bottom="720" w:left="720" w:header="709" w:footer="400" w:gutter="0"/></w:sectPr></w:body></w:document>`);
+  return zip.generateAsync({ type:'blob', mimeType:'application/vnd.openxmlformats-officedocument.wordprocessingml.document', compression:'DEFLATE' });
+}
+
+/* ---------- Aperçu et impression (mêmes blocs) ---------- */
+const CX_PRINT_CSS = `@page{ size:A4; margin:12.7mm; }
+  body{ margin:0; -webkit-print-color-adjust:exact; print-color-adjust:exact; }
+  .cx-page{ font-family:Aptos, Calibri, 'Segoe UI', Arial, sans-serif; font-size:10pt; line-height:1.45; color:#000; }
+  .cx-box{ border:1.5pt solid #F00; text-align:center; font-weight:700; padding:3pt 6pt; margin:10pt 0 12pt; break-after:avoid; }
+  .cx-box.red{ color:#F00; }
+  .cx-h1{ color:#F00; font-weight:700; text-decoration:underline; margin:12pt 0 5pt; break-after:avoid; }
+  .cx-h2{ font-weight:700; border-bottom:1.5pt solid #F00; padding-bottom:1pt; margin:12pt 0 8pt; break-after:avoid; }
+  .cx-h3{ font-weight:700; text-decoration:underline; text-decoration-color:#F00; margin:9pt 0 5pt 14pt; break-after:avoid; }
+  .cx-h3::before{ content:'•'; display:inline-block; width:14pt; margin-left:-14pt; text-decoration:none; }
+  .cx-p{ text-align:justify; margin:0 0 6pt; line-height:1.6; }
+  .cx-p.nb{ font-weight:700; font-style:italic; }
+  .cx-ul{ margin:0 0 6pt; padding-left:22pt; list-style:'-  '; line-height:1.6; }
+  .cx-ul li{ text-align:justify; } .cx-ul li.l1{ margin-left:20pt; list-style:'–  '; }
+  .cx-note{ font-style:italic; font-size:8pt; margin:0 0 8pt; }
+  .cx-t{ border-collapse:collapse; width:100%; margin:3pt 0 8pt; table-layout:fixed; }
+  .cx-t td{ border:0.75pt solid #000; padding:1pt 3pt; vertical-align:middle; word-wrap:break-word; }
+  .cx-t td.r{ text-align:right; } .cx-t td.c{ text-align:center; }`;
+function cxCellHtml(text){ return escapeHtml(String(text == null ? '' : text)).replace(/!!(.+?)!!/g, '<b style="color:#F00">$1</b>').replace(/\*\*(.+?)\*\*/g, '<b>$1</b>').replace(/\n/g, '<br>'); }
+function cxTextHtml(text){
+  return String(text || '').split(/\n\s*\n/).map(block => {
+    const lines = block.split('\n').filter(l => l.trim());
+    if (!lines.length) return '';
+    if (lines.every(l => /^\s*-{1,2}\s+/.test(l))) return `<ul class="cx-ul">${lines.map(l => `<li class="${/^\s*--\s+/.test(l) ? 'l1' : ''}">${cxCellHtml(l.replace(/^\s*-{1,2}\s+/, ''))}</li>`).join('')}</ul>`;
+    const t = lines.join(' ');
+    return `<p class="cx-p${/^NB\s*:/.test(t) ? ' nb' : ''}">${cxCellHtml(t)}</p>`;
+  }).join('');
+}
+function cxBlocksHtml(B){
+  let h = '<div class="cx-page">';
+  for (const b of B){
+    switch (b.t){
+      case 'box': h += `<div class="cx-box${b.red ? ' red' : ''}">${cxCellHtml(b.text)}</div>`; break;
+      case 'h1': h += `<div class="cx-h1">${cxCellHtml(b.text)}</div>`; break;
+      case 'h2': h += `<div class="cx-h2">${cxCellHtml(b.text)}</div>`; break;
+      case 'h3': h += `<div class="cx-h3">${cxCellHtml(b.text)}</div>`; break;
+      case 'p': h += `<p class="cx-p" style="${b.u ? 'text-decoration:underline;' : ''}${b.i ? 'font-style:italic;' : ''}${b.jc ? `text-align:${b.jc === 'right' ? 'right' : b.jc};` : ''}${b.color ? `color:#${b.color};` : ''}${b.b ? 'font-weight:700;' : ''}">${cxCellHtml(b.text)}</p>`; break;
+      case 'text': h += cxTextHtml(b.text); break;
+      case 'lines': h += `<p class="cx-p" style="text-align:left">${String(b.text || '').split('\n').map(cxCellHtml).join('<br>')}</p>`; break;
+      case 'note': h += `<p class="cx-note" style="${b.jc === 'right' ? 'text-align:right;' : ''}${b.color ? `color:#${b.color};` : ''}">${cxCellHtml(b.text)}</p>`; break;
+      case 'table': {
+        const W = b.width || 10466, n = Math.max(...b.rows.map(r => r.reduce((s, c) => s + ((c && c.span) || 1), 0)));
+        const widths = b.widths || Array(n).fill(W / n);
+        h += `<table class="cx-t" style="font-size:${(b.sz || 16) / 2}pt;${W < 10466 ? `width:${Math.round(W / 104.66)}%;` : ''}"><colgroup>${widths.map(w => `<col style="width:${(w / W * 100).toFixed(2)}%">`).join('')}</colgroup>${b.rows.map((r, ri) => `<tr${b.minH ? ` style="height:${b.minH / 20}pt"` : ''}>${r.map((c, ci) => {
+          const x = (c && typeof c === 'object') ? c : { text: c };
+          const head = ri < (b.headRows || 0), fill = x.fill || (head ? b.headFill : null), color = x.color || (head ? b.headColor : null);
+          const al = x.align || (b.align ? b.align[ci] : 'l');
+          if (x.vmerge === 'cont') return '';
+          return `<td${x.span ? ` colspan="${x.span}"` : ''}${x.rowspan ? ` rowspan="${x.rowspan}"` : ''} class="${al}" style="${fill ? `background:#${fill};` : ''}${color ? `color:#${color};` : ''}${x.b || head ? 'font-weight:700;' : ''}${x.i ? 'font-style:italic;' : ''}">${cxCellHtml(x.text)}</td>`;
+        }).join('')}</tr>`).join('')}</table>`; break;
+      }
+      case 'pb': h += '<div style="break-after:page"></div>'; break;
+      case 'space': h += '<div style="height:8pt"></div>'; break;
+    }
+  }
+  return h + '</div>';
+}
+function cxPrint(B, title, footer){
+  let frame = document.getElementById('cx-print-frame');
+  if (frame) frame.remove();
+  frame = document.createElement('iframe');
+  frame.id = 'cx-print-frame'; frame.setAttribute('aria-hidden', 'true');
+  frame.style.cssText = 'position:fixed; right:0; bottom:0; width:0; height:0; border:0; visibility:hidden;';
+  document.body.appendChild(frame);
+  const fd = frame.contentDocument;
+  const foot = footer ? `<div style="position:fixed; bottom:0; left:0; right:0; font-family:Aptos, Calibri, Arial, sans-serif; font-size:8pt;"><b>Chargé d’affaires</b> : ${escapeHtml(footer.ca || '')} / <b>Analyste</b> : ${escapeHtml(footer.analyste || '')} / <b>Date</b> : ${escapeHtml(footer.date || '')}</div>` : '';
+  fd.open();
+  fd.write(`<!doctype html><html lang="fr"><head><meta charset="utf-8"><title>${escapeHtml(title)}</title><style>${CX_PRINT_CSS}</style></head><body>${cxBlocksHtml(B)}${foot}</body></html>`);
+  fd.close();
+  const go = () => { try { frame.contentWindow.focus(); frame.contentWindow.print(); } catch (e){ console.error(e); window.print(); } };
+  if (fd.fonts && fd.fonts.ready) fd.fonts.ready.then(() => setTimeout(go, 50)); else setTimeout(go, 200);
+}
+// Date du pied de page : « JUIN 2026 »
+function cxMonthYear(d = new Date()){ return d.toLocaleDateString('fr-FR', { month:'long', year:'numeric' }).toUpperCase(); }
+/* @@CREDAPP_DOC_END */
 /* @@ANALYSE_ENGINE_START */
 /* ============================================================
    MODULES 3 ET 4 : ANALYSE ÉCONOMIQUE ET ANALYSE FINANCIÈRE
@@ -5460,11 +5718,35 @@ function anBuildData(wb, d){
     for (const p of AN_PERIODS) if (!okFlux(p)) M[p][key] = null;
   };
   fx('dBfr', /variation de bfr/, p => -(M[p].bfr - M[prev[p]].bfr));
-  fx('capex', /- capex/, p => -((B(41, p) - B(41, prev[p])) > 0 ? (B(41, p) - B(41, prev[p])) : 0));
+  // investissements : variation des immobilisations incorporelles et corporelles nettes + dotations de l'exercice
+  fx('capex', /- capex/, p => -Math.max(0, (A(19, p) + A(27, p)) - (A(19, prev[p]) + A(27, prev[p])) + (M[p].dotAmort || 0)));
   fx('fcf', /flux de tresorerie disponible/, p => M[p].mba + M[p].dBfr + M[p].capex);
-  fx('dDettes', /dettes financieres$/, p => M[p].endBrut - M[prev[p]].endBrut);
-  fx('dCapital', /capital social/, p => M[p].capital - M[prev[p]].capital);
-  fx('dividendes', /versements de dividendes/, () => null);
+  fx('dividendes', /dividendes distribues/, () => null);
+  // excédent ou déficit = variation de la trésorerie nette ; financement net = solde (dettes, capital, autres)
+  fx('excedent', /excedent ou deficit/, p => M[p].tn - M[prev[p]].tn);
+  fx('rembAuto', /remboursement de la dette \(auto/, p => (M[p].tn - M[prev[p]].tn) - M[p].fcf - (M[p].dividendes || 0));
+  fx('rembSur', /remboursement de la dette \(surecriture/, () => null);
+  fx('dDettes', null, p => M[p].endBrut - M[prev[p]].endBrut);
+  fx('dCapital', null, p => M[p].capital - M[prev[p]].capital);
+  /* Compléments pour l'analyse rédigée */
+  set('achatsConso', null, p => R(108, p) + R(109, p) + R(115, p) + R(116, p) + R(117, p) + R(118, p) - R(121, p));   // achats + variations de stocks + production stockée
+  set('autresProduits', null, p => R(120, p));
+  set('rf', null, p => R(142, p) || (R(135, p) - R(136, p)));
+  set('haoNet', null, p => R(146, p));
+  set('emprunts', null, p => PS(83, p));
+  set('ccaBloques', null, p => PS(84, p));
+  set('ccaNonBloques', null, p => PS(97, p));
+  set('provLT', null, p => PS(82, p));
+  set('dettesFinTotal', null, p => PS(87, p));
+  set('ressourcesStables', null, p => PS(80, p) + (PS(87, p) || (PS(82, p) + PS(83, p) + PS(84, p) + PS(85, p) + PS(86, p))));   // capitaux permanents + provisions à LT (total 87 de la NF)
+  set('immoNet', null, p => A(41, p));
+  set('immoIC', null, p => A(19, p) + A(27, p));
+  set('immoBrutIC', null, p => B(19, p) + B(27, p));
+  set('autresCreances', null, p => A(50, p) + A(48, p));
+  set('avancesClients', null, p => PS(89, p));
+  set('autresDettes', null, p => PS(92, p));
+  set('immoCorpNet', null, p => A(27, p));
+  set('immoAmort', null, p => d.actifAmort[41][p]);
   return { M, ind, src, tabs: T ? T.names : [], has: d.hasData };
 }
 
@@ -5508,226 +5790,6 @@ function anNoteLines(notes, key, posteNF, mult, k = 3){
 }
 const anJoin = l => l.length > 1 ? l.slice(0, -1).join(', ') + ' et ' + l[l.length - 1] : (l[0] || '');
 
-/* ---------- 4. Analyse économique ---------- */
-function anEconomic(d, data, ctx){
-  const { M } = data, F = anFmt(d), { X, XS, pct, div, evo, ptsTxt, y } = F;
-  const N = M.N, N1 = M.N1, N2 = M.N2, h1 = d.hasData.N1, h2 = d.hasData.N2;
-  const mult = d.info.multiplier, notes = (ctx.ef && ctx.ef.notes) || [];
-  const secs = [];
-  const add = (key, title, paras) => secs.push({ key, title, text: paras.filter(Boolean).join('\n\n') });
-
-  /* Activité */
-  {
-    const p = [];
-    let s = `En ${y.N}, le chiffre d’affaires s’établit à ${X(N.ca)}`;
-    if (h1) s += `, ${evo(N1.ca, N.ca)} par rapport à ${y.N1} (${X(N1.ca)})`;
-    p.push(s + '.');
-    if (h2 && h1 && N2.ca){
-      const cagr = N2.ca > 0 && N.ca > 0 ? Math.pow(N.ca / N2.ca, 0.5) - 1 : null;
-      p.push(`Sur la période ${y.N2} à ${y.N}, il passe de ${X(N2.ca)} à ${X(N.ca)}${cagr != null ? `, soit une évolution annuelle moyenne de ${cagr < 0 ? '-' : '+'}${paNum(Math.round(Math.abs(cagr) * 1000) / 10, 1)} %` : ''}${(N1.ca - N2.ca) * (N.ca - N1.ca) < 0 ? `, avec un ${N1.ca > N2.ca ? 'pic' : 'creux'} en ${y.N1}` : ''}.`);
-    }
-    const nl = anNoteLines(notes, 'ca', N.ca, mult);
-    if (nl) p.push(`Il se compose principalement de ${anJoin(nl.rows.map(r => `${Q(r.label)} (${paXofRaw(r.n)}, ${pct(r.share)})`))}, d’après la note ${nl.id}.`);
-    if (N.production != null && N.ca && Math.abs(N.production - N.ca) >= 0.03 * Math.abs(N.ca))
-      p.push(`La production de l’exercice atteint ${X(N.production)}, l’écart avec le chiffre d’affaires (${XS(N.production - N.ca)}) correspondant à la production stockée ou immobilisée et aux autres produits d’activité.`);
-    add('activite', 'Évolution de l’activité', p);
-  }
-  /* Marges et valeur ajoutée */
-  {
-    const p = [], mb = div(N.margeBrute, N.ca), mb1 = h1 ? div(N1.margeBrute, N1.ca) : null;
-    if (N.margeBrute != null) p.push(`La marge brute ressort à ${X(N.margeBrute)}, soit ${pct(mb)} du chiffre d’affaires${mb1 != null ? ` contre ${pct(mb1)} en ${y.N1} (${ptsTxt(mb1, mb)})` : ''}.`);
-    const ach = div(N.achats, N.ca), ach1 = h1 ? div(N1.achats, N1.ca) : null;
-    if (N.achats) p.push(`Les achats représentent ${pct(ach)} du chiffre d’affaires${ach1 != null ? ` (${pct(ach1)} en ${y.N1})` : ''}.`);
-    if (N.chargesExt) p.push(`Les charges externes s’élèvent à ${X(N.chargesExt)}${h1 ? `, ${evo(N1.chargesExt, N.chargesExt)}` : ''}, soit ${pct(div(N.chargesExt, N.ca))} du chiffre d’affaires.`);
-    const va = div(N.va, N.ca), va1 = h1 ? div(N1.va, N1.ca) : null;
-    p.push(`La valeur ajoutée atteint ${X(N.va)}${h1 ? `, ${evo(N1.va, N.va)}` : ''}, soit un taux de valeur ajoutée de ${pct(va)}${va1 != null ? ` contre ${pct(va1)} en ${y.N1}` : ''}.`);
-    add('marges', 'Marges et valeur ajoutée', p);
-  }
-  /* Personnel et fiscalité */
-  {
-    const p = [], tp = div(N.personnel, N.va), tp1 = h1 ? div(N1.personnel, N1.va) : null;
-    if (N.personnel){
-      let s = `Les charges de personnel s’élèvent à ${X(N.personnel)}${h1 ? `, ${evo(N1.personnel, N.personnel)}` : ''}, et absorbent ${pct(tp)} de la valeur ajoutée${tp1 != null ? ` (${pct(tp1)} en ${y.N1})` : ''}`;
-      if (tp != null && tp > 0.7) s += ', ce qui laisse peu de marge pour couvrir les autres charges';
-      p.push(s + '.');
-    }
-    if (N.impots) p.push(`Les impôts et taxes représentent ${X(N.impots)}, soit ${pct(div(N.impots, N.ca))} du chiffre d’affaires.`);
-    if (p.length) add('personnel', 'Charges de personnel et fiscalité', p);
-  }
-  /* EBE et résultat d'exploitation */
-  {
-    const p = [], m = div(N.ebe, N.ca), m1 = h1 ? div(N1.ebe, N1.ca) : null;
-    const niveau = m == null ? '' : m < 0 ? 'négative' : m < 0.08 ? 'faible' : m < 0.15 ? 'correcte' : 'confortable';
-    p.push(`L’excédent brut d’exploitation s’établit à ${XS(N.ebe)}${h1 ? `, ${evo(N1.ebe, N.ebe)}` : ''}, soit une marge de ${pct(m)}${m1 != null ? ` contre ${pct(m1)} en ${y.N1}` : ''}${niveau ? ` : la rentabilité d’exploitation est ${niveau}` : ''}.`);
-    if (N.dotAmort) p.push(`Après dotations aux amortissements de ${X(N.dotAmort)}${h1 ? ` (${X(N1.dotAmort)} en ${y.N1})` : ''}, le résultat d’exploitation ressort à ${XS(N.re)}, soit ${pct(div(N.re, N.ca))} du chiffre d’affaires.`);
-    add('ebe', 'Excédent brut d’exploitation et résultat d’exploitation', p);
-  }
-  /* Résultat financier et net */
-  {
-    const p = [];
-    if (N.ff){
-      let s = `Les frais financiers atteignent ${X(N.ff)}${h1 ? `, ${evo(N1.ff, N.ff)}` : ''}, soit ${pct(div(N.ff, N.ca))} du chiffre d’affaires`;
-      if (N.ebe > 0) s += ` et ${pct(div(N.ff, N.ebe))} de l’excédent brut d’exploitation`;
-      p.push(s + '.');
-    }
-    if (N.prodFin && Math.abs(N.prodFin) >= 0.005 * Math.abs(N.ca)) p.push(`Les produits financiers s’élèvent à ${X(N.prodFin)}.`);
-    if (N.hao && Math.abs(N.hao) >= 0.005 * Math.abs(N.ca)) p.push(`Le résultat hors activités ordinaires s’établit à ${XS(N.hao)}.`);
-    const mn = div(N.rn, N.ca);
-    p.push(`${N.is ? `Après un impôt sur le résultat de ${X(N.is)}, l` : 'L'}e résultat net ${N.rn < 0 ? 'est déficitaire' : 'ressort'} à ${XS(N.rn)}${h1 ? ` contre ${XS(N1.rn)} en ${y.N1}` : ''}, soit une marge nette de ${pct(mn)}.`);
-    if (N.mba != null) p.push(`La marge brute d’autofinancement atteint ${XS(N.mba)}${h1 ? `, ${evo(N1.mba, N.mba)}` : ''}, soit ${pct(div(N.mba, N.ca))} du chiffre d’affaires.`);
-    add('resultat', 'Résultat financier et résultat net', p);
-  }
-  /* Appréciation */
-  {
-    const p = [], parts = [];
-    const g = h1 ? paGrowth(N1.ca, N.ca) : null;
-    if (g != null) parts.push(Math.abs(g) < 0.02 ? 'une activité stable' : g > 0 ? `une progression de l’activité (+${paNum(Math.round(g * 100), 0)} %)` : `un repli de l’activité (-${paNum(Math.round(-g * 100), 0)} %)`);
-    const m = div(N.ebe, N.ca), m1 = h1 ? div(N1.ebe, N1.ca) : null;
-    if (m != null && m1 != null) parts.push(Math.abs(m - m1) < 0.005 ? `une marge d’EBE maintenue à ${pct(m)}` : m > m1 ? `une amélioration de la marge d’EBE (${pct(m)} contre ${pct(m1)})` : `une érosion de la marge d’EBE (${pct(m)} contre ${pct(m1)})`);
-    if (parts.length) p.push(`L’exercice ${y.N} se caractérise par ${anJoin(parts)}.`);
-    const mn = div(N.rn, N.ca);
-    if (N.rn < 0) p.push(`L’exercice est déficitaire : la capacité de l’entreprise à revenir à l’équilibre est un point clé du dossier.`);
-    else if (mn != null){
-      let s = `La rentabilité nette est ${mn < 0.02 ? 'faible' : mn < 0.05 ? 'modérée' : 'satisfaisante'} (${pct(mn)} du chiffre d’affaires)`;
-      if (N.ebe > 0 && N.ff / N.ebe > 0.3) s += `, pénalisée par des frais financiers qui absorbent ${pct(N.ff / N.ebe)} de l’EBE`;
-      p.push(s + '.');
-    }
-    add('appreciation', 'Appréciation', p);
-  }
-  /* Points en attente de réponse du client */
-  anPendingSection(secs, ctx.questions, ['activite'], 'Points en attente de réponse du client');
-  return { title: 'Analyse économique', sections: secs, table: anEcoTable(d, data) };
-}
-
-/* ---------- 5. Analyse financière ---------- */
-function anFinancial(d, data, ctx){
-  const { M } = data, F = anFmt(d), { X, XS, pct, ratio, fois, jours, div, evo, ptsTxt, y } = F;
-  const N = M.N, N1 = M.N1, h1 = d.hasData.N1;
-  const mult = d.info.multiplier, notes = (ctx.ef && ctx.ef.notes) || [];
-  const secs = [];
-  const add = (key, title, paras) => secs.push({ key, title, text: paras.filter(Boolean).join('\n\n') });
-
-  /* Structure financière */
-  {
-    const p = [], c = div(N.rp, N.totalBilan), c1 = h1 ? div(N1.rp, N1.totalBilan) : null;
-    p.push(`Le total du bilan s’élève à ${X(N.totalBilan)} à fin ${y.N}${h1 ? ` (${X(N1.totalBilan)} à fin ${y.N1})` : ''}.`);
-    const niveau = c == null ? '' : N.rp < 0 ? 'négatifs' : c < 0.15 ? 'faible' : c < 0.3 ? 'moyenne' : 'solide';
-    p.push(N.rp < 0
-      ? `Les ressources propres sont négatives à ${XS(N.rp)} : la situation nette doit être reconstituée.`
-      : `Les ressources propres atteignent ${X(N.rp)}${h1 ? `, ${evo(N1.rp, N.rp)}` : ''}, soit ${pct(c)} du total du bilan${c1 != null ? ` contre ${pct(c1)} en ${y.N1}` : ''} : la capitalisation est ${niveau}.`);
-    const comp = [];
-    if (N.capital) comp.push(`du capital social (${X(N.capital)})`);
-    if (N.reserves) comp.push(`des réserves et primes (${X(N.reserves)})`);
-    if (N.ran) comp.push(`du report à nouveau (${XS(N.ran)})`);
-    if (N.rnBilan) comp.push(`du résultat de l’exercice (${XS(N.rnBilan)})`);
-    if (comp.length > 1) p.push(`Elles se composent ${anJoin(comp)}.`);
-    if (N.capital > 0 && N.rp < N.capital / 2) p.push(`Les capitaux propres sont inférieurs à la moitié du capital social : l’assemblée générale doit statuer sur la poursuite de l’activité et les capitaux propres doivent être reconstitués dans les délais prévus par l’Acte uniforme OHADA.`);
-    if (h1 && N.rn != null){
-      const dRp = N.rp - N1.rp, gap = dRp - N.rn - (N.capital - N1.capital);
-      if (Math.abs(gap) >= Math.max(0.01 * Math.abs(N.totalBilan), 0.1 * Math.abs(N.rn)))
-        p.push(`La variation des ressources propres (${XS(dRp)}) ne s’explique pas par le seul résultat de l’exercice et les mouvements de capital : un écart de ${XS(gap)} reste à justifier (distribution de dividendes, imputation directe ou reclassement).`);
-    }
-    add('structure', 'Structure financière et fonds propres', p);
-  }
-  /* Endettement */
-  {
-    const p = [];
-    if (!N.endBrut) p.push(`L’entreprise ne présente pas d’endettement financier à fin ${y.N}.`);
-    else {
-      const ct = (N.banques || 0) + (N.partCT || 0), shareCT = div(ct, N.endBrut);
-      p.push(`L’endettement financier brut s’élève à ${X(N.endBrut)}${h1 ? `, ${evo(N1.endBrut, N.endBrut)} par rapport à ${y.N1} (${X(N1.endBrut)})` : ''}, dont ${X(N.dettesMLT)} de dettes à moyen et long terme et ${X(N.banques)} de concours bancaires courants${shareCT != null ? ` (${pct(shareCT)} de l’endettement à court terme)` : ''}.`);
-      const extra = [];
-      if (N.creditBail) extra.push(`${X(N.creditBail)} de dettes de location-acquisition`);
-      if (N.cca) extra.push(`${X(N.cca)} de comptes courants d’associés`);
-      if (extra.length) p.push(`Il comprend ${anJoin(extra)}.`);
-      const nl = anNoteLines(notes, 'dettesFin', N.dettesMLT, mult);
-      if (nl) p.push(`Les principales dettes financières sont ${anJoin(nl.rows.map(r => `${Q(r.label)} (${paXofRaw(r.n)})`))}, d’après la note ${nl.id}.`);
-      p.push(`Net de la trésorerie disponible (${X(N.cash)}), l’endettement ressort à ${XS(N.endNet)}.`);
-      const gq = N.gearing == null ? '' : N.gearing > 2 ? 'élevé' : N.gearing > 1 ? 'significatif' : 'maîtrisé';
-      const lq = N.leverage == null || N.ebe <= 0 ? '' : N.leverage > 4 ? 'élevé' : N.leverage > 3 ? 'à surveiller' : 'soutenable';
-      if (N.rp > 0) p.push(`Il représente ${fois(N.gearing)} les ressources propres${h1 && N1.gearing != null ? ` (${fois(N1.gearing)} en ${y.N1})` : ''}, un niveau d’endettement ${gq}.`);
-      if (N.ebe > 0) p.push(`L’endettement brut représente ${fois(N.leverage)} l’excédent brut d’exploitation${h1 && N1.leverage != null && N1.ebe > 0 ? ` (${fois(N1.leverage)} en ${y.N1})` : ''}, un niveau ${lq}. L’EBE couvre ${fois(N.couverture)} les frais financiers.`);
-      else p.push(`L’excédent brut d’exploitation étant ${N.ebe < 0 ? 'négatif' : 'nul'}, l’exploitation ne permet pas d’assurer le service de la dette.`);
-      if (N.partCT && N.mba != null && N.partCT > N.mba) p.push(`Les échéances à moins d’un an des emprunts (${X(N.partCT)}) dépassent la marge brute d’autofinancement de l’exercice (${XS(N.mba)}).`);
-    }
-    if (N.horsBilan) p.push(`Les engagements hors bilan s’élèvent à ${X(N.horsBilan)}.`);
-    add('endettement', 'Endettement', p);
-  }
-  /* Équilibre financier */
-  {
-    const p = [];
-    p.push(`Le fonds de roulement s’établit à ${XS(N.fdr)}${h1 ? ` (${XS(N1.fdr)} en ${y.N1})` : ''} pour un besoin en fonds de roulement de ${XS(N.bfr)}${h1 ? ` (${XS(N1.bfr)} en ${y.N1})` : ''}.`);
-    if (N.fdr < 0) p.push(`Le fonds de roulement négatif traduit le financement d’une partie des immobilisations par des ressources à court terme.`);
-    p.push(N.tn < 0
-      ? `La trésorerie nette est négative à ${X(Math.abs(N.tn))} : le besoin en fonds de roulement est financé en partie par des concours bancaires courants.`
-      : `La trésorerie nette est positive à ${X(N.tn)}.`);
-    const bfrJ = N.ca ? N.bfr / N.ca * 365 : null, bfrJ1 = h1 && N1.ca ? N1.bfr / N1.ca * 365 : null;
-    if (bfrJ != null) p.push(`Le besoin en fonds de roulement représente ${jours(bfrJ)} de chiffre d’affaires${bfrJ1 != null ? ` contre ${jours(bfrJ1)} en ${y.N1}` : ''}.`);
-    const parts = [];
-    if (N.dio != null && N.stocks) parts.push(`les stocks ${jours(N.dio)} de chiffre d’affaires${h1 && N1.dio != null ? ` (${jours(N1.dio)} en ${y.N1})` : ''}`);
-    if (N.dso != null && N.clients) parts.push(`les créances clients ${jours(N.dso)} de chiffre d’affaires${h1 && N1.dso != null ? ` (${jours(N1.dso)})` : ''}`);
-    if (N.dpo != null && N.fournisseurs) parts.push(`les dettes fournisseurs ${jours(N.dpo)} d’achats${h1 && N1.dpo != null ? ` (${jours(N1.dpo)})` : ''}`);
-    if (parts.length) p.push(`${anJoin(parts).replace(/^les stocks /, 'Les stocks représentent ').replace(/^les créances clients /, 'Les créances clients représentent ').replace(/^les dettes fournisseurs /, 'Les dettes fournisseurs représentent ')}.`);
-    add('equilibre', 'Équilibre financier et besoin en fonds de roulement', p);
-  }
-  /* Liquidité */
-  {
-    const p = [];
-    if (N.current != null){
-      let s = `Le ratio de liquidité générale ressort à ${ratio(N.current)}${h1 && N1.current != null ? ` (${ratio(N1.current)} en ${y.N1})` : ''} et la liquidité réduite, hors stocks, à ${ratio(N.quick)}`;
-      s += N.current < 1 ? ' : les actifs circulants ne couvrent pas les dettes à court terme.' : N.quick != null && N.quick < 0.5 ? ' : la liquidité repose largement sur l’écoulement des stocks.' : '.';
-      p.push(s);
-    }
-    if (p.length) add('liquidite', 'Liquidité', p);
-  }
-  /* Flux de trésorerie */
-  {
-    const p = [];
-    if (N.dBfr != null){
-      p.push(`En ${y.N}, la marge brute d’autofinancement de ${XS(N.mba)} ${N.dBfr < 0 ? `a été en partie absorbée par la hausse du besoin en fonds de roulement (${X(-N.dBfr)})` : `a été complétée par une baisse du besoin en fonds de roulement (${X(N.dBfr)})`}${N.capex ? ` et a financé des investissements de ${X(Math.abs(N.capex))}` : ''}.`);
-      p.push(`Le flux de trésorerie disponible ressort ainsi à ${XS(N.fcf)}${N.fcf < 0 && N.dDettes > 0 ? `, déficit couvert par une hausse de l’endettement financier de ${X(N.dDettes)}` : N.fcf > 0 && N.dDettes < 0 ? `, ce qui a permis de réduire l’endettement financier de ${X(-N.dDettes)}` : ''}.`);
-      if (N.dCapital > 0 && N.dCapital >= 0.01 * Math.abs(N.rp || 0)) p.push(`Les fonds propres ont été renforcés par un apport en capital de ${X(N.dCapital)}.`);
-      if (N.dividendes) p.push(`Des dividendes de ${X(Math.abs(N.dividendes))} ont été versés.`);
-    } else p.push(`Les flux de trésorerie ne peuvent être estimés sans l’exercice ${y.N1} dans la NF.`);
-    const tft = ctx.ef && ctx.ef.tft;
-    if (tft && tft.cafg != null) p.push(`Le tableau des flux de trésorerie de l’état financier fait ressortir une capacité d’autofinancement globale de ${XS(tft.cafg)}${tft.acquisitions != null ? ` et des décaissements d’investissement de ${X(Math.abs(tft.acquisitions))}` : ''}.`);
-    add('flux', 'Flux de trésorerie', p);
-  }
-  /* Appréciation */
-  {
-    const p = [], parts = [];
-    const c = div(N.rp, N.totalBilan);
-    if (N.rp < 0) parts.push('des fonds propres négatifs');
-    else if (c != null) parts.push(c < 0.15 ? `une capitalisation faible (${pct(c)} du bilan)` : c < 0.3 ? `une capitalisation moyenne (${pct(c)} du bilan)` : `une capitalisation solide (${pct(c)} du bilan)`);
-    if (N.endBrut){
-      if (N.ebe > 0 && N.leverage != null) parts.push(`un endettement représentant ${fois(N.leverage)} l’EBE`);
-      else parts.push('un endettement non couvert par l’exploitation');
-    }
-    if (N.tn != null) parts.push(N.tn < 0 ? 'une trésorerie nette négative' : 'une trésorerie nette positive');
-    if (parts.length) p.push(`La situation financière à fin ${y.N} se caractérise par ${anJoin(parts)}.`);
-    if (h1 && N.endBrut && N1.endBrut){
-      const g = paGrowth(N1.endBrut, N.endBrut);
-      if (g != null && Math.abs(g) >= 0.1) p.push(`L’endettement ${g > 0 ? 'progresse' : 'recule'} de ${paNum(Math.round(Math.abs(g) * 100), 0)} % sur l’exercice${g > 0 && N.ebe < N1.ebe ? ', alors que l’EBE se replie' : ''}.`);
-    }
-    add('appreciation', 'Appréciation', p);
-  }
-  anPendingSection(secs, ctx.questions, ['actif', 'passif', 'coherences'], 'Points en attente de réponse du client');
-  return { title: 'Analyse financière', sections: secs, table: anFinTable(d, data) };
-}
-
-// Questions du questionnaire de pré-analyse reprises dans l'analyse (numérotation du questionnaire)
-function anPendingSection(secs, q, keys, title){
-  if (!q) return;
-  const order = ['activite', 'actif', 'passif', 'coherences'];
-  let n = 0; const lines = [];
-  for (const k of order) for (const t of (q[k] || [])){
-    const txt = String(t).trim(); if (!txt) continue;
-    n++;
-    if (keys.includes(k)) lines.push(`- Question ${n} : ${txt}`);
-  }
-  if (lines.length) secs.push({ key:'attente', title, text: lines.join('\n') });
-}
-
 /* ---------- 6. Tableaux de synthèse ---------- */
 function anTable(d, data, rows){
   const P = AN_PERIODS.filter(p => d.hasData[p]);
@@ -5766,82 +5828,379 @@ function anFinTable(d, data){
   ]);
 }
 
-/* ---------- 7. Document Word (généré sans modèle) ---------- */
-const AN_RPR = (o = {}) => `<w:rPr><w:rFonts w:ascii="Aptos" w:hAnsi="Aptos" w:cs="Aptos"/>${o.b ? '<w:b/><w:bCs/>' : ''}${o.u ? '<w:u w:val="single"/>' : ''}${o.color ? `<w:color w:val="${o.color}"/>` : ''}<w:sz w:val="${o.sz || 20}"/><w:szCs w:val="${o.sz || 20}"/></w:rPr>`;
-const anRun = (t, o) => `<w:r>${AN_RPR(o)}<w:t xml:space="preserve">${xmlEsc(t)}</w:t></w:r>`;
-const anPara = (t, o = {}, ppr = '') => `<w:p><w:pPr>${ppr}<w:spacing w:before="${o.before || 0}" w:after="${o.after == null ? 120 : o.after}" w:line="300" w:lineRule="auto"/>${o.jc ? `<w:jc w:val="${o.jc}"/>` : '<w:jc w:val="both"/>'}${AN_RPR(o)}</w:pPr>${t ? anRun(t, o) : ''}</w:p>`;
-function anDocxTable(t){
-  const W = 9638, first = 3838, other = Math.floor((W - first) / Math.max(1, t.head.length - 1));
-  const widths = [first, ...t.head.slice(1).map(() => other)];
-  const b = '<w:top w:val="single" w:sz="4" w:space="0" w:color="808080"/><w:left w:val="single" w:sz="4" w:space="0" w:color="808080"/><w:bottom w:val="single" w:sz="4" w:space="0" w:color="808080"/><w:right w:val="single" w:sz="4" w:space="0" w:color="808080"/><w:insideH w:val="single" w:sz="4" w:space="0" w:color="808080"/><w:insideV w:val="single" w:sz="4" w:space="0" w:color="808080"/>';
-  const cell = (txt, w, head, right) => `<w:tc><w:tcPr><w:tcW w:w="${w}" w:type="dxa"/>${head ? '<w:shd w:val="clear" w:color="auto" w:fill="C00000"/>' : ''}<w:vAlign w:val="center"/></w:tcPr><w:p><w:pPr><w:spacing w:before="20" w:after="20"/><w:jc w:val="${right ? 'right' : 'left'}"/><w:rPr><w:sz w:val="17"/><w:szCs w:val="17"/></w:rPr></w:pPr>${anRun(txt, { sz:17, b:head, color: head ? 'FFFFFF' : null })}</w:p></w:tc>`;
-  const row = (cells, head) => `<w:tr>${head ? '<w:trPr><w:tblHeader/></w:trPr>' : ''}${cells.map((c, i) => cell(c, widths[i], head, i > 0)).join('')}</w:tr>`;
-  return `<w:tbl><w:tblPr><w:tblW w:w="${W}" w:type="dxa"/><w:tblBorders>${b}</w:tblBorders><w:tblCellMar><w:left w:w="80" w:type="dxa"/><w:right w:w="80" w:type="dxa"/></w:tblCellMar></w:tblPr><w:tblGrid>${widths.map(w => `<w:gridCol w:w="${w}"/>`).join('')}</w:tblGrid>`
-    + row(t.head, true) + t.body.map(r => row(r, false)).join('') + '</w:tbl>' + anPara('', { after:120 });
+/* ---------- 3 bis. Écriture au standard CREDAPP ---------- */
+// Montants : « 31,6 GXOF », « 4 208 MXOF » ; variations « +5% » ; ratios « 5,6x » ; délais « 43j »
+function anCx(d){
+  const mult = d.info.multiplier;
+  const n1 = v => paNum(Math.round(v * 10) / 10, 1);
+  const Mx = v => {
+    if (v == null || !isFinite(v)) return 'n/d';
+    const a = Math.abs(v * mult), s = v < 0 ? '-' : '';
+    if (a >= 1e6) return `${s}${paNum(Math.round(a / 1e6), 0)} MXOF`;
+    if (a >= 1e3) return `${s}${paNum(Math.round(a / 1e3), 0)} KXOF`;
+    return `${s}${paNum(Math.round(a), 0)} XOF`;
+  };
+  const G = v => {
+    if (v == null || !isFinite(v)) return 'n/d';
+    const a = Math.abs(v * mult);
+    return a >= 1e9 ? `${v < 0 ? '-' : ''}${n1(a / 1e9)} GXOF` : Mx(v);
+  };
+  const dl = v => (v > 0 ? '+' : '') + G(v);
+  const pcRaw = g => { const a = Math.abs(g) * 100; return a < 1 && a > 0 ? paNum(Math.round(a * 10) / 10, 1) : paNum(Math.round(a), 0); };
+  const pc = g => g == null || !isFinite(g) ? 'n/d' : `${g > 0 ? '+' : g < 0 ? '-' : ''}${pcRaw(g)}%`;
+  const pa = g => g == null || !isFinite(g) ? 'n/d' : `${pcRaw(g)}%`;
+  const pu = r => r == null || !isFinite(r) ? 'n/d' : `${Math.abs(r) < 0.02 && r !== 0 ? paNum(Math.round(r * 1000) / 10, 1) : paNum(Math.round(r * 100), 0)}%`;
+  const x = r => r == null || !isFinite(r) ? 'n/d' : `${paNum(Math.round(r * 10) / 10, 1)}x`;
+  const j = v => v == null || !isFinite(v) ? 'n/d' : `${paNum(Math.round(v), 0)}j`;
+  const g = (a, b) => (a == null || b == null || !a) ? null : (b - a) / Math.abs(a);
+  const yy = y => String(y).slice(2);
+  return { Mx, G, dl, pc, pa, pu, x, j, g, yy, mult };
 }
-function anDocBody(doc){
-  let x = anPara(doc.title.toUpperCase(), { b:true, sz:28, color:'E9041E', jc:'center', after:200 });
-  x += anPara(`Nom de l’entité : ${doc.entite}`, { b:true, after:40, jc:'left' });
-  x += anPara(`Exercice analysé : ${doc.exercice}`, { after:40, jc:'left' });
-  x += anPara(`Sources : ${doc.sources}`, { after:240, jc:'left', color:'595959', sz:18 });
-  x += anPara('Chiffres clés', { b:true, sz:22, color:'1F3864', after:80 }, '<w:keepNext/>');
-  x += anDocxTable(doc.table);
-  doc.sections.forEach((s, i) => {
-    x += anPara(`${i + 1}. ${s.title}`, { b:true, sz:22, color:'1F3864', before:200, after:100 }, '<w:keepNext/>');
-    for (const block of String(s.text || '').split(/\n\s*\n/)){
-      const lines = block.split('\n').map(l => l.trim()).filter(Boolean);
-      if (!lines.length) continue;
-      if (lines.every(l => /^-\s+/.test(l))) lines.forEach(l => { x += `<w:p><w:pPr><w:numPr><w:ilvl w:val="0"/><w:numId w:val="1"/></w:numPr><w:spacing w:after="60" w:line="300" w:lineRule="auto"/><w:ind w:left="567" w:hanging="283"/><w:jc w:val="both"/></w:pPr>${anRun(l.replace(/^-\s+/, ''), {})}</w:p>`; });
-      else x += anPara(lines.join(' '), {});
+const anUp = s => String(s || '').toUpperCase();
+
+/* ---------- 4. Analyse économique (partie « 1/ ANALYSE ECONOMIQUE » de la CREDAPP) ---------- */
+function anEconomic(d, data, ctx){
+  const { M } = data, C = anCx(d), y = d.years, N = M.N, N1 = M.N1, N2 = M.N2;
+  const h1 = d.hasData.N1, h2 = d.hasData.N2, E = ctx.entite || d.info.client || 'la société';
+  const notes = (ctx.ef && ctx.ef.notes) || [], mult = d.info.multiplier;
+  const secs = [];
+  // Présentation générale
+  secs.push({ key:'presentation', title:'PRESENTATION GENERALE', level:'h2',
+    text: N.capital ? `${E} dispose d’un capital social de ${C.Mx(N.capital)}.` : '' });
+  secs.push({ key:'dirigeants', title:'LES DIRIGEANTS / LES ACTIONNAIRES', level:'h2', sub:'Dirigeants',
+    grid:{ head:['Fonction', 'Noms et Prénoms', 'Date de naissance', 'Client O/N'], rows:[['PCA - PDG', '', '', ''], ['DG', '', '', ''], ['DAF', '', '', '']] }, text:'' });
+  secs.push({ key:'actionnaires', title:'Actionnaires / Actionnariat', level:'h3',
+    grid:{ head:['Actionnaire', 'Type', '% de détention'], rows:[['', '', ''], ['', '', '']] }, text:'' });
+  secs.push({ key:'activites', title:'ACTIVITE(S)', level:'h2', sub:'Typologie des activités', text:'' });
+  // Répartition du chiffre d'affaires (note annexe)
+  {
+    const note = paFindNote(notes, 'ca');
+    const ref = Math.abs(N.ca * mult);
+    const ok = note && note.rows.some(r => r.total && Math.abs(Math.abs(r.n) - ref) <= Math.max(0.03 * ref, 1e6));
+    if (ok){
+      const detail = note.rows.filter(r => !r.total && r.label && /[a-zà-ÿ]{3}/.test(r.label) && (r.n || r.n1) && Math.abs(r.n) <= ref * 1.02);
+      const totalRow = note.rows.find(r => r.total && Math.abs(Math.abs(r.n) - ref) <= Math.max(0.03 * ref, 1e6));
+      const m = v => v == null || !isFinite(v) ? '' : paNum(Math.round(v / 1e6), 0);
+      const vv = (a, b) => a ? C.pc((b - a) / Math.abs(a)) : '';
+      const rows = [[{ text:'Libellé (MXOF)', b:true }, { text:String(y.N1), b:true, align:'r' }, { text:String(y.N), b:true, align:'r' }, { text:`Var. ${C.yy(y.N1)}/${C.yy(y.N)}`, b:true, align:'r' }, { text:`Poids ${C.yy(y.N)}`, b:true, align:'r' }]];
+      for (const r of detail) rows.push([paLc(r.label).replace(/^./, c => c.toUpperCase()), m(r.n1), m(r.n), vv(r.n1, r.n), ref ? C.pu(r.n / ref) : '']);
+      if (totalRow) rows.push([{ text:'Total chiffre d’affaires', b:true }, { text:m(totalRow.n1), b:true }, { text:m(totalRow.n), b:true }, { text:vv(totalRow.n1, totalRow.n), b:true }, { text:'100%', b:true }]);
+      const top = [...detail].sort((a, b) => b.n - a.n).slice(0, 2).filter(r => r.n > 0.1 * ref);
+      const txt = top.length ? `Le chiffre d’affaires ${y.N} est porté principalement par ${anJoin(top.map(r => `« ${paLc(r.label)} » (${C.pu(r.n / ref)} du CA${r.n1 ? `, ${C.pc((r.n - r.n1) / Math.abs(r.n1))} sur l’exercice` : ''})`))}.` : '';
+      secs.push({ key:'repartition', title:'Répartition du chiffre d’affaires', level:'h3', table:{ rows, widths:[4266, 1550, 1550, 1550, 1550], align:['l', 'r', 'r', 'r', 'r'], sz:16 }, text: txt + (txt ? ` (Note ${note.id})` : '') });
     }
-  });
-  x += anPara(`DOSSIER - ${doc.entite}`, { b:true, before:240, jc:'left', sz:18 });
-  return x;
-}
-async function anBuildDocx(doc){
-  const zip = new JSZip();
-  zip.file('[Content_Types].xml', '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types"><Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/><Default Extension="xml" ContentType="application/xml"/><Override PartName="/word/document.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.document.main+xml"/><Override PartName="/word/styles.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.styles+xml"/><Override PartName="/word/numbering.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.numbering+xml"/></Types>');
-  zip.file('_rels/.rels', '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="word/document.xml"/></Relationships>');
-  zip.file('word/_rels/document.xml.rels', '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/styles" Target="styles.xml"/><Relationship Id="rId2" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/numbering" Target="numbering.xml"/></Relationships>');
-  zip.file('word/styles.xml', '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><w:styles xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main"><w:docDefaults><w:rPrDefault><w:rPr><w:rFonts w:ascii="Aptos" w:hAnsi="Aptos" w:cs="Aptos" w:eastAsia="Aptos"/><w:sz w:val="20"/><w:szCs w:val="20"/><w:lang w:val="fr-FR"/></w:rPr></w:rPrDefault><w:pPrDefault><w:pPr><w:spacing w:after="120"/></w:pPr></w:pPrDefault></w:docDefaults><w:style w:type="paragraph" w:default="1" w:styleId="Normal"><w:name w:val="Normal"/></w:style><w:style w:type="table" w:default="1" w:styleId="TableNormal"><w:name w:val="Normal Table"/><w:tblPr><w:tblInd w:w="0" w:type="dxa"/><w:tblCellMar><w:top w:w="0" w:type="dxa"/><w:left w:w="108" w:type="dxa"/><w:bottom w:w="0" w:type="dxa"/><w:right w:w="108" w:type="dxa"/></w:tblCellMar></w:tblPr></w:style></w:styles>');
-  zip.file('word/numbering.xml', '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><w:numbering xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main"><w:abstractNum w:abstractNumId="0"><w:multiLevelType w:val="singleLevel"/><w:lvl w:ilvl="0"><w:start w:val="1"/><w:numFmt w:val="bullet"/><w:lvlText w:val="-"/><w:lvlJc w:val="left"/><w:pPr><w:ind w:left="567" w:hanging="283"/></w:pPr><w:rPr><w:rFonts w:ascii="Aptos" w:hAnsi="Aptos"/></w:rPr></w:lvl></w:abstractNum><w:num w:numId="1"><w:abstractNumId w:val="0"/></w:num></w:numbering>');
-  zip.file('word/document.xml', `<?xml version="1.0" encoding="UTF-8" standalone="yes"?><w:document xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"><w:body>${anDocBody(doc)}<w:sectPr><w:pgSz w:w="11906" w:h="16838"/><w:pgMar w:top="1134" w:right="1134" w:bottom="1134" w:left="1134" w:header="567" w:footer="567" w:gutter="0"/></w:sectPr></w:body></w:document>`);
-  return zip.generateAsync({ type:'blob', mimeType:'application/vnd.openxmlformats-officedocument.wordprocessingml.document', compression:'DEFLATE' });
+  }
+  secs.push({ key:'production', title:'Moyens de production', level:'h3', text:'' });
+  secs.push({ key:'secteur', title:'ETUDE SECTORIELLE', level:'h2', text:'' });
+  // Clients et fournisseurs : délais
+  {
+    const p = [];
+    if (N.clients) p.push(`Les créances clients s’établissent à ${C.Mx(N.clients)} à fin ${y.N}, soit ${C.j(N.dso)} de CA${h1 && N1.dso != null ? ` (vs ${C.j(N1.dso)} en ${y.N1})` : ''}.`);
+    if (N.fournisseurs) p.push(`Les dettes fournisseurs ressortent à ${C.Mx(N.fournisseurs)}, soit ${C.j(N.dpo)} d’achats${h1 && N1.dpo != null ? ` (vs ${C.j(N1.dpo)} en ${y.N1})` : ''}.`);
+    secs.push({ key:'clients', title:'CLIENTS ET FOURNISSEURS', level:'h2', text: p.join(' ') });
+  }
+  // Stocks
+  if (N.stocks){
+    const p = [];
+    if (h1){
+      const s1 = N1.stocks - (h2 ? N2.stocks : N1.stocks), s2 = N.stocks - N1.stocks;
+      const seq = h2 ? (s1 < 0 && s2 < 0 ? 'des baisses successives' : s1 > 0 && s2 > 0 ? 'des hausses successives' : s2 < 0 ? 'une baisse après une hausse en ' + y.N1 : 'une hausse après une baisse en ' + y.N1)
+                     : (s2 < 0 ? 'une baisse' : 'une hausse');
+      p.push(`En chiffres, nous relevons que sur ${h2 ? 'les deux derniers exercices' : 'le dernier exercice'} le stock de ${E} connaît ${seq}${s2 < 0 ? ', reflétant une gestion plus serrée de cette composante' : ''}.`);
+    }
+    const nl = anNoteLines(notes, 'stocks', N.stocks, mult, 2);
+    let s = `Au 31/12/${y.N}, le stock s’élève à ${C.G(N.stocks)} soit ${C.pu(N.stocks / N.totalBilan)} du TB et ${C.j(N.dio)} du CA${C.yy(y.N)}.`;
+    if (nl) s += ` Il se compose principalement de ${anJoin(nl.rows.map(r => `${r.label} (${C.pu(r.share)} du stock)`))}.`;
+    p.push(s);
+    secs.push({ key:'stocks', title:'STOCKS', level:'h2', text: p.join(' ') });
+  }
+  secs.push({ key:'faits', title:'FAITS MARQUANTS DE L’EXERCICE EN COURS ET STRATEGIE A MOYEN TERME', level:'h2', text:'' });
+  return { kind:'eco', title:'1/ ANALYSE ECONOMIQUE', entity:E, sections: secs };
 }
 
-/* ---------- 8. Aperçu et impression (même contenu que le Word) ---------- */
-const AN_PRINT_CSS = `@page{ size:A4; margin:18mm 18mm 18mm; }
-  body{ margin:0; -webkit-print-color-adjust:exact; print-color-adjust:exact; }
-  .av-page{ font-family:Aptos, Calibri, 'Segoe UI', Arial, sans-serif; font-size:10.5pt; line-height:1.5; color:#000; }
-  .av-title{ text-align:center; color:#E9041E; font-weight:700; font-size:14pt; margin-bottom:12pt; }
-  .av-id{ margin:0 0 2pt; }
-  .av-src{ color:#595959; font-size:9pt; margin:0 0 14pt; }
-  .av-h{ color:#1F3864; font-weight:700; font-size:11pt; margin:14pt 0 5pt; break-after:avoid; page-break-after:avoid; }
-  .av-p{ text-align:justify; margin:0 0 6pt; }
-  .av-ul{ margin:0 0 6pt; padding-left:22pt; list-style:'-  '; }
-  .av-ul li{ margin-bottom:3pt; text-align:justify; }
-  .av-t{ border-collapse:collapse; width:100%; font-size:8.5pt; margin:4pt 0 10pt; }
-  .av-t th{ background:#C00000; color:#fff; font-weight:700; padding:2pt 5pt; text-align:right; border:1px solid #808080; }
-  .av-t th:first-child, .av-t td:first-child{ text-align:left; }
-  .av-t td{ padding:2pt 5pt; text-align:right; border:1px solid #808080; }
-  .av-foot{ margin-top:18pt; font-weight:700; font-size:9pt; }`;
-function anDocHtml(doc){
-  const e = escapeHtml;
-  let h = `<div class="av-page"><div class="av-title">${e(doc.title.toUpperCase())}</div>
-    <p class="av-id"><b>Nom de l’entité : ${e(doc.entite)}</b></p><p class="av-id">Exercice analysé : ${e(String(doc.exercice))}</p>
-    <p class="av-src">Sources : ${e(doc.sources)}</p>
-    <div class="av-h">Chiffres clés</div>
-    <table class="av-t"><thead><tr>${doc.table.head.map(c => `<th>${e(c)}</th>`).join('')}</tr></thead><tbody>${doc.table.body.map(r => `<tr>${r.map(c => `<td>${e(c)}</td>`).join('')}</tr>`).join('')}</tbody></table>`;
-  doc.sections.forEach((s, i) => {
-    h += `<div class="av-h">${i + 1}. ${e(s.title)}</div>`;
-    for (const block of String(s.text || '').split(/\n\s*\n/)){
-      const lines = block.split('\n').map(l => l.trim()).filter(Boolean);
-      if (!lines.length) continue;
-      if (lines.every(l => /^-\s+/.test(l))) h += `<ul class="av-ul">${lines.map(l => `<li>${e(l.replace(/^-\s+/, ''))}</li>`).join('')}</ul>`;
-      else h += `<p class="av-p">${e(lines.join(' '))}</p>`;
+/* ---------- 5. Analyse financière (partie « 2/ ANALYSE FINANCIERE » de la CREDAPP) ---------- */
+function anFinancial(d, data, ctx){
+  const { M } = data, C = anCx(d), y = d.years, N = M.N, N1 = M.N1, N2 = M.N2;
+  const h1 = d.hasData.N1, h2 = d.hasData.N2, E = ctx.entite || d.info.client || 'la société';
+  const notes = (ctx.ef && ctx.ef.notes) || [], mult = d.info.multiplier;
+  const g = C.g, secs = [];
+  const audited = /^oui|^yes/i.test(String(d.info.audite || '').trim());
+  secs.push({ key:'intro', title:'', level:null,
+    text: `Les états financiers ont été établis selon les normes SYSCOHADA et l’Acte Uniforme relatif au droit comptable et à l’information financière. Notre analyse porte sur les chiffres définitifs de l’exercice ${y.N}${audited ? ` audités${ctx.audit ? ` par le cabinet ${ctx.audit}` : ''}` : (ctx.audit ? ` audités par le cabinet ${ctx.audit}` : ' (non audités)')}.` });
+  secs.push({ key:'nf', title:'', level:null, table: anNfTable(d, data), text:null });
+
+  /* Activité et rentabilité */
+  {
+    const p = [];
+    const gCA = h1 ? g(N1.ca, N.ca) : null;
+    let s = '';
+    if (h2 && h1){
+      const g1 = g(N2.ca, N1.ca);
+      const shape = Math.sign(g1) !== Math.sign(gCA) ? 'en dents de scie' : gCA > 0 ? 'en progression' : 'en repli';
+      s += `Sur ces dernières années, l’activité de ${E} évolue ${shape} (${C.pc(g1)} en ${y.N1}). `;
     }
-  });
-  return h + `<div class="av-foot">DOSSIER - ${e(doc.entite)}</div></div>`;
+    if (h1) s += `Sur l’exercice ${y.N}, ${E} clôture l’année avec ${Math.abs(gCA) < 0.005 ? 'une stabilité' : gCA < 0 ? 'un repli' : 'une progression'} de ${C.pa(gCA)} du **CA** qui passe de ${C.G(N1.ca)} à **${C.G(N.ca)}**.`;
+    else s += `Sur l’exercice ${y.N}, ${E} réalise un **CA** de **${C.G(N.ca)}**.`;
+    const nl = anNoteLines(notes, 'ca', N.ca, mult, 2);
+    if (nl) s += ` Le chiffre d’affaires est porté principalement par ${anJoin(nl.rows.map(r => `« ${r.label} » (${C.pu(r.share)} du CA)`))}.`;
+    p.push(s);
+
+    const q = [];
+    if (h1 && N.achatsConso && N1.achatsConso){
+      const a1 = N1.achatsConso, a = N.achatsConso, ga = g(a1, a);
+      const corr = Math.sign(a - a1) === Math.sign(N.ca - N1.ca) ? 'Positivement corrélés au niveau d’activité' : 'Contrairement au niveau d’activité';
+      q.push(`${corr}, les achats consommés (achats + variations de stocks + production stockée) sur la période ont connu ${a < a1 ? 'une diminution' : 'une augmentation'} en valeur passant de ${C.G(a1)} à ${C.G(a)} en ${y.N} (soit ${C.dl(a - a1)} ; ${C.pc(ga)} par rapport à ${y.N1}).`);
+      const w = a / N.ca, w1 = a1 / N1.ca;
+      if (Math.abs(w - w1) >= 0.005) q.push(`Evoluant ${w < w1 ? 'moins' : 'plus'} rapidement que le niveau d’activité, le poids des achats ${w < w1 ? 'se rétracte' : 's’accroît'} pour accaparer ${C.pu(w)} du CA${C.yy(y.N)} (vs ${C.pu(w1)} en ${y.N1}).`);
+      else q.push(`Le poids des achats reste stable à ${C.pu(w)} du CA.`);
+    }
+    let ceDir = 0;
+    if (h1 && N.chargesExt){
+      const gce = g(N1.chargesExt, N.chargesExt); ceDir = Math.sign(gce || 0);
+      const w = N.chargesExt / N.ca, w1 = N1.chargesExt / N1.ca;
+      q.push(`S’agissant des charges externes, nous relevons ${Math.abs(gce) < 0.005 ? 'une stabilité de' : gce > 0 ? `une augmentation de ${C.pa(gce)} de` : `une diminution de ${C.pa(gce)} de`} cette rubrique qui se chiffre à ${C.Mx(N.chargesExt)} en ${y.N}${Math.round(w * 100) !== Math.round(w1 * 100) ? ` tout en ${w > w1 ? 'augmentant' : 'réduisant'} son poids à ${C.pu(w)} du CA` : `, soit ${C.pu(w)} du CA`}.`);
+    }
+    if (h1 && N.personnel){
+      const gp = g(N1.personnel, N.personnel);
+      q.push(`${Math.sign(gp) === ceDir && ceDir ? 'Constat similaire pour les' : 'S’agissant des'} charges de personnel qui enregistrent ${Math.abs(gp) < 0.005 ? 'une stabilité' : `une ${gp > 0 ? 'hausse' : 'baisse'} de ${C.pa(gp)}`} passant de ${C.G(N1.personnel)} à ${C.G(N.personnel)} en ${y.N}.`);
+    }
+    const m = N.ca ? N.ebe / N.ca : null, m1 = h1 && N1.ca ? N1.ebe / N1.ca : null;
+    if (h1){
+      const ge = g(N1.ebe, N.ebe);
+      q.push(`En prenant en compte l’ensemble des autres produits et charges, ${E} extériorise un **EBE** de **${C.Mx(N.ebe)}** traduisant ${Math.abs(ge) < 0.005 ? 'une stabilité' : ge < 0 ? `un repli de ${C.pa(ge)}` : `une progression de ${C.pa(ge)}`} comparé à l’exercice précédent, soit une marge d’EBE de ${C.pu(m)} (vs ${C.pu(m1)} en ${y.N1}).`);
+      const ap = N.autresProduits || 0, ap1 = N1.autresProduits || 0;
+      if (ap1 - ap >= 0.01 * Math.abs(N.ca) && ap1 - ap >= 0.3 * Math.abs(N1.ebe - N.ebe) && N.ebe < N1.ebe)
+        q.push(`Il convient toutefois de souligner que contrairement à ${y.N1}, la relation n’a pas bénéficié d’autres produits aussi importants (${C.Mx(ap)} en ${y.N} contre ${C.Mx(ap1)} en ${y.N1}), ce qui explique en partie la baisse de l’EBE.`);
+      else if (ap - ap1 >= 0.01 * Math.abs(N.ca) && ap - ap1 >= 0.3 * Math.abs(N.ebe - N1.ebe))
+        q.push(`Il convient de souligner que l’EBE bénéficie d’autres produits significatifs (${C.Mx(ap)} vs ${C.Mx(ap1)} en ${y.N1}), dont le caractère récurrent reste à confirmer.`);
+    } else q.push(`${E} extériorise un **EBE** de **${C.Mx(N.ebe)}**, soit une marge d’EBE de ${C.pu(m)}.`);
+    p.push(q.join(' '));
+
+    const r = [];
+    if (N.dotAmort){
+      const gd = h1 ? g(N1.dotAmort, N.dotAmort) : null;
+      const invest = h1 && N.immoBrut > N1.immoBrut;
+      r.push(`${invest && gd > 0 ? 'Reflétant en partie la politique d’investissement de l’exercice, l' : 'L'}es dotations aux amortissements, aux provisions et aux dépréciations ${gd == null ? 's’établissent' : `enregistrent ${Math.abs(gd) < 0.005 ? 'une stabilité' : `une ${gd > 0 ? 'hausse' : 'baisse'} de ${C.pa(gd)}`} pour s’établir`} à ${C.G(N.dotAmort)}.`);
+    }
+    if (N.rf){
+      const gf = h1 ? g(N1.ff, N.ff) : null;
+      let t = `Quant au résultat financier, il ${N.rf < 0 ? (h1 && N1.rf < 0 ? 'demeure toujours négatif' : 'ressort négatif') : 'ressort positif'}, à/h de ${C.Mx(N.rf)}`;
+      if (N.rf < 0 && N.ff){
+        const heavy = N.ebe > 0 && N.ff / N.ebe > 0.3;
+        t += `, en raison d’un niveau ${heavy ? 'encore élevé ' : ''}de charges financières (${C.Mx(N.ff)})${heavy ? ', traduisant une dépendance au financement bancaire' : ''}`;
+        if (gf != null) t += gf < -0.005 ? `, malgré une légère amélioration (${C.pc(gf)} ; ${C.dl(N.ff - N1.ff)}) par rapport à ${y.N1}` : gf > 0.005 ? `, en hausse (${C.pc(gf)} ; ${C.dl(N.ff - N1.ff)}) par rapport à ${y.N1}` : '';
+      }
+      r.push(t + '.');
+    }
+    if (N.haoNet && Math.abs(N.haoNet) >= 0.005 * Math.abs(N.ca)) r.push(`Le résultat HAO s’établit à ${C.Mx(N.haoNet)}.`);
+    if (N.rn != null){
+      if (N.rn < 0) r.push(`Déduction faite de l’IS, ${E} clôture l’exercice ${y.N} sur une perte de **${C.Mx(N.rn)}**${h1 ? ` contre un ${N1.rn < 0 ? 'déficit' : 'bénéfice'} de ${C.Mx(N1.rn)} en N-1` : ''}.`);
+      else {
+        let t = `Déduction faite de l’IS, ${E} parvient à clôturer l’exercice ${y.N} avec un **RN** de **${C.Mx(N.rn)}**`;
+        if (h1){
+          const dr = N.rn - N1.rn;
+          t += ` contre ${C.Mx(N1.rn)} en N-1 soit une ${dr < 0 ? 'baisse' : 'hausse'} en valeur de ${C.Mx(Math.abs(dr))}`;
+          const dap = (N1.autresProduits || 0) - (N.autresProduits || 0);
+          if (dr < 0 && dap > 0 && Math.abs(dap + dr) <= 0.3 * Math.abs(dr)) t += ` correspondant sensiblement aux autres produits de l’exercice précédent dont la relation n’a pas bénéficié en ${y.N}`;
+        }
+        r.push(t + '.');
+      }
+    }
+    p.push(r.join(' '));
+    secs.push({ key:'activite', title:'ACTIVITE ET RENTABILITE', level:'h2', text: p.filter(Boolean).join('\n\n') });
+  }
+
+  /* Structure financière */
+  let ccaInfo = null;
+  {
+    const p = [];
+    let s = '';
+    if (h1){
+      const dRp = N.rp - N1.rp, dCap = N.capital - N1.capital, grp = g(N1.rp, N.rp);
+      let intro;
+      if (N.rn > 0 && N1.rn > 0 && Math.abs(dRp - dCap - N.rn) <= Math.max(0.05 * Math.abs(N.rn), 0.002 * Math.abs(N.totalBilan))) intro = `Avec le report intégral du RN${C.yy(y.N1)} et le résultat bénéficiaire de ${y.N}`;
+      else if (N.rn > 0 && dRp - dCap < N.rn) intro = `Après distribution de dividendes (${C.Mx(N.rn - (dRp - dCap))} environ) et avec le résultat bénéficiaire de ${y.N}`;
+      else if (N.rn < 0) intro = `Impactées par la perte de l’exercice`;
+      else intro = `Sous l’effet du résultat de l’exercice${dCap ? ' et des mouvements de capital' : ''}`;
+      s += `${intro}, les ressources propres de notre relation ${dRp >= 0 ? 's’améliorent' : 'se contractent'} de ${C.pa(grp)} pour se positionner à ${C.Mx(N.rp)}.`;
+      const gtb = g(N1.totalBilan, N.totalBilan), c = N.rp / N.totalBilan, c1 = N1.rp / N1.totalBilan;
+      s += ` Toute chose égale par ailleurs, avec un TB qui ${gtb < 0 ? 'diminue' : 'augmente'} (${C.pc(gtb)}), la structure financière ${c >= c1 ? 'se consolide' : 'se fragilise'} d’où un **ratio d’autonomie financière** qui se positionne à **${C.pu(c)}** en ${y.N} (vs ${C.pu(c1)} en ${y.N1}).`;
+    } else s += `Les ressources propres s’élèvent à ${C.Mx(N.rp)}, soit un **ratio d’autonomie financière** de **${C.pu(N.rp / N.totalBilan)}**.`;
+    if (N.endBrut){
+      const MT = (N.emprunts || 0) + (N.creditBail || 0), CT = (N.banques || 0) + (N.ccaNonBloques || 0) + (N.partCT || 0);
+      const mtD = [N.emprunts ? `${C.G(N.emprunts)} en emprunts` : '', N.creditBail ? `${C.Mx(N.creditBail)} en CB` : ''].filter(Boolean);
+      const ctD = [N.banques ? `${C.G(N.banques)} en tréso passive` : '', N.ccaNonBloques ? `${C.Mx(N.ccaNonBloques)} en CCA non bloqués` : '', N.partCT ? `${C.Mx(N.partCT)} de part CT des dettes MLT` : ''].filter(Boolean);
+      const first = MT >= CT ? ['MT', MT, mtD] : ['CT', CT, ctD], second = MT >= CT ? ['CT', CT, ctD] : ['MT', MT, mtD];
+      s += ` Au niveau de l’endettement financier brut de ${C.G(N.endBrut)}, il faut noter la prédominance des dettes ${first[0]} qui se chiffrent à ${C.G(first[1])}${first[2].length ? ` (dont ${anJoin(first[2])})` : ''}${second[1] ? ` contre des engagements ${second[0]} de ${C.G(second[1])}${second[2].length ? ` (dont ${anJoin(second[2])})` : ''}` : ''}.`;
+      if (h1){
+        const dNB = (N.ccaNonBloques || 0) - (N1.ccaNonBloques || 0), dB = (N.ccaBloques || 0) - (N1.ccaBloques || 0);
+        if (dNB < 0 && Math.abs(dNB) >= 0.02 * N.totalBilan && dB > 0 && Math.abs(dB + dNB) <= 0.3 * Math.abs(dNB)){
+          s += ` En ce qui concerne les CCA non bloqués, nous relevons une baisse significative (${C.dl(dNB)}) s’expliquant par un reclassement de ce montant en CCA bloqués.`;
+          ccaInfo = { amount: -dNB };
+        }
+      }
+      // CCA bloqués inscrits en emprunts dans la NF : retraitement indiqué par l'analyste
+      let lev = N.leverage, gear = N.gearing;
+      if (!N.ccaBloques && ctx.ccaBloques > 0){
+        const endAdj = N.endBrut - ctx.ccaBloques;
+        s += ` Les emprunts de la NF incluent ${C.G(ctx.ccaBloques)} de CCA bloqués : hors ces comptes, l’endettement financier brut ressort à ${C.G(endAdj)}.`;
+        lev = N.ebe > 0 ? endAdj / N.ebe : null; gear = N.rp > 0 ? endAdj / N.rp : null;
+      }
+      s += ` Le **leverage** et le **gearing** se positionnent respectivement à **${N.ebe > 0 ? C.x(lev) : 'n/d'}** et **${C.x(gear)}**${h1 && N1.ebe > 0 && N1.leverage != null && !(ctx.ccaBloques > 0 && !N.ccaBloques) ? ` (vs ${C.x(N1.leverage)} et ${C.x(N1.gearing)} en ${y.N1})` : ''}.`;
+    } else s += ` ${E} ne présente pas d’endettement financier à fin ${y.N}.`;
+    p.push(s);
+    const cca = N.ccaBloques || ctx.ccaBloques || 0;
+    if (cca > 0){
+      const end = N.ccaBloques ? N.endBrut : N.endBrut - cca;
+      p.push(`NB : En intégrant les CCA bloqués de ${C.G(cca)} comme quasi fonds propres, le ratio d’autonomie financière ressort à ${C.pu((N.rp + cca) / N.totalBilan)} pour un gearing de ${C.x(end / (N.rp + cca))}.`);
+    }
+    secs.push({ key:'structure', title:'STRUCTURE FINANCIERE ET TRESORERIE', level:'h2', sub:'Structure financière', text: p.join('\n\n') });
+  }
+
+  /* Trésorerie */
+  {
+    const p = [];
+    if (h1){
+      const dF = N.fdr - N1.fdr, big = Math.abs(dF) >= Math.max(0.5 * Math.abs(N1.fdr), 0.02 * N.totalBilan);
+      p.push(`Au niveau du haut du bilan nous relevons un **FDR** qui ${dF >= 0 ? 's’améliore' : 'se dégrade'}${big ? ' de manière significative' : ''} en passant de ${C.Mx(N1.fdr)} à **${C.Mx(N.fdr)}** en ${y.N} soit l’équivalent de ${C.j(N.fdr / N.ca * 365)} du CA${C.yy(y.N)} (vs ${C.j(N1.fdr / N1.ca * 365)} du CA en N-1). Cette ${dF >= 0 ? 'augmentation' : 'diminution'} se justifie par ${N.ressourcesStables >= N1.ressourcesStables ? 'une hausse' : 'une baisse'} des ressources stables (capitaux permanents + provisions à LT) (${C.pc(g(N1.ressourcesStables, N.ressourcesStables))} ; ${C.dl(N.ressourcesStables - N1.ressourcesStables)}) ${Math.sign(N.immoNet - N1.immoNet) !== Math.sign(N.ressourcesStables - N1.ressourcesStables) ? 'tandis que' : 'et'} l’actif immobilisé net ${N.immoNet <= N1.immoNet ? 'diminue' : 'augmente'} (${C.pc(g(N1.immoNet, N.immoNet))} ; ${C.dl(N.immoNet - N1.immoNet)}).`);
+      // détail : ressources stables et actif immobilisé
+      const dRS = N.ressourcesStables - N1.ressourcesStables;
+      const comps = [
+        { k:'rp', v: N.rp - N1.rp, up: N.rn > 0 && Math.abs(N.rp - N1.rp - N.rn) <= 0.1 * Math.abs(N.rn) ? `l’intégration du RN bénéficiaire de ${y.N}` : `la hausse des ressources propres (${C.dl(N.rp - N1.rp)})`, down:`la baisse des ressources propres (${C.dl(N.rp - N1.rp)})` },
+        { k:'cca', v: (N.ccaBloques || 0) - (N1.ccaBloques || 0), up: ccaInfo ? `la remontée de ${C.G(ccaInfo.amount)} depuis les CCA non bloqués vers les CCA bloqués` : `la hausse des CCA bloqués (${C.dl((N.ccaBloques || 0) - (N1.ccaBloques || 0))})`, down:`la baisse des CCA bloqués (${C.dl((N.ccaBloques || 0) - (N1.ccaBloques || 0))})` },
+        { k:'emp', v: (N.emprunts || 0) - (N1.emprunts || 0), up:`la mise en place de nouveaux emprunts (${C.dl((N.emprunts || 0) - (N1.emprunts || 0))})`, down:`les remboursements de dettes MLT intervenus sur l’année (${C.dl((N.emprunts || 0) - (N1.emprunts || 0))})` },
+        { k:'cb', v: (N.creditBail || 0) - (N1.creditBail || 0), up:'la hausse du crédit-bail', down:'la baisse du crédit-bail' },
+        { k:'prov', v: (N.provLT || 0) - (N1.provLT || 0), up:'la hausse des provisions pour risques', down:'la baisse des provisions pour risques' },
+      ].filter(c => Math.abs(c.v) >= 0.05 * Math.abs(dRS || 1) && Math.abs(c.v) >= 0.002 * N.totalBilan);
+      const same = comps.filter(c => Math.sign(c.v) === Math.sign(dRS)).sort((a, b) => Math.abs(b.v) - Math.abs(a.v));
+      const opp = comps.filter(c => Math.sign(c.v) !== Math.sign(dRS)).sort((a, b) => Math.abs(b.v) - Math.abs(a.v));
+      const bl = [];
+      if (same.length){
+        const ds = c => dRS >= 0 ? c.up : c.down;
+        let t = `- Pour les ressources stables, la ${dRS >= 0 ? 'hausse' : 'baisse'} s’explique principalement par ${same.length > 1 ? `(i) ${ds(same[0])}. Et dans une moindre mesure par (ii) ${ds(same[1])}` : ds(same[0])}.`;
+        if (opp.length) t += ` Notons que ${opp.length > 1 ? 'ces évolutions ont été en partie compensées' : 'cette évolution a été en partie compensée'} par ${anJoin(opp.slice(0, 2).map(c => dRS >= 0 ? c.down : c.up))}.`;
+        bl.push(t);
+      }
+      const acq = (N.immoBrut || 0) - (N1.immoBrut || 0), am = (N.immoAmort || 0) - (N1.immoAmort || 0);
+      if (acq || am) bl.push(`- Au niveau de l’actif immobilisé net, la variation à la ${N.immoNet <= N1.immoNet ? 'baisse' : 'hausse'} s’explique par ${am > acq ? `la supériorité des amortissements de l’exercice (${C.dl(am)}) comparés aux acquisitions brutes (${C.dl(acq)})` : `des acquisitions brutes (${C.dl(acq)}) supérieures aux amortissements de l’exercice (${C.dl(am)})`}.`);
+      if (bl.length) p.push(bl.join('\n'));
+      // BFR
+      const dB = N.bfr - N1.bfr;
+      let b = `Quant au bas du bilan, il fait apparaître un besoin à financer qui ${dB >= 0 ? 's’accroît' : 'se réduit'} avec un **BFR** qui passe de ${C.G(N1.bfr)} à ${C.G(N.bfr)} en ${y.N} représentant ${C.j(N.bfr / N.ca * 365)} du CA${C.yy(y.N)} (vs ${C.j(N1.bfr / N1.ca * 365)} en N-1).`;
+      const parts = [
+        { l:'des stocks', v:'stocks', asset:true }, { l:'des créances clients', v:'clients', asset:true }, { l:'des autres créances', v:'autresCreances', asset:true },
+        { l:'des dettes fournisseurs', v:'fournisseurs', asset:false }, { l:'des dettes fiscales et sociales', v:'fiscSoc', asset:false }, { l:'des autres dettes', v:'autresDettes', asset:false }, { l:'des avances clients', v:'avancesClients', asset:false },
+      ].map(c => { const a = N1[c.v] || 0, z = N[c.v] || 0; return { ...c, a, z, d: z - a, eff: c.asset ? z - a : a - z }; }).filter(c => Math.abs(c.d) >= 0.002 * N.totalBilan);
+      const desc = c => `${c.d < 0 ? (c.asset ? 'la baisse' : 'le repli') : 'la hausse'} ${c.l} (${C.pc(g(c.a, c.z))} ; ${C.dl(c.d)}) qui ${c.v === 'stocks' ? `passent de ${C.G(c.a)} à ${C.G(c.z)}` : `s’établissent à ${C.Mx(c.z)}`} en ${y.N}`;
+      const agg = parts.filter(c => c.eff > 0).sort((a, z) => z.eff - a.eff), imp = parts.filter(c => c.eff < 0).sort((a, z) => a.eff - z.eff);
+      const main = dB >= 0 ? agg : imp, counter = dB >= 0 ? imp : agg;
+      if (main.length) b += ` Principalement, cette évolution trouve sa justification dans ${desc(main[0])}.`;
+      if (counter.length) b += ` ${dB >= 0 ? 'Venant en amélioration du BFR' : 'En sens inverse'}, nous relevons ${desc(counter[0])}.`;
+      const rest = parts.filter(c => c !== main[0] && c !== counter[0]);
+      if (!rest.some(c => Math.abs(c.eff) >= 0.25 * Math.abs(dB || 1))) b += ' Les autres postes du BFR n’évoluent que très peu.';
+      const gt = N1.tn ? (N.tn - N1.tn) / Math.abs(N1.tn) : null;
+      b += ` In fine, ${E} clôture l’exercice ${y.N} avec une **trésorerie nette** qui ${N.tn < 0 ? (N1.tn < 0 ? 'demeure déficitaire' : 'devient déficitaire') : 'ressort excédentaire'} à/h de **${C.G(N.tn)}** (vs ${C.G(N1.tn)} au 31/12/${y.N1})${gt != null && Math.abs(gt) >= 0.01 ? ` tout en ${N.tn > N1.tn ? 's’améliorant' : 'se dégradant'} de ${C.pa(gt)}` : ''}.`;
+      p.push(b);
+    } else {
+      p.push(`Le **FDR** s’établit à ${C.Mx(N.fdr)} pour un **BFR** de ${C.G(N.bfr)}, soit une **trésorerie nette** de **${C.G(N.tn)}** à fin ${y.N}.`);
+    }
+    secs.push({ key:'tresorerie', title:'Trésorerie', level:'h3', text: p.join('\n\n') });
+  }
+
+  /* Flux de trésorerie */
+  {
+    const t = anFluxTable(d, data);
+    let txt = '';
+    if (N.excedent != null){
+      txt = `En ${y.N}, ${ccaInfo ? `principalement du fait du reclassement de ${C.G(ccaInfo.amount)} en CCA bloqués, ` : ''}la relation clôture l’exercice avec ${N.excedent >= 0 ? 'un excédent' : 'un déficit'} de trésorerie de ${C.Mx(Math.abs(N.excedent))} faisant passer la trésorerie de fin de période de ${C.Mx(N1.tn)} à ${C.Mx(N.tn)} en fin ${y.N}.`;
+      if (N.fcf != null) txt += ` Le flux de trésorerie disponible ressort à ${C.Mx(N.fcf)}, ${N.fcf < 0 ? 'la MBA ne couvrant pas la variation du BFR et les investissements' : 'la MBA couvrant la variation du BFR et les investissements de l’exercice'}.`;
+    }
+    if (t) secs.push({ key:'flux', title:'FLUX DE TRESORERIE', level:'h2', table: t, text: txt });
+  }
+  return { kind:'fin', title:'2/ ANALYSE FINANCIERE', entity:E, sections: secs };
+}
+
+/* ---------- 6. Tableaux repris de la NF (onglet de synthèse et tableau de flux) ---------- */
+function anNfTable(d, data){
+  const M = data.M, P = AN_PERIODS.filter(p => d.hasData[p]), y = d.years;
+  const dev = d.info.devise || 'XOF', mu = d.info.multiplier;
+  const unit = mu === 1e6 ? 'Millions' : mu === 1e3 ? 'Milliers' : 'Unités';
+  const audited = /^oui|^yes/i.test(String(d.info.audite || '').trim());
+  const num = v => v == null || !isFinite(v) ? '' : paNum(Math.round(v), 0);
+  const pct1 = v => v == null || !isFinite(v) ? '' : `${paNum(Math.round(v * 1000) / 10, 1)}%`;
+  const xx = v => v == null || !isFinite(v) ? '' : `${paNum(Math.round(v * 100) / 100, 2)} x`;
+  const varp = (a, b) => (a == null || b == null || !a) ? '' : `${paNum(Math.round((b - a) / Math.abs(a) * 1000) / 10, 1)}%`;
+  const head = [`Monnaie  ${dev} / ${unit} / ${audited ? 'Audité' : 'Non-Audité'}`];
+  P.forEach((p, i) => { head.push(`31/12/${y[p]}`); if (i) head.push('%Δ'); });
+  const ncol = head.length;
+  const row = (label, f, kind) => {
+    const r = [{ text: label, align:'r' }];
+    P.forEach((p, i) => {
+      const v = f(M[p], p);
+      r.push({ text: kind === 'x' ? xx(v) : kind === '%' ? pct1(v) : num(v), align:'r' });
+      if (i) r.push({ text: kind ? '' : varp(f(M[P[i - 1]], P[i - 1]), v), align:'r' });
+    });
+    return r;
+  };
+  const sep = () => { const r = [{ text:'' }]; P.forEach((p, i) => { r.push({ text:'' }); if (i) r.push({ text:'%Δ', align:'r', b:true }); }); return r; };
+  const div = (a, b) => (a == null || !b ? null : a / b);
+  const rows = [head.map((h, i) => ({ text:h, align: i ? 'r' : 'r', b:true })),
+    row('Total Bilan', m => m.totalBilan), row('Immobilisations Corporelles Nettes', m => m.immoCorpNet), row('Ressources Propres', m => m.rp), row('Total endettement financier brut', m => m.endBrut),
+    sep(), row('CA', m => m.ca), row('EBE', m => m.ebe), row('Frais financiers', m => m.ff), row('RN', m => m.rn), row('MBA', m => m.mba),
+    sep(), row('FDR', m => m.fdr), row('BFR', m => m.bfr), row('Trésorerie Nette', m => m.tn),
+    sep(), row('Ressources Propres / Total Bilan (%)', m => div(m.rp, m.totalBilan), '%'), row('Total endettement financier brut / RP (Gearing)', m => m.gearing, 'x'),
+    row('Total endettement financier brut / EBE (Leverage) - Annualisé', m => m.ebe > 0 ? m.leverage : null, 'x'), row('EBE / CA (%)', m => div(m.ebe, m.ca), '%'),
+    row('EBE / Frais financiers', m => m.couverture, 'x'), row('RN / CA (%)', m => div(m.rn, m.ca), '%')];
+  const first = 3900, other = Math.floor((10466 - first) / (ncol - 1));
+  return { rows, widths:[first, ...Array(ncol - 1).fill(other)], sz:14, align: head.map(() => 'r') };
+}
+function anFluxTable(d, data){
+  const M = data.M, P = AN_PERIODS.filter(p => d.hasData[p] && M[p].fcf != null), y = d.years;
+  if (!P.length) return null;
+  const num = v => v == null || !isFinite(v) ? '-' : paNum(Math.round(v), 0);
+  const varp = (a, b) => (a == null || b == null || !a) ? '' : `${paNum(Math.round((b - a) / Math.abs(a) * 1000) / 10, 1)}%`;
+  const head = [{ text:'Devise/ certifié', b:true }, ...P.map(p => ({ text:`31/12/${y[p]}`, b:true, align:'r' }))];
+  if (P.length > 1) head.push({ text:'%Δ', b:true, align:'r' });
+  const row = (label, k, bold) => {
+    const r = [{ text:label, b:bold }, ...P.map(p => ({ text:num(M[p][k]), b:bold, align:'r' }))];
+    if (P.length > 1) r.push({ text: varp(M[P[P.length - 2]][k], M[P[P.length - 1]][k]), b:bold, align:'r' });
+    return r;
+  };
+  const rows = [head, row('MBA', 'mba', true), row('(+/-) variation de BFR', 'dBfr'), row('- CAPEX', 'capex'), row('= flux de trésorerie disponible', 'fcf', true),
+    row('- dividendes distribués', 'dividendes'), row('- remboursement de la dette (auto/net si négatif)', 'rembAuto'), row('- remboursement de la dette (surécriture)', 'rembSur'),
+    row('= Excédent ou déficit', 'excedent', true), [{ text:'Déficit financé par (nouvelle dette, trésorerie…)', i:true }, ...P.map(() => ''), ...(P.length > 1 ? [''] : [])]];
+  const n = rows[0].length, first = 4600, other = Math.floor((10466 - first) / (n - 1));
+  return { rows, widths:[first, ...Array(n - 1).fill(other)], sz:14 };
+}
+
+/* ---------- 7. Blocs du document (Word, aperçu, impression) ---------- */
+function anIsEmptySection(s){
+  const gridFilled = s.grid && s.grid.rows.some(r => r.some(c => String(c || '').trim()));
+  return !String(s.text || '').trim() && !s.table && !gridFilled;
+}
+function anSectionBlocks(s){
+  const B = [];
+  if (s.title && s.level) B.push({ t: s.level, text: s.title });
+  if (s.sub) B.push({ t:'h3', text: s.sub });
+  if (s.table) B.push({ t:'table', ...s.table });
+  if (s.grid){
+    const rows = s.grid.rows.filter(r => r.some(c => String(c || '').trim()));
+    if (rows.length){
+      const n = s.grid.head.length, W = 10466;
+      B.push({ t:'table', rows:[s.grid.head.map(h => ({ text:h, b:true, fill:'D9D9D9' })), ...rows], widths: Array(n).fill(Math.floor(W / n)), sz:16 });
+    }
+  }
+  if (String(s.text || '').trim()) B.push({ t:'text', text: s.text });
+  return B;
+}
+function anBlocks(out){
+  const B = [{ t:'box', text: out.title }];
+  if (out.kind === 'fin') B.push({ t:'space', h:40 }, { t:'box', text: anUp(out.entity), red:true });
+  for (const s of out.sections){
+    if (anIsEmptySection(s)) continue;
+    B.push(...anSectionBlocks(s));
+  }
+  return B;
 }
 /* @@ANALYSE_ENGINE_END */
 /* @@ANALYSE_UI_START */
@@ -5934,6 +6293,15 @@ function anIdent(){
   return { entite, exercice };
 }
 
+// Unité des montants : choisie une seule fois, dans la pré-analyse ; NF déposée dans un onglet d'analyse : unité de cette NF
+function anUnite(){
+  if (anState.nfFrom !== 'upload'){
+    const sel = document.getElementById('pa-unit');
+    if (sel && paState.data && sel.value) return sel.value;
+  }
+  return (anState.d && anState.d.info.unite) || 'Milliers';
+}
+
 function anRenderSources(){
   const d = anState.d;
   const ef = d ? anEf(d) : null;
@@ -5953,7 +6321,6 @@ function anRenderSources(){
     document.getElementById(`an-${k}-generate`).disabled = !d;
     document.getElementById(`an-${k}-num-1`).classList.toggle('done', !!d);
     if (d){
-      if (!anState.edited[k + 'unit']) document.getElementById(`an-${k}-unit`).value = d.info.unite;
     }
   }
   if (typeof cdAfterSources === 'function') cdAfterSources(d);
@@ -5969,12 +6336,14 @@ async function anGenerate(k){
   anRenderSources();
   if (!anState.d) return;
   anAlert(k, '');
-  // unité choisie dans le module (la NF peut indiquer une unité erronée) : copie des données, la NF chargée n'est pas modifiée
-  const unite = document.getElementById(`an-${k}-unit`).value;
+  // unité des montants : celle choisie dans la pré-analyse (copie des données, la NF chargée n'est pas modifiée)
+  const unite = anUnite();
   const d = { ...anState.d, info:{ ...anState.d.info, unite, multiplier: unite === 'Millions' ? 1e6 : unite === 'Milliers' ? 1e3 : 1 } };
   const ef = anEf(d), qs = anQuestions(d, ef);
   const data = anBuildData(anState.wb, d);
-  const r = AN_KINDS[k].build(d, data, { ef: ef ? ef.ef : null, questions: qs.q });
+  const val = id => { const el = document.getElementById(id); return el ? el.value.trim() : ''; };
+  const ccaM = parseFloat(val('an-fin-cca').replace(/\s/g, '').replace(',', '.')) || 0;
+  const r = AN_KINDS[k].build(d, data, { ef: ef ? ef.ef : null, questions: qs.q, entite: anIdent().entite, audit: val('an-fin-audit'), ccaBloques: ccaM * 1e6 / d.info.multiplier });
   const src = [data.tabs.length ? 'Notice Financière (feuille de saisie et onglets de calcul)' : 'Notice Financière (feuille de saisie)'];
   if (ef) src.push(`états financiers ${d.years.N}`);
   src.push(qs.from === 'pre' ? 'questionnaire de pré-analyse' : 'questions établies depuis la NF');
@@ -5982,7 +6351,7 @@ async function anGenerate(k){
   const gaps = PA_PERIODS.filter(p => d.hasData[p] && Math.abs(d.balance[p].actif - d.balance[p].passif) > 1).map(p => d.years[p]);
   if (gaps.length) anAlert(k, `Bilan déséquilibré dans la NF (${gaps.join(', ')}) : vérifiez la NF avant d’utiliser l’analyse.`, 'warn');
   const caXof = Math.abs(data.M.N.ca || 0) * d.info.multiplier;
-  if (caXof > 0 && caXof < 5e7) anAlert(k, `Chiffre d’affaires ${d.years.N} = ${paXof(data.M.N.ca, d.info.multiplier)} avec l’unité « ${unite} » : vérifiez l’unité des montants de la NF puis régénérez.`, 'warn');
+  if (caXof > 0 && caXof < 5e7) anAlert(k, `Chiffre d’affaires ${d.years.N} = ${paXof(data.M.N.ca, d.info.multiplier)} avec l’unité « ${unite} » : vérifiez l’unité des montants dans l’onglet Pré-analyse puis régénérez.`, 'warn');
   else if (caXof > 5e13) anAlert(k, `Chiffre d’affaires ${d.years.N} = ${paXof(data.M.N.ca, d.info.multiplier)} avec l’unité « ${unite} » : montant improbable, vérifiez l’unité des montants de la NF.`, 'warn');
   if (!data.tabs.length) anAlert(k, 'Onglets de calcul absents du classeur : agrégats recalculés depuis la feuille de saisie.', 'warn');
   document.getElementById(`an-${k}-result`).style.display = 'block';
@@ -5992,33 +6361,47 @@ async function anGenerate(k){
 
 function anRenderResult(k){
   const o = anState.out[k]; if (!o) return;
-  const t = o.table;
-  document.getElementById(`an-${k}-table`).innerHTML = `<div class="pa-table-wrap"><table class="review pa-synth"><thead><tr>${t.head.map((h, i) => `<th${i ? ' class="num"' : ''}>${escapeHtml(h)}</th>`).join('')}</tr></thead>
-    <tbody>${t.body.map(r => `<tr>${r.map((c, i) => `<td${i ? ' class="num"' : ''}>${escapeHtml(c)}</td>`).join('')}</tr>`).join('')}</tbody></table></div>`;
+  document.getElementById(`an-${k}-table`).innerHTML = '';
   const host = document.getElementById(`an-${k}-sections`);
-  host.innerHTML = o.sections.map((s, i) => `<div class="pa-sec an-sec" data-i="${i}">
-      <div class="pa-sec-head"><h4>${i + 1}. ${escapeHtml(s.title)}</h4></div>
-      <textarea class="an-text" rows="3" aria-label="${escapeHtml(s.title)}">${escapeHtml(s.text)}</textarea>
-    </div>`).join('');
+  const tableHtml = t => `<div class="pa-table-wrap"><table class="review an-cx">${t.rows.map((r, ri) => `<tr>${r.map(c => { const x = (c && typeof c === 'object') ? c : { text:c }; return `<td class="${x.align === 'r' ? 'num' : ''}${x.b || ri === 0 ? ' b' : ''}">${escapeHtml(String(x.text == null ? '' : x.text))}</td>`; }).join('')}</tr>`).join('')}</table></div>`;
+  host.innerHTML = `<div class="an-doc-title">${escapeHtml(o.title)}</div>` + o.sections.map((s, i) => {
+    const head = s.title ? `<div class="pa-sec-head"><h4>${escapeHtml(s.title)}</h4></div>` : '';
+    const sub = s.sub ? `<div class="an-sub">${escapeHtml(s.sub)}</div>` : '';
+    const grid = s.grid ? `<div class="pa-table-wrap"><table class="review an-grid"><thead><tr>${s.grid.head.map(h => `<th>${escapeHtml(h)}</th>`).join('')}</tr></thead><tbody>${s.grid.rows.map((r, ri) => `<tr data-r="${ri}">${r.map((c, ci) => `<td><input type="text" data-c="${ci}" value="${escapeHtml(c)}" aria-label="${escapeHtml(s.grid.head[ci])}"></td>`).join('')}</tr>`).join('')}</tbody></table></div><button type="button" class="action pa-add an-grid-add">+ Ajouter une ligne</button>` : '';
+    const ta = s.text != null ? `<textarea class="an-text" rows="3" aria-label="${escapeHtml(s.title || s.key)}">${escapeHtml(s.text)}</textarea>` : '';
+    return `<div class="pa-sec an-sec${s.level === 'h3' ? ' an-sec-h3' : ''}" data-i="${i}">${head}${sub}${s.table ? tableHtml(s.table) : ''}${grid}${ta}</div>`;
+  }).join('');
   const fit = ta => { ta.style.height = 'auto'; ta.style.height = ta.scrollHeight + 2 + 'px'; };
   host.querySelectorAll('.an-sec textarea').forEach(ta => {
     fit(ta);
     ta.addEventListener('input', () => { o.sections[+ta.closest('.an-sec').dataset.i].text = ta.value; fit(ta); });
   });
+  host.querySelectorAll('.an-grid input').forEach(inp => inp.addEventListener('input', () => {
+    const s = o.sections[+inp.closest('.an-sec').dataset.i];
+    s.grid.rows[+inp.closest('tr').dataset.r][+inp.dataset.c] = inp.value;
+  }));
+  host.querySelectorAll('.an-grid-add').forEach(b => b.addEventListener('click', () => {
+    const s = o.sections[+b.closest('.an-sec').dataset.i];
+    s.grid.rows.push(s.grid.head.map(() => '')); anRenderResult(k);
+  }));
 }
 
+// Pied de page CREDAPP : chargé d'affaires et analyste saisis dans l'onglet CREDAP
+function anFooter(){
+  const v = id => { const el = document.getElementById(id); return el ? el.value.trim() : ''; };
+  return { ca: v('cd-ca'), analyste: v('cd-analyste'), date: cxMonthYear() };
+}
 function anDoc(k){
   const o = anState.out[k]; if (!o) return null;
-  return { title:o.title, table:o.table, sources:o.sources,
-    entite: anIdent().entite, exercice: anIdent().exercice,
-    sections: o.sections.map(s => ({ title:s.title, text:String(s.text || '').trim() })).filter(s => s.text) };
+  const id = anIdent();
+  return { blocks: anBlocks({ ...o, entity: id.entite || o.entity }), entite: id.entite, exercice: id.exercice };
 }
 async function anDownload(k){
   const doc = anDoc(k); if (!doc) return;
   const btns = document.querySelectorAll(`#an-${k}-download, #an-preview-download`);
   btns.forEach(b => b.disabled = true);
   try {
-    const blob = await anBuildDocx(doc);
+    const blob = await cxBuildDocx(doc.blocks, anFooter());
     const safe = String(doc.entite).replace(/[\\/:*?"<>|]+/g, '').trim() || 'CLIENT';
     downloadBlob(blob, `${AN_KINDS[k].file} - ${safe} ${doc.exercice}.docx`);
     markModuleDone(k);
@@ -6027,19 +6410,7 @@ async function anDownload(k){
 }
 function anPrint(k){
   const doc = anDoc(k); if (!doc) return;
-  let frame = document.getElementById('an-print-frame');
-  if (frame) frame.remove();
-  frame = document.createElement('iframe');
-  frame.id = 'an-print-frame';
-  frame.setAttribute('aria-hidden', 'true');
-  frame.style.cssText = 'position:fixed; right:0; bottom:0; width:0; height:0; border:0; visibility:hidden;';
-  document.body.appendChild(frame);
-  const fd = frame.contentDocument;
-  fd.open();
-  fd.write(`<!doctype html><html lang="fr"><head><meta charset="utf-8"><title>${escapeHtml(`${AN_KINDS[k].file} - ${doc.entite} ${doc.exercice}`)}</title><style>${AN_PRINT_CSS}</style></head><body>${anDocHtml(doc)}</body></html>`);
-  fd.close();
-  const go = () => { try { frame.contentWindow.focus(); frame.contentWindow.print(); } catch (e){ console.error(e); window.print(); } };
-  if (fd.fonts && fd.fonts.ready) fd.fonts.ready.then(() => setTimeout(go, 50)); else setTimeout(go, 200);
+  cxPrint(doc.blocks, `${AN_KINDS[k].file} - ${doc.entite} ${doc.exercice}`, anFooter());
   markModuleDone(k);
 }
 function anOpenPreview(k){
@@ -6067,7 +6438,7 @@ function anOpenPreview(k){
   }
   m.dataset.kind = k;
   m.querySelector('#an-preview-title').textContent = `Aperçu : ${AN_KINDS[k].title.toLowerCase()}`;
-  m.querySelector('#an-preview-body').innerHTML = anDocHtml(doc);
+  m.querySelector('#an-preview-body').innerHTML = cxBlocksHtml(doc.blocks);
   m.querySelector('#an-preview-body').scrollTop = 0;
   m.classList.add('open');
   document.body.style.overflow = 'hidden';
@@ -6077,9 +6448,9 @@ function anOpenPreview(k){
 function initAnalyseModules(){
   // styles de l'aperçu : ceux du document imprimé, sans les règles de page
   const st = document.createElement('style');
-  st.textContent = AN_PRINT_CSS.replace(/@page\{[^}]*\}/, '').replace(/\bbody\{[^}]*\}/, '') + `
-    .pa-preview-body .av-page{ background:#fff; max-width:794px; margin:0 auto; padding:44px 52px; box-shadow:0 4px 18px rgba(0,0,0,0.12); }
-    @media (max-width:640px){ .pa-preview-body .av-page{ padding:24px 16px; } }`;
+  st.textContent = CX_PRINT_CSS.replace(/@page\{[^}]*\}/, '').replace(/\bbody\{[^}]*\}/, '') + `
+    .pa-preview-body .cx-page{ background:#fff; max-width:794px; margin:0 auto; padding:44px 48px; box-shadow:0 4px 18px rgba(0,0,0,0.12); }
+    @media (max-width:640px){ .pa-preview-body .cx-page{ padding:24px 16px; } }`;
   document.head.appendChild(st);
   for (const k of Object.keys(AN_KINDS)){
     paWireDrop(`an-${k}-drop`, `an-${k}-input`, f => anLoadNfFile(f, k));
@@ -6087,7 +6458,6 @@ function initAnalyseModules(){
     document.getElementById(`an-${k}-preview`).addEventListener('click', () => anOpenPreview(k));
     document.getElementById(`an-${k}-download`).addEventListener('click', () => anDownload(k));
     document.getElementById(`an-${k}-print`).addEventListener('click', () => anPrint(k));
-    ['unit'].forEach(f => { const el = document.getElementById(`an-${k}-${f}`); el.addEventListener(el.tagName === 'SELECT' ? 'change' : 'input', () => { anState.edited[k + f] = true; }); });
   }
 }
 initAnalyseModules();
@@ -6171,251 +6541,349 @@ function cdAvisPropose(crit){
 }
 const cdNote = s => s >= 1 ? 'Favorable' : s === 0 ? 'Neutre' : s === -1 ? 'Vigilance' : 'Critique';
 
-/* ---------- 2. Demande de crédit ---------- */
+/* ---------- 2. Demande de crédit (montants en MXOF) ---------- */
 function cdParseMontant(v){
   const s = String(v == null ? '' : v).replace(/[\s  ]/g, '').replace(',', '.');
   const n = parseFloat(s); return Number.isFinite(n) ? n : null;
 }
-function cdLignes(req){ return (req.lignes || []).filter(l => (l.nature || '').trim() || cdParseMontant(l.montant)); }
-function cdTotalDemande(req){ return cdLignes(req).reduce((s, l) => s + (cdParseMontant(l.montant) || 0), 0); }   // en millions de XOF
+const CD_LINE_TYPES = ['Court Terme', 'Moyen Terme', 'Engagement par signature', 'Risque de marché'];
+function cdLignes(req){ return (req.lignes || []).filter(l => (l.nature || '').trim() || cdParseMontant(l.apres) != null); }
+const cdIsMarche = l => /march/i.test(l.type || '');
+function cdTotals(req){
+  const L = cdLignes(req).filter(l => !cdIsMarche(l));
+  const sum = k => L.reduce((s, l) => s + (cdParseMontant(l[k]) || 0), 0);
+  return { avant: sum('avant'), apres: sum('apres'), encours: sum('encours') };
+}
+const cdM = v => v == null ? '' : paNum(Math.round(v * 10) / 10, v % 1 ? 1 : 0);
+const cdBox = b => b ? '☒' : '☐';
 
-/* ---------- 3. Sections rédigées du CREDAP ---------- */
-function cdFirstParas(text, n = 1){ return String(text || '').split(/\n\s*\n/).map(x => x.trim()).filter(x => x && !/^- /.test(x)).slice(0, n); }
+/* ---------- 3. Textes rédigés du CREDAP (modifiables) ---------- */
+function cdFirst(out, key, n = 1){
+  const s = out && out.sections.find(x => x.key === key);
+  return s ? String(s.text || '').split(/\n\s*\n/).map(x => x.trim()).filter(x => x && !/^-/.test(x)).slice(0, n) : [];
+}
 function cdGenerate(d, data, ctx, req){
-  const { M } = data, N = M.N, F = anFmt(d), y = d.years;
-  const eco = ctx.eco, fin = ctx.fin;
-  const sec = k => (o => o ? o.sections.find(s => s.key === k) : null);
-  const ecoS = k => sec(k)(eco), finS = k => sec(k)(fin);
-  const crit = cdScore(d, data, ctx);
-  const prop = cdAvisPropose(crit);
-  const secs = [];
-  const add = (key, title, paras) => { const t = paras.filter(Boolean).join('\n\n'); if (t) secs.push({ key, title, text:t }); };
-
-  // Présentation et activité
-  add('presentation', 'Présentation de la contrepartie et activité', [
-    req.secteur ? `${req.entite} exerce dans le secteur suivant : ${req.secteur}.` : '',
-    req.groupe ? `La société appartient au groupe ${req.groupe}.` : '',
-    ...(ecoS('activite') ? cdFirstParas(ecoS('activite').text, 3) : []),
-  ]);
-  // Synthèse économique
-  add('eco', 'Synthèse de l’analyse économique', [
-    ...(ecoS('ebe') ? cdFirstParas(ecoS('ebe').text, 1) : []),
-    ...(ecoS('resultat') ? cdFirstParas(ecoS('resultat').text, 4).filter(p => /résultat net|frais financiers/.test(p)) : []),
-    ...(ecoS('appreciation') ? cdFirstParas(ecoS('appreciation').text, 3) : []),
-  ]);
-  // Synthèse financière
-  add('fin', 'Synthèse de l’analyse financière', [
-    ...(finS('structure') ? cdFirstParas(finS('structure').text, 3).filter(p => /ressources propres|capitaux propres|OHADA/i.test(p)).slice(0, 2) : []),
-    ...(finS('endettement') ? cdFirstParas(finS('endettement').text, 6).filter(p => /^L’endettement financier brut s’élève|fois|ne présente pas/.test(p)).slice(0, 3) : []),
-    ...(finS('equilibre') ? cdFirstParas(finS('equilibre').text, 2) : []),
-    ...(finS('appreciation') ? cdFirstParas(finS('appreciation').text, 2) : []),
-  ]);
-  // Capacité de remboursement
+  const { M } = data, C = anCx(d), y = d.years, N = M.N, N1 = M.N1, h1 = d.hasData.N1, E = req.entite || d.info.client;
+  const crit = cdScore(d, data, ctx), prop = cdAvisPropose(crit);
+  const T = cdTotals(req), L = cdLignes(req);
+  const texts = {};
+  // Synthèse sur l'emprunteur : présentation, chiffres clés, relation bancaire, demande
   {
     const p = [];
-    const totalM = cdTotalDemande(req), totalNf = totalM * 1e6 / d.info.multiplier;
-    const lignes = cdLignes(req);
-    if (lignes.length) p.push(`La demande porte sur ${lignes.length} ligne(s) pour un montant total de ${paXofRaw(totalM * 1e6)}${req.nature ? ` (${req.nature.toLowerCase()})` : ''}.`);
-    if (N.mba > 0){
-      p.push(`La marge brute d’autofinancement de l’exercice ${y.N} s’élève à ${F.X(N.mba)}${N.endBrut ? `, et l’endettement financier brut représente ${paNum(Math.round(N.endBrut / N.mba * 10) / 10, 1)} années de MBA` : ''}.`);
-      if (totalNf && /^nouvelle/i.test(req.nature || '')){
-        const newDebt = N.endBrut + totalNf;
-        p.push(`Après mise en place des concours sollicités, l’endettement brut atteindrait ${F.X(newDebt)}, soit ${N.ebe > 0 ? `${F.fois(newDebt / N.ebe)} l’EBE et ` : ''}${paNum(Math.round(newDebt / N.mba * 10) / 10, 1)} années de MBA.`);
-      }
-    } else if (N.endBrut) p.push(`La marge brute d’autofinancement de l’exercice ${y.N} est ${N.mba < 0 ? 'négative' : 'nulle'} : le remboursement des concours repose sur des ressources autres que l’exploitation, à identifier.`);
-    if (N.partCT) p.push(`Les échéances à moins d’un an des emprunts s’élèvent à ${F.X(N.partCT)}${N.mba > 0 ? (N.partCT > N.mba ? ', au-delà de la MBA de l’exercice' : ', couvertes par la MBA de l’exercice') : ''}.`);
-    if (N.fcf != null) p.push(`Le flux de trésorerie disponible de l’exercice ressort à ${F.XS(N.fcf)}.`);
-    add('remboursement', 'Capacité de remboursement', p);
+    const pres = cdFirst(ctx.eco, 'presentation', 2).join(' ');
+    p.push(pres || `${E}${req.secteur ? ` exerce dans le secteur suivant : ${req.secteur}` : ''}${N.capital ? `${req.secteur ? ',' : ''} avec un capital de ${C.Mx(N.capital)}` : ''}.`);
+    const act = cdFirst(ctx.fin, 'activite', 1)[0] || '';
+    let chiffres = act.replace(/ Le chiffre d’affaires est porté principalement.*$/, '');
+    if (h1){
+      chiffres += ` En prenant en compte l’ensemble des produits et charges, ${E} extériorise un **EBE** de **${C.Mx(N.ebe)}** traduisant ${N.ebe < N1.ebe ? 'un repli' : 'une progression'} de ${C.pa(C.g(N1.ebe, N.ebe))} comparé à l’exercice précédent.`;
+      chiffres += ` ${E} ${N.rn >= 0 ? `parvient à clôturer l’exercice ${y.N} avec un **RN** de **${C.Mx(N.rn)}**` : `clôture l’exercice ${y.N} sur une perte de **${C.Mx(N.rn)}**`} contre ${C.Mx(N1.rn)} en N-1.`;
+      const struct = cdFirst(ctx.fin, 'structure', 1)[0] || '';
+      const m = struct.match(/^.*?ratio d’autonomie financière\*\* qui se positionne à \*\*[^*]+\*\*[^.]*\./);
+      if (m) chiffres += ' ' + m[0];
+      const nb = (ctx.fin && ctx.fin.sections.find(x => x.key === 'structure') || {}).text || '';
+      const nbm = nb.match(/NB : En intégrant (.*)$/m);
+      if (nbm) chiffres += ` En intégrant ${nbm[1]}`;
+    }
+    p.push(chiffres.trim());
+    const rel = [];
+    if (req.depuis) rel.push(`Depuis ${req.depuis}, l’entreprise est cliente de Société Générale Sénégal.`);
+    const pool = cdPool(req);
+    if (pool){
+      rel.push(`Le pool bancaire est composé de ${pool.n - 1} autre${pool.n - 1 > 1 ? 's' : ''} confrère${pool.n - 1 > 1 ? 's' : ''}.${pool.sg ? ` La SGSN ${pool.rank === 1 ? 'est la première banque' : `occupe la ${pool.rank}${pool.rank === 1 ? 're' : 'ème'} position des banques`} de la contrepartie avec ${C.pu(pool.sg.share)} des autorisations${pool.before.length ? ` et se situe derrière ${anJoin(pool.before.map(b => `${b.banque} (${C.pu(b.share)} des autos)`))}` : ''}.` : ''}`);
+    }
+    const f = cdParseMontant(req.flux), f1 = cdParseMontant(req.flux1);
+    if (f){
+      const caM = N.ca * d.info.multiplier / 1e6;
+      rel.push(`En termes de flux, nous relevons ${f1 ? `${f < f1 ? 'un repli' : 'une hausse'} de ${C.pa((f - f1) / f1)} de ces derniers qui se positionnent à ${paNum(Math.round(f), 0)} MXOF en ${y.N} (vs ${paNum(Math.round(f1), 0)} MXOF en ${y.N1})` : `des flux de ${paNum(Math.round(f), 0)} MXOF en ${y.N}`}, soit un rapport Flux/CA de ${C.pu(f / caM)}${pool && pool.sg ? ` pour une part de ${C.pu(pool.sg.share)} dans les engagements` : ''}.`);
+    }
+    if (rel.length) p.push(rel.join(' '));
+    if (L.length){
+      const dExp = T.apres - T.avant;
+      p.push(`C’est dans ce contexte que la relation nous sollicite pour ${req.nature ? `le ${req.nature.toLowerCase().replace(/^nouvelle demande$/, 'la mise en place de nouvelles lignes')}` : 'l’examen'} de ses lignes. ${dExp ? `Avec ${dExp > 0 ? 'la hausse' : 'la baisse'} des autorisations (${dExp > 0 ? '+' : ''}${cdM(dExp)} MXOF), notre` : 'Notre'} exposition après demande s’élève à ${cdM(T.apres)} MXOF (vs ${cdM(T.avant)} MXOF en N-1).${req.garantiesTxt ? ` A date, comme garanties, nous disposons des garanties suivantes : ${req.garantiesTxt.replace(/\.$/, '')}.` : ''}`);
+    }
+    texts.synthese = p.filter(Boolean).join('\n\n');
   }
-  // Forces et vigilances
-  const forces = crit.filter(c => c.s >= 1 && c.force).map(c => `- ${c.force}`);
-  const vig = crit.filter(c => c.s <= -1 && c.vigil).map(c => `- ${c.vigil}${c.s <= -2 ? ' (point critique)' : ''}`);
-  add('forces', 'Points forts', [forces.join('\n')]);
-  add('vigilance', 'Points de vigilance', [vig.join('\n')]);
-  // Points en suspens : questions au client et documents
+  // Justification de la position
   {
-    const q = ctx.questions || {}, p = [];
-    const lines = [];
-    let n = 0;
-    for (const k of PA_ANALYSIS_KEYS) for (const t of (q[k] || [])){ n++; const constat = String(t).split(/\.\s+(?=Pourriez|Merci|Quels?|Quelles?)/)[0].trim(); lines.push(`- Question ${n} : ${constat.replace(/\.?$/, '.')}`); }
-    if (lines.length) p.push(`${n} question(s) ont été adressées au client et restent en attente de réponse :`, lines.join('\n'));
-    if (ctx.docs && ctx.docs.length) p.push('Documents demandés :', ctx.docs.map(t => `- ${String(t).replace(/\.?$/, '.')}`).join('\n'));
-    add('suspens', 'Points en suspens', p);
+    const p = [];
+    const m = N.ca ? N.ebe / N.ca : null, m1 = h1 && N1.ca ? N1.ebe / N1.ca : null;
+    if (h1) p.push(`${N.ca < N1.ca ? 'Malgré un recul de l’activité' : 'Dans un contexte de progression de l’activité'} (${C.pc(C.g(N1.ca, N.ca))}), l’entreprise ${m >= m1 ? 'maintient' : 'voit se contracter'} sa rentabilité d’exploitation avec un EBE de ${C.Mx(N.ebe)}, représentant ${C.pu(m)} du CA (vs ${C.pu(m1)} en ${y.N1}).`);
+    const st = [];
+    st.push(`Le ratio d’autonomie financière s’affiche à ${C.pu(N.rp / N.totalBilan)}`);
+    if (N.endBrut && N.ebe > 0) st.push(`le gearing à ${C.x(N.gearing)} et le leverage à ${C.x(N.leverage)}${h1 && N1.ebe > 0 ? ` vs ${C.x(N1.leverage)}` : ''}`);
+    p.push(`${st.join(', ')}.`);
+    const nb = ((ctx.fin && ctx.fin.sections.find(x => x.key === 'structure')) || {}).text || '';
+    const nbm = nb.match(/NB : En intégrant (.*)$/m);
+    if (nbm) p.push(`En intégrant ${nbm[1]}`);
+    const pool = cdPool(req);
+    if (pool && pool.sg) p.push(`Nous occupons une position ${pool.rank <= 3 ? 'stratégique' : 'significative'} au sein du pool bancaire de ${E}, avec une part de ${C.pu(pool.sg.share)} des engagements bancaires.`);
+    texts.justification = p.join(' ');
   }
-  return { sections: secs, crit, prop };
+  // Points d'attention : documents et points du questionnaire, vigilances de la grille
+  {
+    const rows = [];
+    for (const t of (ctx.docs || [])) rows.push(['Réserves bloquantes', `Fournir : ${String(t).replace(/\.$/, '')}.`, '']);
+    for (const c of crit.filter(c => c.s <= -1)) rows.push(['Points de suivi', c.vigil || c.label, c.constat]);
+    texts.attention = rows;
+  }
+  // Positionnement final : forces et faiblesses par axe
+  {
+    const f = crit.filter(c => c.s >= 1), w = crit.filter(c => c.s <= -1);
+    const pick = (list, keys) => list.filter(c => keys.includes(c.key)).map(c => c.s >= 1 ? c.force : c.vigil).filter(Boolean);
+    const growth = crit.find(c => c.key === 'activite');
+    texts.swot = [
+      ['Marché / Positionnement', pick(f, ['activite']).join('\n'), pick(w, ['activite']).join('\n')],
+      ['Management', '', ''],
+      ['Structure financière et trésorerie', pick(f, ['ebe', 'rn', 'rp', 'dette', 'ff', 'remb', 'treso']).join('\n'), pick(w, ['ebe', 'rn', 'rp', 'dette', 'ff', 'remb', 'treso']).join('\n')],
+      ['Relations bancaires avec contrepartie et dirigeant', req.depuis ? `Client historique de la SGSN (depuis ${req.depuis})` : '', (cdPool(req) || {}).n > 3 ? 'Multi bancarisée' : ''],
+    ];
+  }
+  return { crit, prop, texts };
 }
-// Conclusion selon l'avis retenu (régénérée quand l'avis change, sauf modification par l'analyste)
+// Pool bancaire : parts des autorisations, rang de la SGSN
+function cdPool(req){
+  const rows = (req.pool || []).map(r => ({ banque: String(r.banque || '').trim(), ct: cdParseMontant(r.ct) || 0, mt: cdParseMontant(r.mt) || 0 })).filter(r => r.banque && (r.ct || r.mt));
+  if (!rows.length) return null;
+  const tot = rows.reduce((s, r) => s + r.ct + r.mt, 0) || 1;
+  rows.forEach(r => { r.total = r.ct + r.mt; r.share = r.total / tot; r.isSg = /^(sg|sgsn|soci[eé]t[eé] g[eé]n[eé]rale)/i.test(r.banque); });
+  const sorted = [...rows].sort((a, b) => b.total - a.total);
+  const sg = rows.find(r => r.isSg) || null;
+  const rank = sg ? sorted.indexOf(sg) + 1 : null;
+  return { rows, sorted, total: tot, n: rows.length, sg, rank, before: sg ? sorted.slice(0, rank - 1).slice(0, 4) : [] };
+}
 function cdConclusion(d, data, req, avis, conditions){
-  const totalM = cdTotalDemande(req);
-  const objet = totalM ? `la demande ${req.nature ? `de ${req.nature.toLowerCase()} ` : ''}portant sur ${paXofRaw(totalM * 1e6)}` : 'la demande';
+  const T = cdTotals(req);
+  const objet = T.apres ? `la demande ${req.nature ? `de ${req.nature.toLowerCase()} ` : ''}portant sur une exposition de ${cdM(T.apres)} MXOF` : 'la demande';
   let t = `Au regard de l’analyse de l’activité, de la rentabilité, de la structure financière et de la capacité de remboursement de ${req.entite || 'la contrepartie'}, nous émettons un avis ${avis.toLowerCase()} sur ${objet}.`;
-  if (avis === 'Favorable sous conditions' || (conditions && conditions.trim())) t += conditions && conditions.trim() ? ` Cet avis est assorti des conditions suivantes : ${conditions.trim().replace(/\.?$/, '.')}` : ' Les conditions de mise en place sont précisées ci-dessous.';
+  if (conditions && conditions.trim()) t += ` Cet avis est assorti des conditions suivantes : ${conditions.trim().replace(/\.?$/, '.')}`;
+  else if (avis === 'Favorable sous conditions') t += ' Les conditions de mise en place sont précisées dans les points d’attention.';
   if (avis === 'Réservé') t += ' Les réponses du client aux points en suspens conditionnent la suite donnée au dossier.';
   if (avis === 'Défavorable') t += ' Les points critiques relevés ne permettent pas, en l’état, d’accompagner la demande.';
   return t;
 }
 
-/* ---------- 4. Tableaux du CREDAP ---------- */
-function cdSynthTable(d, data){
-  const div = (a, b) => (a == null || !b ? null : a / b);
-  const t = anTable(d, data, [
-    ['Chiffre d’affaires', m => m.ca], ['Excédent brut d’exploitation', m => m.ebe], ['Frais financiers', m => m.ff], ['Résultat net', m => m.rn], ['Marge brute d’autofinancement', m => m.mba],
-    ['Total du bilan', m => m.totalBilan], ['Immobilisations corporelles nettes', (m, p) => d.actifNet[27][p]], ['Ressources propres', m => m.rp], ['Endettement financier brut', m => m.endBrut],
-    ['Fonds de roulement', m => m.fdr], ['Besoin en fonds de roulement', m => m.bfr], ['Trésorerie nette', m => m.tn],
-    ['Ressources propres / total du bilan', m => div(m.rp, m.totalBilan), '%'], ['Endettement brut / ressources propres', m => m.gearing, 'x'],
-    ['Endettement brut / EBE', m => m.ebe > 0 ? m.leverage : null, 'x'], ['EBE / chiffre d’affaires', m => div(m.ebe, m.ca), '%'],
-    ['EBE / frais financiers', m => m.couverture, 'x'], ['Résultat net / chiffre d’affaires', m => div(m.rn, m.ca), '%'],
-  ]);
-  // variation du dernier exercice (montants seulement)
-  if (d.hasData.N1 && d.hasData.N){
-    t.head.push('Var.');
-    const keys = ['ca','ebe','ff','rn','mba','totalBilan',null,'rp','endBrut','fdr','bfr','tn'];
-    t.body.forEach((r, i) => {
-      const k = keys[i];
-      let a = null, b = null;
-      if (k){ a = data.M.N1[k]; b = data.M.N[k]; } else if (i === 6){ a = d.actifNet[27].N1; b = d.actifNet[27].N; }
-      const g = i < 12 && a ? (b - a) / Math.abs(a) : null;
-      r.push(g == null ? '' : `${g > 0 ? '+' : g < 0 ? '-' : ''}${paNum(Math.round(Math.abs(g) * 100), 0)} %`);
-    });
-  }
-  return t;
-}
-function cdFluxTable(d, data){
-  const P = AN_PERIODS.filter(p => data.M[p].dBfr != null);
-  if (!P.length) return null;
-  const t = anTable(d, data, [
-    ['Marge brute d’autofinancement', m => m.mba], ['Variation du besoin en fonds de roulement', m => m.dBfr], ['Investissements', m => m.capex],
-    ['Flux de trésorerie disponible', m => m.fcf], ['Variation de l’endettement financier', m => m.dDettes], ['Dividendes versés', m => m.dividendes],
-  ]);
-  const keep = AN_PERIODS.filter(p => d.hasData[p]).map(p => P.includes(p));
-  t.head = t.head.filter((_, i) => i === 0 || keep[i - 1]);
-  t.body = t.body.map(r => r.filter((_, i) => i === 0 || keep[i - 1]));
-  return t;
-}
-
-/* ---------- 5. Document : blocs communs au Word, à l'aperçu et à l'impression ---------- */
+/* ---------- 4. Document CREDAPP (blocs) ---------- */
 function cdBlocks(doc){
+  const { req, d, data } = doc, C = anCx(d), y = d.years, N = data.M.N, L = cdLignes(req), T = cdTotals(req);
   const B = [];
-  B.push({ t:'title', text:'CREDAP - DEMANDE DE CRÉDIT' });
-  B.push({ t:'subtitle', text:doc.entite });
-  B.push({ t:'h', text:'1. Identification de la contrepartie' });
-  B.push({ t:'kv', rows: doc.ident.filter(r => r[1] !== '' && r[1] != null) });
-  B.push({ t:'h', text:'2. Objet de la demande' });
-  if (doc.lignes.length){
-    const rows = doc.lignes.map(l => [l.nature || '', l.montant != null ? paNum(l.montant, l.montant % 1 ? 1 : 0) : '', l.duree || '', l.garanties || '']);
-    if (doc.lignes.length > 1) rows.push(['Total', paNum(doc.total, doc.total % 1 ? 1 : 0), '', '']);
-    B.push({ t:'table', head:['Nature de la ligne', 'Montant (MXOF)', 'Durée', 'Garanties'], body:rows, widths:[3300, 1700, 1500, 3138], align:['l', 'r', 'l', 'l'] });
-  } else B.push({ t:'p', text:'Lignes à préciser.' });
-  if (doc.garanties) B.push({ t:'p', text:`Garanties : ${doc.garanties}` });
-  let n = 3;
-  const textSec = s => { B.push({ t:'h', text:`${n++}. ${s.title}` }); B.push({ t:'text', text:s.text }); };
-  const by = k => doc.sections.find(s => s.key === k);
-  if (by('presentation')) textSec(by('presentation'));
-  B.push({ t:'h', text:`${n++}. Synthèse financière` });
-  B.push({ t:'table', head:doc.synth.head, body:doc.synth.body });
-  if (doc.flux){ B.push({ t:'sub', text:'Flux de trésorerie' }); B.push({ t:'table', head:doc.flux.head, body:doc.flux.body }); }
-  for (const k of ['eco', 'fin', 'remboursement', 'forces', 'vigilance', 'suspens']) if (by(k)) textSec(by(k));
-  B.push({ t:'h', text:`${n++}. Appréciation du dossier` });
-  B.push({ t:'table', head:['Critère', 'Constat', 'Appréciation'], body:doc.grille.map(c => [c.label, c.constat, cdNote(c.s)]), widths:[2600, 5338, 1700], align:['l', 'l', 'l'] });
-  B.push({ t:'avis', text:`Avis : ${doc.avis}` });
-  if (doc.conclusion) B.push({ t:'text', text:doc.conclusion });
-  B.push({ t:'sign', rows:[['Chargé d’affaires', 'Analyste crédit', 'Décision'], ['', '', ''], ['Date :', 'Date :', 'Date :']] });
+  const W = 10466;
+  // En-tête
+  const segs = ['S1', 'S2', 'S3'].map(s => `${s}${s === 'S2' ? ' (WL/sensible)' : ''} ${cdBox(req.segment === s)}`).join('   ');
+  B.push({ t:'table', widths:[1900, 6166, 2400], sz:18, rows:[
+    [{ text:`[${cxMonthYear()}]\n\n**Filiale : ${req.filiale || 'SGSN'}**\n**Clientèle : ${req.clientele || ''}**`, vmerge:'start', rowspan:2 },
+     { text:`**Emprunteur** : ${anUp(req.entite)}\n**N°RCT** : ${req.rct || ''}        Prospect ${cdBox(req.prospect)}\n${segs}\nPour S2 ou S3, précisez la date d’entrée : ${req.dateS || ''}\n**NAER** : ${req.naer || ''}\nKYC – risque LAB : **${req.kyc || ''}**\nValidité : **${req.validiteKyc || ''}**\nValidation LoD1 (DCE) ${cdBox(req.lod1)}        Validation LoD2 (CPLE) ${cdBox(req.lod2)}\nClient Leverage Lending ou HLT ? ${cdBox(req.hlt)}`, vmerge:'start', rowspan:2 },
+     { text: req.note || '', align:'c', sz:44 }],
+    [{ text:'', vmerge:'cont' }, { text:'', vmerge:'cont' }, { text:`Revue le : ${req.revue || ''}\nValidité : ${req.validite || ''}` }],
+  ]});
+  // Objet du dossier
+  {
+    const lines = L.filter(l => !/moyen/i.test(l.type)).map(l => `-   ${l.nature} de ${cdM(cdParseMontant(l.apres))} MXOF`);
+    const mt = L.filter(l => /moyen/i.test(l.type));
+    if (mt.length) lines.push('-   Revue des CMT en cours :', ...mt.map(l => `      •  ${l.nature} : ${l.initial ? `Montant initial de ${l.initial} MXOF / ` : ''}Encours : ${cdM(cdParseMontant(l.encours))} MXOF`));
+    const txt = `**Le présent dossier porte sur ${req.nature ? `le ${req.nature.toLowerCase()}` : 'l’examen'} des lignes comme suit :**\n\n${lines.join('\n')}${req.plafond ? `\n\n!!${req.plafond}!!` : ''}\n\n!!→ Exposition post validation = ${cdM(T.apres)} MXOF (vs ${cdM(T.avant)} MXOF en N-1)!!\n**Réponse souhaitée le** : ${req.reponse || 'ASAP'}`;
+    B.push({ t:'table', widths:[2600, 7866], sz:18, rows:[[{ text:'**Objet du dossier :**\nObjet des financements', fill:'F2F2F2' }, { text: txt }]] });
+  }
+  B.push({ t:'h1', text:'Synthèse sur l’emprunteur' }, { t:'text', text: doc.texts.synthese });
+  if (doc.texts.justification) B.push({ t:'h1', text:'Justification de la position' }, { t:'text', text: doc.texts.justification });
+  // Synthèse de l'exposition
+  {
+    const buckets = ['<= 1 an', 'De 1 à 5 ans', 'De 5 à 7 ans', 'De 7 à 10 ans', 'De 10 à 15 ans'];
+    const bucketOf = l => /moyen/i.test(l.type) ? 1 : 0;
+    const sums = k => buckets.map((_, i) => L.filter(l => !cdIsMarche(l) && bucketOf(l) === i).reduce((s, l) => s + (cdParseMontant(l[k]) || 0), 0));
+    const av = sums('avant'), ap = sums('apres');
+    const f = v => v ? paNum(Math.round(v), 0) : '';
+    B.push({ t:'h1', text:'Synthèse de l’exposition Groupe SG, avec intégration des lignes demandées (détails paragraphe 4)' });
+    B.push({ t:'table', widths:[3466, 1400, 1400, 1400, 1400, 1400], sz:16, headRows:1, rows:[
+      ['Risques débiteurs En MXOF', ...buckets].map((h, i) => ({ text:h, b:true, align: i ? 'c' : 'l' })),
+      ['Autorisations Précédentes', ...av.map(f)], [{ text:'Total Autorisations après demande', b:true }, ...ap.map(v => ({ text:f(v), b:true }))],
+      ['Variation', ...ap.map((v, i) => (v || av[i]) ? paNum(Math.round(v - av[i]), 0) : '')], ['Variation %', ...ap.map((v, i) => av[i] ? `${paNum(Math.round((v - av[i]) / av[i] * 100), 0)}%` : '')],
+    ]});
+    const mk = L.filter(cdIsMarche);
+    if (mk.length) B.push({ t:'table', widths:[3466, 1400, 1400, 1400, 1400, 1400], sz:16, headRows:1, rows:[
+      ['Risques de remplacement', ...buckets].map((h, i) => ({ text:h, b:true, align: i ? 'c' : 'l' })),
+      ['Autorisations Précédentes', mk.map(l => `${l.avant || ''} ${l.devise || ''}`.trim()).join(' / '), '', '', '', ''],
+      [{ text:'Total Autorisations après demande', b:true }, mk.map(l => `${l.apres || ''} ${l.devise || ''}`.trim()).join(' / '), '', '', '', ''],
+    ]});
+  }
+  B.push({ t:'lines', text:'**Compétence Commerciale :**\n☐ Direction Commerciale Entité\n☐ Responsable d’Implantation\n☐ AFMO/DIR\n☐ PCRU (préciser : …………………………)' });
+  // 1/ Vérifications réglementaires
+  const rg = doc.reg || {};
+  B.push({ t:'pb' }, { t:'box', text:'1/ VERIFICATIONS REGLEMENTAIRES' });
+  B.push({ t:'h2', text:'ENCADREMENT DU CREDIT' }, { t:'p', text:`Les demandes de financement sont-elles concernées par un encadrement en CORISQ ou CORESP ? Oui ${cdBox(rg.encadrement)} - Non ${cdBox(!rg.encadrement)}` });
+  B.push({ t:'h2', text:'RSE' }, { t:'table', widths:[3600, 1633, 3600, 1633], sz:16, rows:[
+    ['Evaluation E&S Client', { text: rg.esClient || 'Non éligible', b:true, align:'c' }, 'Date dernière revue E&S', { text: rg.esDate || 'MM/AA', align:'c' }],
+    ['Evaluation E&S Transaction', { text: rg.esTrans || 'Non éligible', b:true, align:'c' }, 'Date dernière revue E&S', { text: rg.esDate || 'MM/AA', align:'c' }],
+    ['ICVI Transition calculé NOVA', { text: rg.ccviT || '', b:true, align:'c' }, 'CCVI Transition retenu NOVA', { text: rg.ccviT || '', b:true, align:'c' }],
+    ['ICVI Physique calculé NOVA', { text: rg.ccviP || '', b:true, align:'c' }, 'CCVI Physique retenu NOVA', { text: rg.ccviP || '', b:true, align:'c' }],
+    [{ text:'Une politique sectorielle s’applique-t-elle au client ?', span:2 }, { text: rg.politique ? 'OUI' : 'NON', b:true, align:'c', span:2 }],
+    [{ text:'Le client a-t-il identifié un risque physique ? Si oui le(s)quel(s) et détailler les mesures prises par le client', span:2 }, { text:'NON', b:true, align:'c', span:2 }],
+    [{ text:'Finançons-nous ou avons-nous en garantie un actif immobilier présentant un risque physique géographique ?', span:2 }, { text:'NON', b:true, align:'c', span:2 }],
+  ]});
+  B.push({ t:'h2', text:'RESTRUCTURE v/s RENEGOCIE' }, { t:'p', text:'N/A' }, { t:'h2', text:'FINANCEMENTS SPECIALISES (Bâle IV)' }, { t:'p', text:'N/A' });
+  B.push({ t:'h2', text:'CONCENTRATION INDIVIDUELLE' }, { t:'p', text:`Le client ou groupe client fait-il l’objet d’un suivi en Concentration Individuelle (Seuil d’exposition de 90 MEUR) ? Oui ${cdBox(rg.concentration)} - Non ${cdBox(!rg.concentration)}` });
+  B.push({ t:'h2', text:'CRITERES UTP' }, { t:'p', text:'Si les réponses ci-dessous de ce questionnaire de pré qualification comportent au moins un OUI il convient alors de renseigner l’annexe dédiée au critères UTP (cf. guide utilisateur).', sz:18 });
+  B.push({ t:'table', widths:[9066, 700, 700], sz:16, rows:[['', { text:'OUI', b:true, align:'c' }, { text:'NON', b:true, align:'c' }], ...CD_UTP.map((q, i) => [q, { text:cdBox((rg.utp || [])[i]), align:'c' }, { text:cdBox(!(rg.utp || [])[i]), align:'c' }])] });
+  // 1/ et 2/ : analyses
+  if (doc.eco){ B.push({ t:'pb' }, ...anBlocks(doc.eco)); }
+  if (doc.fin){ B.push({ t:'pb' }, ...anBlocks(doc.fin)); }
+  // 3 / Relations bancaires
+  B.push({ t:'pb' }, { t:'box', text:'3 / RELATIONS BANCAIRES' }, { t:'h2', text:'RELATIONS BANCAIRES, POOL' });
+  const pool = cdPool(req);
+  if (pool){
+    const f = v => v ? paNum(Math.round(v), 0) : '';
+    const rows = [[{ text:'Banque', b:true }, { text:'Autorisations CT', b:true, align:'r' }, { text:'Encours MT', b:true, align:'r' }, { text:'Total', b:true, align:'r' }, { text:'% par banque', b:true, align:'r' }]];
+    for (const r of pool.rows) rows.push([{ text:r.banque, b:r.isSg, color:r.isSg ? CX_RED : null }, { text:f(r.ct), align:'r', color:r.isSg ? CX_RED : null }, { text:f(r.mt), align:'r', color:r.isSg ? CX_RED : null }, { text:f(r.total), align:'r', b:true, color:r.isSg ? CX_RED : null }, { text:C.pu(r.share), align:'r', color:r.isSg ? CX_RED : null }]);
+    rows.push([{ text:'Total', b:true, fill:'C6E0B4' }, { text:f(pool.rows.reduce((s, r) => s + r.ct, 0)), b:true, align:'r', fill:'C6E0B4' }, { text:f(pool.rows.reduce((s, r) => s + r.mt, 0)), b:true, align:'r', fill:'C6E0B4' }, { text:f(pool.total), b:true, align:'r', fill:'C6E0B4' }, { text:'100%', b:true, align:'r', fill:'C6E0B4' }]);
+    B.push({ t:'table', widths:[3466, 1750, 1750, 1750, 1750], sz:16, rows });
+  }
+  if (doc.texts.relations) B.push({ t:'text', text: doc.texts.relations });
+  if (doc.texts.strategie) B.push({ t:'h2', text:'STRATEGIE DE L’IMPLANTATION VIS-A-VIS DU CLIENT' }, { t:'text', text: doc.texts.strategie });
+  if (req.note) B.push({ t:'h2', text:'MISE A JOUR DE LA NOTATION' }, { t:'p', text:`La note actuelle de la relation est de ${req.note}${req.validite ? ` pour une échéance au ${req.validite}` : ''}.` });
+  // 4 / Descriptif et analyse de la demande
+  B.push({ t:'pb' }, { t:'box', text:'4 / DESCRIPTIF ET ANALYSE DE LA DEMANDE' });
+  {
+    const rows = [['LIGNES', 'Encours', 'Auto AVANT', 'Auto APRES', 'Δ', 'DVA', 'Maturité des engagements', 'Garanties APRES demande'].map((h, i) => ({ text:h, b:true, align: i ? 'c' : 'l' }))];
+    const groups = [['Court Terme', l => !/moyen|march/i.test(l.type)], ['Moyen Terme', l => /moyen/i.test(l.type)], ['Risque de marché', cdIsMarche]];
+    for (const [g, fn] of groups){
+      const ls = L.filter(fn); if (!ls.length) continue;
+      rows.push([{ text:g, b:true, i:true, span:8 }]);
+      for (const l of ls){
+        const a = cdParseMontant(l.avant), z = cdParseMontant(l.apres), dlt = a != null && z != null ? z - a : null;
+        rows.push([l.nature, { text:cdM(cdParseMontant(l.encours)), align:'r' }, { text:cdM(a), align:'r' }, { text:cdM(z), align:'r' }, { text: dlt ? `${dlt > 0 ? '+' : ''}${cdM(dlt)}` : '-', align:'c' }, { text:l.dva || '', align:'c' }, { text:l.maturite || '', align:'c' }, { text:l.garanties || 'Voir garanties', align:'c' }]);
+      }
+    }
+    rows.push([{ text:'TOTAL RISQUE DEBITEUR', b:true }, { text:cdM(T.encours), b:true, align:'r' }, { text:cdM(T.avant), b:true, align:'r' }, { text:cdM(T.apres), b:true, align:'r' }, { text: T.apres - T.avant ? `${T.apres > T.avant ? '+' : ''}${cdM(T.apres - T.avant)}` : '-', b:true, align:'c' }, '', '', '']);
+    B.push({ t:'table', widths:[2366, 1000, 1000, 1000, 800, 1100, 1600, 1600], sz:15, rows });
+    B.push({ t:'note', text:'DVA : Date de validité administrative   Maturité : durée de l’engagement sollicité' });
+    if (req.plafond) B.push({ t:'note', text: req.plafond, color: CX_RED });
+  }
+  if ((req.garanties || []).some(g => g.garantie)){
+    B.push({ t:'h1', text:'Garanties existantes' });
+    const gs = req.garanties.filter(g => g.garantie);
+    B.push({ t:'table', widths:[2300, 3166, 1500, 1100, 1100, 1300], sz:15, rows:[
+      ['LIGNES COUVERTES', 'GARANTIES', 'MONTANT', 'DATE DE DEBUT', 'DATE DE FIN', 'COMMENTAIRE'].map(h => ({ text:h, b:true, fill:'375623', color:'FFFFFF', align:'c' })),
+      ...gs.map((g, i) => [i === 0 ? { text:'ENSEMBLE DES ENGAGEMENTS', vmerge:'start', rowspan: gs.length } : { text:'', vmerge:'cont' }, g.garantie, { text:g.montant ? `${g.montant} MXOF` : '', align:'r' }, { text:g.debut || '', align:'c' }, { text:g.fin || '', align:'c' }, g.commentaire || '']),
+    ]});
+  }
+  B.push({ t:'h1', text:'Garanties à prendre' }, { t:'p', text: req.garantiesPrendre || 'Maintien des garanties', b:true });
+  // Détail ligne par ligne
+  B.push({ t:'p', text:`**${anUp(req.entite)}**` });
+  const detail = (title, ls, start) => {
+    if (!ls.length) return start;
+    B.push({ t:'h1', text:title });
+    ls.forEach((l, i) => {
+      const a = cdParseMontant(l.avant), z = cdParseMontant(l.apres);
+      const sens = a == null || !a ? 'Mise en place' : z > a ? 'Renouvellement à la hausse' : z < a ? 'Renouvellement à la baisse' : 'Renouvellement à l’identique';
+      const kind = /signature/i.test(l.type) ? 'Engagements par signature' : /moyen/i.test(l.type) ? 'Moyen terme' : /march/i.test(l.type) ? 'Risque de marché' : 'Engagements par caisse';
+      B.push({ t:'p', text:`**${start + i}.  ${kind} : ${sens} de la ligne de ${l.nature} de ${cdM(z)} ${l.devise || 'MXOF'}**` });
+      const just = l.justification || cdAutoJustif(l, d, data);
+      const t = [`**Nature et montant de la ligne demandée :** ${l.nature} de ${cdM(z)} ${l.devise || 'MXOF'}.`, just ? `**Justification du montant :** ${just}` : '', l.fonctionnement ? `**Fonctionnement du compte :** ${l.fonctionnement}` : '', l.dva ? `**DVA demandée :** ${l.dva}` : '', (l.taux || l.rbo) ? `**Conditions de taux / rentabilité :** ${l.taux ? `Taux : ${l.taux}` : ''}${l.taux && l.rbo ? ' // ' : ''}${l.rbo ? `RBO : ${l.rbo}` : ''}` : '', `**Garantie recueillie et confirmée au dossier :** ${l.garanties || 'Voir garanties'}`].filter(Boolean);
+      B.push({ t:'text', text: t.join('\n\n') });
+    });
+    return start + ls.length;
+  };
+  let k = detail('Lignes Court Terme', L.filter(l => !/moyen|march/i.test(l.type)), 1);
+  k = detail('Moyen Terme', L.filter(l => /moyen/i.test(l.type)), k);
+  detail('Risque de marché', L.filter(cdIsMarche), k);
+  if (doc.texts.capacite) B.push({ t:'h1', text:'Capacité de remboursement' }, { t:'text', text: doc.texts.capacite });
+  // Points d'attention
+  if (doc.texts.attention && doc.texts.attention.length){
+    B.push({ t:'h2', text:'POINTS D’ATTENTION' });
+    const rows = [['Points', 'Eléments', 'Commentaires'].map(h => ({ text:h, b:true, fill:'1F3864', color:'FFFFFF', align:'c' }))];
+    const byType = {};
+    for (const r of doc.texts.attention) (byType[r[0] || 'Points de suivi'] = byType[r[0] || 'Points de suivi'] || []).push(r);
+    for (const [ty, rs] of Object.entries(byType)) rs.forEach((r, i) => rows.push([i === 0 ? { text:ty, vmerge:'start', rowspan:rs.length, align:'c' } : { text:'', vmerge:'cont' }, r[1] || '', { text:r[2] || '', b:true }]));
+    B.push({ t:'table', widths:[1700, 4383, 4383], sz:16, rows });
+  }
+  // Synthèse et positionnement final
+  B.push({ t:'box', text:'SYNTHESE DE LA DEMANDE ET POSITIONNEMENT FINAL' });
+  const bul = s => String(s || '').split('\n').map(x => x.trim()).filter(Boolean).map(x => `•  ${x}`).join('\n') || '•';
+  B.push({ t:'table', widths:[2800, 3833, 3833], sz:17, rows:[
+    [{ text:'' }, { text:'Points forts / Opportunités', b:true, align:'c' }, { text:'Points faibles / Menaces', b:true, align:'c' }],
+    ...doc.texts.swot.map(r => [r[0], bul(r[1]), bul(r[2])]),
+  ]});
+  B.push({ t:'table', widths:[5400, 1200, 3866], sz:16, rows:[
+    [{ text:'FACTEURS AGGRAVANTS DU RISQUE DE CRÉDIT VISION CLIENT (SI EXPO BRUTE NIVEAU GROUPE > 5MEUR)', b:true }, { text:'Valeur', b:true, align:'c' }, { text:'Justification', b:true, align:'c' }],
+    ['Présence du client sur la liste d’exclusion E&S ?', { text:'NON', b:true, align:'c' }, ''],
+    ['Non-respect des critères d’exclusion client des politiques sectorielles du Groupe SG', { text:'NON', b:true, align:'c' }, ''],
+    ['Controverses matérielles environnementales, sociales, gouvernance (sécurité financière) ?', { text:'NON', b:true, align:'c' }, ''],
+    ['Origination guidelines NZBA', { text:'NON', b:true, align:'c' }, ''],
+    ['Risque de transition – climat – CCVI transition', { text: rg.ccviT || '', b:true, align:'c' }, ''],
+    ['Risques physiques – climat – CCVI physique', { text: rg.ccviP || '', b:true, align:'c' }, ''],
+    ['Risque de crédit d’origine ESG', { text:'NON', b:true, align:'c' }, ''],
+  ]});
+  // Conclusions des valideurs
+  B.push({ t:'p', text:'**Conclusions de l’ensemble des valideurs**', u:true });
+  for (const [role, txt] of [['ARC/CC', ''], ['RM/DCE', doc.conclusion || ''], ['RI', '']])
+    B.push({ t:'table', widths:[10466], sz:18, borderColor:CX_RED, borderSz:8, minH:900, rows:[[{ text:`**${role}**          **Nom :**                              **Date :**\n${txt}` }]] });
   return B;
 }
-function cdDocxBody(B){
-  let x = '';
-  const kv = rows => {
-    const b = '<w:top w:val="single" w:sz="4" w:space="0" w:color="808080"/><w:left w:val="single" w:sz="4" w:space="0" w:color="808080"/><w:bottom w:val="single" w:sz="4" w:space="0" w:color="808080"/><w:right w:val="single" w:sz="4" w:space="0" w:color="808080"/><w:insideH w:val="single" w:sz="4" w:space="0" w:color="808080"/><w:insideV w:val="single" w:sz="4" w:space="0" w:color="808080"/>';
-    const cell = (t, w, bold, fill) => `<w:tc><w:tcPr><w:tcW w:w="${w}" w:type="dxa"/>${fill ? `<w:shd w:val="clear" w:color="auto" w:fill="${fill}"/>` : ''}</w:tcPr><w:p><w:pPr><w:spacing w:before="30" w:after="30"/><w:rPr><w:sz w:val="18"/><w:szCs w:val="18"/></w:rPr></w:pPr>${anRun(String(t), { sz:18, b:bold })}</w:p></w:tc>`;
-    return `<w:tbl><w:tblPr><w:tblW w:w="9638" w:type="dxa"/><w:tblBorders>${b}</w:tblBorders><w:tblCellMar><w:left w:w="80" w:type="dxa"/><w:right w:w="80" w:type="dxa"/></w:tblCellMar></w:tblPr><w:tblGrid><w:gridCol w:w="3200"/><w:gridCol w:w="6438"/></w:tblGrid>`
-      + rows.map(r => `<w:tr>${cell(r[0], 3200, true, 'F2F2F2')}${cell(r[1], 6438, false)}</w:tr>`).join('') + '</w:tbl>' + anPara('', { after:80 });
-  };
-  const table = blk => {
-    const W = 9638, n = blk.head.length;
-    const widths = blk.widths || (() => { const f = n > 4 ? 3600 : 4200, o = Math.floor((W - f) / Math.max(1, n - 1)); return [f, ...Array(n - 1).fill(o)]; })();
-    const align = blk.align || blk.head.map((_, i) => i ? 'r' : 'l');
-    const b = '<w:top w:val="single" w:sz="4" w:space="0" w:color="808080"/><w:left w:val="single" w:sz="4" w:space="0" w:color="808080"/><w:bottom w:val="single" w:sz="4" w:space="0" w:color="808080"/><w:right w:val="single" w:sz="4" w:space="0" w:color="808080"/><w:insideH w:val="single" w:sz="4" w:space="0" w:color="808080"/><w:insideV w:val="single" w:sz="4" w:space="0" w:color="808080"/>';
-    const cell = (t, i, head, bold) => `<w:tc><w:tcPr><w:tcW w:w="${widths[i]}" w:type="dxa"/>${head ? '<w:shd w:val="clear" w:color="auto" w:fill="C00000"/>' : ''}<w:vAlign w:val="center"/></w:tcPr><w:p><w:pPr><w:spacing w:before="20" w:after="20"/><w:jc w:val="${align[i] === 'r' ? 'right' : 'left'}"/><w:rPr><w:sz w:val="17"/><w:szCs w:val="17"/></w:rPr></w:pPr>${anRun(String(t), { sz:17, b:head || bold, color: head ? 'FFFFFF' : null })}</w:p></w:tc>`;
-    const row = (r, head) => `<w:tr><w:trPr><w:cantSplit/>${head ? '<w:tblHeader/>' : ''}${blk.tall && !head && r.every(c => !c) ? '<w:trHeight w:val="900"/>' : ''}</w:trPr>${r.map((c, i) => cell(c, i, head, !head && r[0] === 'Total')).join('')}</w:tr>`;
-    return `<w:tbl><w:tblPr><w:tblW w:w="${W}" w:type="dxa"/><w:tblBorders>${b}</w:tblBorders><w:tblCellMar><w:left w:w="80" w:type="dxa"/><w:right w:w="80" w:type="dxa"/></w:tblCellMar></w:tblPr><w:tblGrid>${widths.map(w => `<w:gridCol w:w="${w}"/>`).join('')}</w:tblGrid>`
-      + row(blk.head, true) + blk.body.map(r => row(r, false)).join('') + '</w:tbl>' + anPara('', { after:80 });
-  };
-  const text = t => {
-    let o = '';
-    for (const block of String(t || '').split(/\n\s*\n/)){
-      const lines = block.split('\n').map(l => l.trim()).filter(Boolean);
-      if (!lines.length) continue;
-      if (lines.every(l => /^-\s+/.test(l))) lines.forEach(l => { o += `<w:p><w:pPr><w:numPr><w:ilvl w:val="0"/><w:numId w:val="1"/></w:numPr><w:spacing w:after="60" w:line="300" w:lineRule="auto"/><w:ind w:left="567" w:hanging="283"/><w:jc w:val="both"/></w:pPr>${anRun(l.replace(/^-\s+/, ''), {})}</w:p>`; });
-      else o += anPara(lines.join(' '), {});
-    }
-    return o;
-  };
-  for (const b of B){
-    if (b.t === 'title') x += anPara(b.text, { b:true, sz:28, color:'E9041E', jc:'center', after:60 });
-    else if (b.t === 'subtitle') x += anPara(b.text, { b:true, sz:24, jc:'center', after:240 });
-    else if (b.t === 'h') x += anPara(b.text, { b:true, sz:22, color:'1F3864', before:200, after:100 }, '<w:keepNext/>');
-    else if (b.t === 'sub') x += anPara(b.text, { b:true, sz:20, color:'C00000', before:80, after:60 }, '<w:keepNext/>');
-    else if (b.t === 'kv') x += kv(b.rows);
-    else if (b.t === 'table') x += table(b);
-    else if (b.t === 'p') x += anPara(b.text, {});
-    else if (b.t === 'text') x += text(b.text);
-    else if (b.t === 'avis') x += `<w:p><w:pPr><w:pBdr><w:top w:val="single" w:sz="8" w:space="4" w:color="C00000"/><w:left w:val="single" w:sz="8" w:space="4" w:color="C00000"/><w:bottom w:val="single" w:sz="8" w:space="4" w:color="C00000"/><w:right w:val="single" w:sz="8" w:space="4" w:color="C00000"/></w:pBdr><w:spacing w:before="160" w:after="160"/><w:jc w:val="center"/></w:pPr>${anRun(b.text, { b:true, sz:24, color:'C00000' })}</w:p>`;
-    else if (b.t === 'sign') x += anPara('', { after:120 }) + table({ head:b.rows[0], body:b.rows.slice(1), widths:[3212, 3213, 3213], align:['l', 'l', 'l'], tall:true });
+const CD_UTP = [
+  'Le client est-il en S2 ?',
+  'Existe-t-il des impayés ou irrégularités sur crédit CT ou MT > 30 j ?',
+  'Avons-nous connaissance d’arriérés de paiement auprès de créanciers publics qui dépassent 30 j ?',
+  'Avons-nous connaissance de réduction de lignes d’autorisation de crédit en raison d’une dégradation de la situation financière de notre client ?',
+  'Un moratoire ou un accord de suspension des paiements dus à SG repoussant la reprise des versements > à 30 jours est-il signé ?',
+  'Avons-nous connaissance de la signature d’un moratoire ou un accord de suspension des paiements dus auprès d’un autre établissement de crédit repoussant la reprise des versements > à 30 jours ?',
+  'Un niveau élevé de dette financière CT et/ou MT arrive-t-il à échéance dans un futur proche, et la capacité du débiteur à refinancer cette dette apparaît-elle sévèrement compromise en raison de sa situation financière dégradée ?',
+  'Le client connait-il une détérioration brutale de sa situation financière (baisse brutale du CA, de la marge, du résultat, flux de trésorerie négatif, …), ou de son activité (perte d’un client clé, destruction d’un actif principal, perte de licence…) ?',
+  'L’emprunteur est-il un Professionnel de l’immobilier ?',
+];
+// Pré-remplissage des critères UTP à partir des chiffres (l'analyste confirme)
+function cdUtpSuggest(d, data, req){
+  const N = data.M.N, N1 = data.M.N1, h1 = d.hasData.N1;
+  const brutal = h1 && ((N1.ca && (N.ca - N1.ca) / Math.abs(N1.ca) <= -0.25) || (N1.ebe > 0 && N.ebe <= 0) || (N1.rn > 0 && N.rn < 0 && Math.abs(N.rn) > 0.05 * N.ca));
+  const dette = N.partCT > 0 && N.mba != null && N.partCT > Math.max(N.mba, 0) && N.tn < 0;
+  return [req.segment === 'S2', false, false, false, false, false, !!dette, !!brutal, false];
+}
+// Justification automatique du montant d'une ligne court terme : poids en jours de CA
+function cdAutoJustif(l, d, data){
+  const z = cdParseMontant(l.apres), N = data.M.N;
+  if (!z || !N.ca || /moyen|march/i.test(l.type)) return '';
+  const j = z * 1e6 / (N.ca * d.info.multiplier) * 365;
+  const dso = N.dso != null ? Math.round(N.dso) : null;
+  if (/d[ée]couvert|spot|tr[ée]sorerie|facilit/i.test(l.nature)) return `La ligne représente ${paNum(Math.round(j), 0)}j du CA${String(d.years.N).slice(2)}${dso ? ` contre un DSO clients de ${dso} jours` : ''}.`;
+  if (/escompte|epc|affacturage|mobilisation|cr[ée]ances/i.test(l.nature)) return `La facilité permettra de mobiliser les créances clients (${N.clients ? `${anCx(d).Mx(N.clients)} à fin ${d.years.N}` : ''}${dso ? `, soit ${dso}j de CA` : ''}).`;
+  return '';
+}
+// Capacité de remboursement
+function cdCapacite(d, data, req){
+  const C = anCx(d), N = data.M.N, y = d.years, p = [];
+  const T = cdTotals(req), mult = d.info.multiplier;
+  if (N.mba > 0 && N.endBrut){
+    p.push(`La MBA de l’exercice ${y.N} s’élève à ${C.Mx(N.mba)} et l’endettement financier brut représente ${paNum(Math.round(N.endBrut / N.mba * 10) / 10, 1)} années de MBA.`);
+    const newMt = cdLignes(req).filter(l => /moyen/i.test(l.type)).reduce((s, l) => s + Math.max(0, (cdParseMontant(l.apres) || 0) - (cdParseMontant(l.avant) || 0)), 0) * 1e6 / mult;
+    if (newMt) p.push(`Après mise en place des nouveaux concours MT, l’endettement brut atteindrait ${C.G(N.endBrut + newMt)}, soit ${N.ebe > 0 ? `${C.x((N.endBrut + newMt) / N.ebe)} l’EBE et ` : ''}${paNum(Math.round((N.endBrut + newMt) / N.mba * 10) / 10, 1)} années de MBA.`);
+  } else if (N.endBrut) p.push(`La MBA de l’exercice ${y.N} est ${N.mba < 0 ? 'négative' : 'nulle'} : le remboursement des concours repose sur des ressources autres que l’exploitation, à identifier.`);
+  if (N.partCT) p.push(`Les échéances à moins d’un an des emprunts s’élèvent à ${C.Mx(N.partCT)}${N.mba > 0 ? (N.partCT > N.mba ? ', au-delà de la MBA de l’exercice' : ', couvertes par la MBA de l’exercice') : ''}.`);
+  if (N.tn < 0 && T.apres){
+    const ct = cdLignes(req).filter(l => !/moyen|march|signature/i.test(l.type)).reduce((s, l) => s + (cdParseMontant(l.apres) || 0), 0);
+    if (ct) p.push(`La trésorerie nette de fin d’exercice (${C.G(N.tn)}) est à rapprocher des autorisations CT décaissables sollicitées auprès de la SGSN (${cdM(ct)} MXOF).`);
   }
-  return x;
+  return p.join(' ');
 }
-async function cdBuildDocx(doc){
-  // même enveloppe que les analyses, corps du CREDAP
-  const zip = new JSZip();
-  const tmp = await JSZip.loadAsync(await (await anBuildDocx({ title:'x', entite:'', exercice:'', sources:'', table:{ head:['x'], body:[] }, sections:[] })).arrayBuffer());
-  for (const name of Object.keys(tmp.files)) if (!tmp.files[name].dir && name !== 'word/document.xml') zip.file(name, await tmp.file(name).async('string'));
-  zip.file('word/document.xml', `<?xml version="1.0" encoding="UTF-8" standalone="yes"?><w:document xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"><w:body>${cdDocxBody(cdBlocks(doc))}<w:sectPr><w:pgSz w:w="11906" w:h="16838"/><w:pgMar w:top="1134" w:right="1134" w:bottom="1134" w:left="1134" w:header="567" w:footer="567" w:gutter="0"/></w:sectPr></w:body></w:document>`);
-  return zip.generateAsync({ type:'blob', mimeType:'application/vnd.openxmlformats-officedocument.wordprocessingml.document', compression:'DEFLATE' });
-}
-const CD_PRINT_CSS = AN_PRINT_CSS + `
-  .av-sub{ text-align:center; font-weight:700; font-size:12pt; margin:-6pt 0 14pt; }
-  .av-h2{ color:#C00000; font-weight:700; margin:8pt 0 4pt; }
-  .av-kv{ border-collapse:collapse; width:100%; font-size:9pt; margin:2pt 0 8pt; }
-  .av-kv th{ background:#F2F2F2; text-align:left; width:33%; padding:3pt 6pt; border:1px solid #808080; }
-  .av-kv td{ padding:3pt 6pt; border:1px solid #808080; }
-  .av-t td.l, .av-t th.l{ text-align:left; }
-  .av-avis{ border:1.5pt solid #C00000; color:#C00000; font-weight:700; font-size:12pt; text-align:center; padding:6pt; margin:10pt 0; }
-  .av-sign td{ height:46pt; vertical-align:top; text-align:left; }`;
-function cdDocHtml(doc){
-  const e = escapeHtml;
-  const table = b => {
-    const align = b.align || b.head.map((_, i) => i ? 'r' : 'l');
-    return `<table class="av-t${b.sign ? ' av-sign' : ''}"><thead><tr>${b.head.map((c, i) => `<th class="${align[i]}">${e(c)}</th>`).join('')}</tr></thead><tbody>${b.body.map(r => `<tr>${r.map((c, i) => `<td class="${align[i]}"${r[0] === 'Total' ? ' style="font-weight:700"' : ''}>${e(c)}</td>`).join('')}</tr>`).join('')}</tbody></table>`;
-  };
-  const text = t => String(t || '').split(/\n\s*\n/).map(block => {
-    const lines = block.split('\n').map(l => l.trim()).filter(Boolean);
-    if (!lines.length) return '';
-    if (lines.every(l => /^-\s+/.test(l))) return `<ul class="av-ul">${lines.map(l => `<li>${e(l.replace(/^-\s+/, ''))}</li>`).join('')}</ul>`;
-    return `<p class="av-p">${e(lines.join(' '))}</p>`;
-  }).join('');
-  let h = '<div class="av-page">';
-  for (const b of cdBlocks(doc)){
-    if (b.t === 'title') h += `<div class="av-title">${e(b.text)}</div>`;
-    else if (b.t === 'subtitle') h += `<div class="av-sub">${e(b.text)}</div>`;
-    else if (b.t === 'h') h += `<div class="av-h">${e(b.text)}</div>`;
-    else if (b.t === 'sub') h += `<div class="av-h2">${e(b.text)}</div>`;
-    else if (b.t === 'kv') h += `<table class="av-kv">${b.rows.map(r => `<tr><th>${e(r[0])}</th><td>${e(String(r[1]))}</td></tr>`).join('')}</table>`;
-    else if (b.t === 'table') h += table(b);
-    else if (b.t === 'p') h += `<p class="av-p">${e(b.text)}</p>`;
-    else if (b.t === 'text') h += text(b.text);
-    else if (b.t === 'avis') h += `<div class="av-avis">${e(b.text)}</div>`;
-    else if (b.t === 'sign') h += table({ head:b.rows[0], body:b.rows.slice(1), align:['l', 'l', 'l'], sign:true });
-  }
-  return h + '</div>';
-}
+const CD_PRINT_CSS = CX_PRINT_CSS;
 /* @@CREDAP_ENGINE_END */
 /* @@CREDAP_UI_START */
 /* ============================================================
-   MODULE 5 : interface de la synthèse du dossier et du CREDAP
+   MODULE 5 : interface de la CREDAPP (synthèse du dossier et demande de crédit)
    ============================================================ */
-const cdState = { lignes:[{ nature:'', montant:'', duree:'', garanties:'' }], out:null, conclEdited:false };
+const CD_LINE_FIELDS = [
+  { k:'type', label:'Type', options: CD_LINE_TYPES }, { k:'nature', label:'Nature de la ligne' },
+  { k:'encours', label:'Encours (MXOF)', num:true }, { k:'avant', label:'Auto avant (MXOF)', num:true }, { k:'apres', label:'Auto après (MXOF)', num:true },
+  { k:'devise', label:'Devise' }, { k:'dva', label:'DVA' }, { k:'maturite', label:'Maturité' }, { k:'garanties', label:'Garanties après demande' },
+  { k:'taux', label:'Taux' }, { k:'rbo', label:'RBO' },
+  { k:'justification', label:'Justification du montant', area:true }, { k:'fonctionnement', label:'Fonctionnement du compte', area:true },
+];
+const cdNewLine = () => ({ type:'Court Terme', nature:'', encours:'', avant:'', apres:'', devise:'MXOF', dva:'', maturite:'12 mois', garanties:'', taux:'', rbo:'', justification:'', fonctionnement:'' });
+const cdState = {
+  lignes:[cdNewLine()],
+  garanties:[{ garantie:'', montant:'', debut:'', fin:'', commentaire:'' }],
+  pool:[{ banque:'SGSN', ct:'', mt:'' }, { banque:'', ct:'', mt:'' }],
+  attention:[], swot:[], utp:null, utpTouched:false, out:null, conclEdited:false,
+};
 
-function cdUnit(){ return document.getElementById('an-credap-unit').value; }
+function cdUnit(){ return anUnite(); }
 function cdD(){
   if (!anState.d) return null;
   const unite = cdUnit();
@@ -6429,45 +6897,78 @@ function cdAnalysis(k, d, data, ctx){
 }
 function cdAfterSources(d){
   const host = document.getElementById('an-credap-sources'); if (!host) return;
-  const st = k => { const o = anState.out[k]; return o && o.dRef === anState.d ? `${AN_KINDS[k].title} rédigée dans son module` : `${AN_KINDS[k].title} établie à la génération`; };
+  const st = k => { const o = anState.out[k]; return o && o.dRef === anState.d ? `${AN_KINDS[k].title} rédigée dans son onglet` : `${AN_KINDS[k].title} établie à la génération`; };
   if (d) host.insertAdjacentHTML('beforeend', `<div class="an-src"><span class="an-src-k">Analyses</span><span class="file-chip">${escapeHtml(st('eco'))}</span><span class="file-chip">${escapeHtml(st('fin'))}</span></div>`);
   if (d){
     const clean = v => { const t = String(v || '').trim(); return /^(xxx|adg12345)$/i.test(t) ? '' : t; };
-    const g = document.getElementById('cd-groupe'), r = document.getElementById('cd-rct');
-    if (!anState.edited.cdgroupe) g.value = clean(d.info.groupe);
-    if (!anState.edited.cdrct) r.value = clean(d.info.rct);
-    const nat = document.getElementById('cd-nature'), pr = document.getElementById('pa-renouv');
-    if (!anState.edited.cdnature && pr && pr.value) nat.value = pr.value;
-    const gar = document.getElementById('cd-garanties'), pg = document.getElementById('pa-garanties');
-    if (!anState.edited.cdgaranties && pg && pg.value && !gar.value) gar.value = pg.value;
+    const set = (id, v) => { const el = document.getElementById(id); if (el && !anState.edited['cd' + id] && v) el.value = v; };
+    set('cd-groupe', clean(d.info.groupe));
+    set('cd-rct', clean(d.info.rct));
+    const pr = document.getElementById('pa-renouv'); if (pr && pr.value) set('cd-nature', pr.value);
   }
 }
 
-/* ---------- Lignes demandées ---------- */
+/* ---------- Saisies en lignes (lignes de crédit, garanties, pool) ---------- */
+function cdRowsTable(hostId, arr, cols, rerender){
+  const host = document.getElementById(hostId);
+  host.innerHTML = `<div class="pa-table-wrap"><table class="review cd-rows"><thead><tr>${cols.map(c => `<th${c.num ? ' class="num"' : ''}>${escapeHtml(c.label)}</th>`).join('')}<th></th></tr></thead><tbody>
+    ${arr.map((r, i) => `<tr data-i="${i}">${cols.map(c => `<td><input type="text" data-k="${c.k}"${c.num ? ' class="num" inputmode="decimal"' : ''} value="${escapeHtml(r[c.k] || '')}" aria-label="${escapeHtml(c.label)} ${i + 1}"></td>`).join('')}<td><button type="button" class="cd-del" aria-label="Supprimer">×</button></td></tr>`).join('')}
+  </tbody></table></div>`;
+  host.querySelectorAll('input').forEach(inp => inp.addEventListener('input', () => { arr[+inp.closest('tr').dataset.i][inp.dataset.k] = inp.value; if (rerender) rerender(); }));
+  host.querySelectorAll('.cd-del').forEach(b => b.addEventListener('click', () => { arr.splice(+b.closest('tr').dataset.i, 1); cdRowsTable(hostId, arr, cols, rerender); if (rerender) rerender(); }));
+}
 function cdRenderLignes(){
   const host = document.getElementById('cd-lignes');
-  host.innerHTML = `<div class="pa-table-wrap"><table class="review cd-lignes"><thead><tr><th>Nature de la ligne</th><th class="num">Montant (MXOF)</th><th>Durée</th><th>Garanties</th><th></th></tr></thead><tbody>
-    ${cdState.lignes.map((l, i) => `<tr data-i="${i}">
-      <td><input type="text" data-f="nature" value="${escapeHtml(l.nature)}" aria-label="Nature de la ligne ${i + 1}"></td>
-      <td><input type="text" inputmode="decimal" data-f="montant" class="num" value="${escapeHtml(l.montant)}" aria-label="Montant ${i + 1}"></td>
-      <td><input type="text" data-f="duree" value="${escapeHtml(l.duree)}" aria-label="Durée ${i + 1}"></td>
-      <td><input type="text" data-f="garanties" value="${escapeHtml(l.garanties)}" aria-label="Garanties ${i + 1}"></td>
-      <td><button type="button" class="cd-del" aria-label="Supprimer la ligne" ${cdState.lignes.length < 2 ? 'disabled' : ''}>×</button></td></tr>`).join('')}
-    </tbody></table></div><div class="cd-total" id="cd-total"></div>`;
-  host.querySelectorAll('input').forEach(inp => inp.addEventListener('input', () => { cdState.lignes[+inp.closest('tr').dataset.i][inp.dataset.f] = inp.value; cdRenderTotal(); }));
-  host.querySelectorAll('.cd-del').forEach(b => b.addEventListener('click', () => { cdState.lignes.splice(+b.closest('tr').dataset.i, 1); cdRenderLignes(); }));
+  host.innerHTML = cdState.lignes.map((l, i) => `<div class="cd-line" data-i="${i}">
+    <div class="cd-line-head"><b>Ligne ${i + 1}</b><button type="button" class="cd-del" aria-label="Supprimer la ligne" ${cdState.lignes.length < 2 ? 'disabled' : ''}>×</button></div>
+    <div class="cd-line-grid">${CD_LINE_FIELDS.filter(f => !f.area).map(f => `<label>${escapeHtml(f.label)}${f.options
+      ? `<select data-k="${f.k}">${f.options.map(o => `<option${o === l[f.k] ? ' selected' : ''}>${escapeHtml(o)}</option>`).join('')}</select>`
+      : `<input type="text" data-k="${f.k}"${f.num ? ' class="num" inputmode="decimal"' : ''} value="${escapeHtml(l[f.k] || '')}">`}</label>`).join('')}</div>
+    ${CD_LINE_FIELDS.filter(f => f.area).map(f => `<label class="cd-line-area">${escapeHtml(f.label)}<textarea data-k="${f.k}" rows="2" class="pa-textarea">${escapeHtml(l[f.k] || '')}</textarea></label>`).join('')}
+  </div>`).join('');
+  host.querySelectorAll('[data-k]').forEach(el => el.addEventListener(el.tagName === 'SELECT' ? 'change' : 'input', () => { cdState.lignes[+el.closest('.cd-line').dataset.i][el.dataset.k] = el.value; cdRenderTotal(); }));
+  host.querySelectorAll('.cd-line-head .cd-del').forEach(b => b.addEventListener('click', () => { cdState.lignes.splice(+b.closest('.cd-line').dataset.i, 1); cdRenderLignes(); }));
   cdRenderTotal();
 }
 function cdRenderTotal(){
-  const t = cdTotalDemande({ lignes: cdState.lignes });
-  const bad = cdState.lignes.filter(l => String(l.montant).trim() && cdParseMontant(l.montant) == null).length;
-  document.getElementById('cd-total').innerHTML = (t ? `Total demandé : <b>${escapeHtml(paXofRaw(t * 1e6))}</b>` : '') + (bad ? ` <span class="cd-bad">${bad} montant(s) illisible(s)</span>` : '');
+  const T = cdTotals({ lignes: cdState.lignes });
+  const bad = cdState.lignes.filter(l => ['encours', 'avant', 'apres'].some(k => String(l[k] || '').trim() && cdParseMontant(l[k]) == null)).length;
+  document.getElementById('cd-total').innerHTML = (T.apres || T.avant ? `Exposition avant : <b>${escapeHtml(cdM(T.avant))} MXOF</b> · après demande : <b>${escapeHtml(cdM(T.apres))} MXOF</b>` : '') + (bad ? ` <span class="cd-bad">${bad} montant(s) illisible(s)</span>` : '');
+}
+function cdRenderInputs(){
+  cdRenderLignes();
+  cdRowsTable('cd-garanties-rows', cdState.garanties, [{ k:'garantie', label:'Garantie' }, { k:'montant', label:'Montant (MXOF)', num:true }, { k:'debut', label:'Date de début' }, { k:'fin', label:'Date de fin' }, { k:'commentaire', label:'Commentaire' }]);
+  cdRowsTable('cd-pool-rows', cdState.pool, [{ k:'banque', label:'Banque' }, { k:'ct', label:'Autorisations CT (MXOF)', num:true }, { k:'mt', label:'Encours MT (MXOF)', num:true }]);
+  cdRenderUtp();
+}
+function cdRenderUtp(){
+  const host = document.getElementById('cd-utp');
+  const v = cdState.utp || CD_UTP.map(() => false);
+  host.innerHTML = CD_UTP.map((q, i) => `<label class="cd-check"><input type="checkbox" data-i="${i}" ${v[i] ? 'checked' : ''}> ${escapeHtml(q)}</label>`).join('');
+  host.querySelectorAll('input').forEach(c => c.addEventListener('change', () => { cdState.utp = cdState.utp || CD_UTP.map(() => false); cdState.utp[+c.dataset.i] = c.checked; cdState.utpTouched = true; }));
 }
 function cdRequest(){
-  const v = id => document.getElementById(id).value.trim();
+  const v = id => { const el = document.getElementById(id); return el ? el.value.trim() : ''; };
+  const c = id => { const el = document.getElementById(id); return !!(el && el.checked); };
   const id = anIdent();
-  return { entite: id.entite, exercice: id.exercice, groupe: v('cd-groupe'), rct: v('cd-rct'), secteur: v('cd-secteur'),
-    notation: v('cd-notation'), nature: v('cd-nature'), garanties: v('cd-garanties'), lignes: cdState.lignes.map(l => ({ ...l })) };
+  const gs = cdState.garanties.filter(g => g.garantie);
+  return {
+    entite: id.entite, exercice: id.exercice, groupe: v('cd-groupe'), rct: v('cd-rct'), secteur: v('cd-secteur'),
+    filiale: v('cd-filiale'), clientele: v('cd-clientele'), prospect: c('cd-prospect'), segment: v('cd-segment'), dateS: v('cd-dates'),
+    naer: v('cd-naer'), kyc: v('cd-kyc'), validiteKyc: v('cd-validite-kyc'), lod1: c('cd-lod1'), lod2: c('cd-lod2'), hlt: c('cd-hlt'),
+    note: v('cd-note'), revue: v('cd-revue'), validite: v('cd-validite'),
+    nature: v('cd-nature'), plafond: v('cd-plafond'), reponse: v('cd-reponse'),
+    lignes: cdState.lignes.map(l => ({ ...l })), garanties: gs.map(g => ({ ...g })), garantiesPrendre: v('cd-gprendre'),
+    garantiesTxt: gs.length ? anJoin(gs.slice(0, 3).map(g => `${g.garantie}${g.montant ? ` (${g.montant} MXOF)` : ''}`)) : '',
+    depuis: v('cd-depuis'), flux: v('cd-flux'), flux1: v('cd-flux1'), pool: cdState.pool.map(p => ({ ...p })),
+  };
+}
+function cdReg(){
+  const v = id => { const el = document.getElementById(id); return el ? el.value.trim() : ''; };
+  const c = id => { const el = document.getElementById(id); return !!(el && el.checked); };
+  return { encadrement: c('cd-encadrement'), concentration: c('cd-concentration'), politique: c('cd-politique'),
+    esClient: v('cd-es-client'), esTrans: v('cd-es-trans'), esDate: v('cd-es-date'), ccviT: v('cd-ccvi-t'), ccviP: v('cd-ccvi-p'),
+    utp: cdState.utp || CD_UTP.map(() => false) };
 }
 
 /* ---------- Génération ---------- */
@@ -6479,22 +6980,22 @@ async function cdGenerateUi(){
   const d = cdD();
   const ef = anEf(d), qs = anQuestions(d, ef);
   const data = anBuildData(anState.wb, d);
-  const ctx0 = { ef: ef ? ef.ef : null, questions: qs.q };
+  const ctx0 = { ef: ef ? ef.ef : null, questions: qs.q, entite: anIdent().entite };
   const eco = cdAnalysis('eco', d, data, ctx0), fin = cdAnalysis('fin', d, data, ctx0);
-  // documents demandés : ceux du questionnaire de pré-analyse, sinon ceux établis depuis la NF
   const docs = qs.from === 'pre' ? (paState.sections.docs || []).map(t => String(t).trim()).filter(Boolean)
     : generatePreanalyseQuestions(d, {}, ef ? ef.ef : null).questions.docs.map(x => x.text);
   const req = cdRequest();
   const r = cdGenerate(d, data, { ...ctx0, eco: eco.out, fin: fin.out, docs }, req);
-  const src = [data.tabs.length ? 'Notice Financière (onglets de calcul)' : 'Notice Financière (feuille de saisie)'];
-  if (ef) src.push(`états financiers ${d.years.N}`);
-  src.push(qs.from === 'pre' ? 'questionnaire de pré-analyse' : 'questions établies depuis la NF');
-  src.push(eco.from === 'module' || fin.from === 'module' ? 'analyses économique et financière des modules 3 et 4' : 'analyses économique et financière établies à la génération');
-  cdState.out = { d, data, req, ...r, synth: cdSynthTable(d, data), flux: cdFluxTable(d, data), sources: anJoin(src) };
+  if (!cdState.utpTouched){ cdState.utp = cdUtpSuggest(d, data, req); cdRenderUtp(); }
+  const rel = r.texts.synthese.split(/\n\s*\n/).find(p => /pool bancaire|cliente de Société Générale|En termes de flux/.test(p)) || '';
+  cdState.out = { d, data, eco: eco.out, fin: fin.out, crit: r.crit, prop: r.prop,
+    texts: { synthese: r.texts.synthese, justification: r.texts.justification, relations: rel, strategie: '', capacite: cdCapacite(d, data, req) } };
+  cdState.attention = r.texts.attention.map(x => ({ type:x[0], element:x[1], commentaire:x[2] }));
+  cdState.swot = r.texts.swot.map(x => ({ axe:x[0], forces:x[1], faiblesses:x[2] }));
   cdState.conclEdited = false;
   const caXof = Math.abs(data.M.N.ca || 0) * d.info.multiplier;
-  if (caXof > 0 && caXof < 5e7) anAlert('credap', `Chiffre d’affaires ${d.years.N} = ${paXof(data.M.N.ca, d.info.multiplier)} avec l’unité « ${d.info.unite} » : vérifiez l’unité des montants de la NF puis régénérez.`, 'warn');
-  if (!cdLignes(req).length) anAlert('credap', 'Aucune ligne de crédit saisie : la demande figurera « à préciser » dans le CREDAP.', 'warn');
+  if (caXof > 0 && caXof < 5e7) anAlert('credap', `Chiffre d’affaires ${d.years.N} = ${paXof(data.M.N.ca, d.info.multiplier)} avec l’unité « ${d.info.unite} » : vérifiez l’unité des montants dans l’onglet Pré-analyse puis régénérez.`, 'warn');
+  if (!cdLignes(req).length) anAlert('credap', 'Aucune ligne de crédit saisie : l’objet du dossier et le descriptif de la demande seront vides.', 'warn');
   document.getElementById('an-credap-result').style.display = 'block';
   cdRenderResult();
   document.getElementById('an-credap-result').scrollIntoView({ behavior:'smooth', block:'start' });
@@ -6505,18 +7006,22 @@ function cdRenderResult(){
   const tag = s => `<span class="cd-note cd-n${s >= 1 ? 'p' : s === 0 ? 'z' : s === -1 ? 'm' : 'c'}">${cdNote(s)}</span>`;
   document.getElementById('cd-grille').innerHTML = `<div class="pa-table-wrap"><table class="review cd-grille"><thead><tr><th>Critère</th><th>Constat</th><th>Appréciation</th></tr></thead>
     <tbody>${o.crit.map(c => `<tr><td>${escapeHtml(c.label)}</td><td>${escapeHtml(c.constat)}</td><td>${tag(c.s)}</td></tr>`).join('')}</tbody></table></div>`;
-  const sel = document.getElementById('cd-avis');
-  sel.value = o.prop.avis;
+  document.getElementById('cd-avis').value = o.prop.avis;
   document.getElementById('cd-avis-prop').textContent = `Avis proposé : ${o.prop.avis}`;
   cdRefreshConclusion(true);
-  const host = document.getElementById('cd-sections');
-  host.innerHTML = o.sections.map((s, i) => `<div class="pa-sec an-sec" data-i="${i}">
-      <div class="pa-sec-head"><h4>${escapeHtml(s.title)}</h4></div>
-      <textarea class="an-text" rows="3" aria-label="${escapeHtml(s.title)}">${escapeHtml(s.text)}</textarea></div>`).join('');
-  host.querySelectorAll('.an-sec textarea').forEach(ta => {
-    cdFit(ta);
-    ta.addEventListener('input', () => { o.sections[+ta.closest('.an-sec').dataset.i].text = ta.value; cdFit(ta); });
-  });
+  const sec = (key, title) => `<div class="pa-sec an-sec" data-k="${key}"><div class="pa-sec-head"><h4>${escapeHtml(title)}</h4></div><textarea class="an-text" rows="3" aria-label="${escapeHtml(title)}">${escapeHtml(o.texts[key] || '')}</textarea></div>`;
+  document.getElementById('cd-sections').innerHTML = sec('synthese', 'Synthèse sur l’emprunteur') + sec('justification', 'Justification de la position')
+    + sec('relations', 'Relations bancaires') + sec('strategie', 'Stratégie de l’implantation vis-à-vis du client') + sec('capacite', 'Capacité de remboursement')
+    + `<div class="pa-sec"><div class="pa-sec-head"><h4>Points d’attention</h4></div><div id="cd-attention"></div><button type="button" class="action pa-add" id="cd-add-attention">+ Ajouter un point</button></div>`
+    + `<div class="pa-sec"><div class="pa-sec-head"><h4>Synthèse de la demande et positionnement final</h4></div><div id="cd-swot"></div></div>`;
+  document.querySelectorAll('#cd-sections .an-sec textarea').forEach(ta => { cdFit(ta); ta.addEventListener('input', () => { o.texts[ta.closest('.an-sec').dataset.k] = ta.value; cdFit(ta); }); });
+  cdRowsTable('cd-attention', cdState.attention, [{ k:'type', label:'Points' }, { k:'element', label:'Eléments' }, { k:'commentaire', label:'Commentaires' }]);
+  document.getElementById('cd-add-attention').addEventListener('click', () => { cdState.attention.push({ type:'Points de suivi', element:'', commentaire:'' }); cdRowsTable('cd-attention', cdState.attention, [{ k:'type', label:'Points' }, { k:'element', label:'Eléments' }, { k:'commentaire', label:'Commentaires' }]); });
+  const sw = document.getElementById('cd-swot');
+  sw.innerHTML = `<div class="cd-swot">${cdState.swot.map((r, i) => `<div class="cd-swot-row" data-i="${i}"><div class="cd-swot-axe">${escapeHtml(r.axe)}</div>
+    <label>Points forts / Opportunités<textarea data-k="forces" rows="2" class="pa-textarea">${escapeHtml(r.forces)}</textarea></label>
+    <label>Points faibles / Menaces<textarea data-k="faiblesses" rows="2" class="pa-textarea">${escapeHtml(r.faiblesses)}</textarea></label></div>`).join('')}</div>`;
+  sw.querySelectorAll('textarea').forEach(ta => ta.addEventListener('input', () => { cdState.swot[+ta.closest('.cd-swot-row').dataset.i][ta.dataset.k] = ta.value; }));
 }
 function cdFit(ta){ ta.style.height = 'auto'; ta.style.height = ta.scrollHeight + 2 + 'px'; }
 function cdRefreshConclusion(force){
@@ -6531,47 +7036,28 @@ function cdRefreshConclusion(force){
 
 function cdDoc(){
   const o = cdState.out; if (!o) return null;
-  const req = cdRequest(), d = o.d;
-  const lignes = cdLignes(req).map(l => ({ nature:l.nature.trim(), montant:cdParseMontant(l.montant), duree:l.duree.trim(), garanties:l.garanties.trim() }));
-  const audite = String(d.info.audite || '').trim();
-  return {
-    entite: req.entite || d.info.client || '', exercice: req.exercice || d.years.N,
-    ident: [['Raison sociale', req.entite || d.info.client || ''], ['Groupe', req.groupe], ['Code RCT', req.rct], ['Secteur d’activité', req.secteur], ['Notation interne', req.notation],
-      ['Nature de la demande', req.nature], ['Exercice de référence', String(req.exercice || d.years.N)],
-      ['États financiers', [audite ? (/^oui|^yes/i.test(audite) ? 'audités' : 'non audités') : '', d.info.norme || '', d.info.consolide || ''].filter(Boolean).join(', ')],
-      ['Sources', o.sources]],
-    lignes, total: lignes.reduce((s, l) => s + (l.montant || 0), 0), garanties: req.garanties,
-    synth: o.synth, flux: o.flux, sections: o.sections.map(s => ({ ...s, text:String(s.text || '').trim() })).filter(s => s.text),
-    grille: o.crit, avis: document.getElementById('cd-avis').value,
-    conclusion: document.getElementById('cd-conclusion').value.trim(),
-  };
+  const req = cdRequest();
+  const id = anIdent();
+  const B = cdBlocks({ req, d:o.d, data:o.data, eco:{ ...o.eco, entity:id.entite || o.eco.entity }, fin:{ ...o.fin, entity:id.entite || o.fin.entity }, reg: cdReg(),
+    texts:{ ...o.texts, attention: cdState.attention.filter(a => a.element || a.commentaire).map(a => [a.type, a.element, a.commentaire]), swot: cdState.swot.map(s => [s.axe, s.forces, s.faiblesses]) },
+    conclusion: document.getElementById('cd-conclusion').value.trim() });
+  return { blocks:B, entite: req.entite || o.d.info.client || '', exercice: req.exercice || o.d.years.N };
 }
 async function cdDownload(){
   const doc = cdDoc(); if (!doc) return;
   const btns = document.querySelectorAll('#an-credap-download, #cd-preview-download');
   btns.forEach(b => b.disabled = true);
   try {
-    const blob = await cdBuildDocx(doc);
+    const blob = await cxBuildDocx(doc.blocks, anFooter());
     const safe = String(doc.entite).replace(/[\\/:*?"<>|]+/g, '').trim() || 'CLIENT';
-    downloadBlob(blob, `CREDAP - ${safe} ${doc.exercice}.docx`);
+    downloadBlob(blob, `CREDAPP ${new Date().getFullYear()} - ${safe}.docx`);
     markModuleDone('credap');
   } catch (err){ console.error(err); alert('Échec : ' + (err.message || err)); }
   finally { btns.forEach(b => b.disabled = false); }
 }
 function cdPrint(){
   const doc = cdDoc(); if (!doc) return;
-  let frame = document.getElementById('cd-print-frame');
-  if (frame) frame.remove();
-  frame = document.createElement('iframe');
-  frame.id = 'cd-print-frame'; frame.setAttribute('aria-hidden', 'true');
-  frame.style.cssText = 'position:fixed; right:0; bottom:0; width:0; height:0; border:0; visibility:hidden;';
-  document.body.appendChild(frame);
-  const fd = frame.contentDocument;
-  fd.open();
-  fd.write(`<!doctype html><html lang="fr"><head><meta charset="utf-8"><title>${escapeHtml(`CREDAP - ${doc.entite} ${doc.exercice}`)}</title><style>${CD_PRINT_CSS}</style></head><body>${cdDocHtml(doc)}</body></html>`);
-  fd.close();
-  const go = () => { try { frame.contentWindow.focus(); frame.contentWindow.print(); } catch (e){ console.error(e); window.print(); } };
-  if (fd.fonts && fd.fonts.ready) fd.fonts.ready.then(() => setTimeout(go, 50)); else setTimeout(go, 200);
+  cxPrint(doc.blocks, `CREDAPP - ${doc.entite}`, anFooter());
   markModuleDone('credap');
 }
 function cdOpenPreview(){
@@ -6581,12 +7067,12 @@ function cdOpenPreview(){
     m = document.createElement('div');
     m.id = 'cd-preview'; m.className = 'pa-preview';
     m.innerHTML = `<div class="pa-preview-card" role="dialog" aria-modal="true" aria-labelledby="cd-preview-title">
-      <div class="pa-preview-head"><h3 id="cd-preview-title">Aperçu du CREDAP</h3><span class="pa-preview-meta"></span><button type="button" class="app-modal-x" id="cd-preview-x" aria-label="Fermer">×</button></div>
+      <div class="pa-preview-head"><h3 id="cd-preview-title">Aperçu de la CREDAPP</h3><span class="pa-preview-meta"></span><button type="button" class="app-modal-x" id="cd-preview-x" aria-label="Fermer">×</button></div>
       <div class="pa-preview-body" id="cd-preview-body"></div>
       <div class="pa-preview-foot">
-        <button type="button" class="action pa-secondary" id="cd-preview-edit"><span class="ico ico-back" aria-hidden="true"></span>Revenir au CREDAP</button>
+        <button type="button" class="action pa-secondary" id="cd-preview-edit"><span class="ico ico-back" aria-hidden="true"></span>Revenir à la CREDAPP</button>
         <button type="button" class="action pa-secondary" id="cd-preview-print"><span class="ico ico-print" aria-hidden="true"></span>Imprimer</button>
-        <button type="button" class="action amber" id="cd-preview-download"><span class="ico ico-download" aria-hidden="true"></span>Télécharger le CREDAP</button>
+        <button type="button" class="action amber" id="cd-preview-download"><span class="ico ico-download" aria-hidden="true"></span>Télécharger la CREDAPP</button>
       </div></div>`;
     document.body.appendChild(m);
     const close = () => { m.classList.remove('open'); document.body.style.overflow = ''; };
@@ -6597,7 +7083,7 @@ function cdOpenPreview(){
     m.addEventListener('click', ev => { if (ev.target === m) close(); });
     document.addEventListener('keydown', ev => { if (ev.key === 'Escape' && m.classList.contains('open')) close(); });
   }
-  m.querySelector('#cd-preview-body').innerHTML = cdDocHtml(doc);
+  m.querySelector('#cd-preview-body').innerHTML = cxBlocksHtml(doc.blocks);
   m.querySelector('#cd-preview-body').scrollTop = 0;
   m.classList.add('open');
   document.body.style.overflow = 'hidden';
@@ -6605,21 +7091,20 @@ function cdOpenPreview(){
 }
 
 function initCredapModule(){
-  const st = document.createElement('style');
-  st.textContent = CD_PRINT_CSS.replace(/@page\{[^}]*\}/, '').replace(/\bbody\{[^}]*\}/, '');
-  document.head.appendChild(st);
   paWireDrop('an-credap-drop', 'an-credap-input', f => anLoadNfFile(f, 'credap'));
   document.getElementById('an-credap-generate').addEventListener('click', cdGenerateUi);
   document.getElementById('an-credap-preview').addEventListener('click', cdOpenPreview);
   document.getElementById('an-credap-download').addEventListener('click', cdDownload);
   document.getElementById('an-credap-print').addEventListener('click', cdPrint);
-  document.getElementById('cd-add-ligne').addEventListener('click', () => { cdState.lignes.push({ nature:'', montant:'', duree:'', garanties:'' }); cdRenderLignes(); });
-  ['unit'].forEach(f => { const el = document.getElementById(`an-credap-${f}`); el.addEventListener(el.tagName === 'SELECT' ? 'change' : 'input', () => { anState.edited['credap' + f] = true; }); });
-  ['groupe', 'rct', 'nature', 'garanties'].forEach(f => { const el = document.getElementById(`cd-${f}`); el.addEventListener(el.tagName === 'SELECT' ? 'change' : 'input', () => { anState.edited['cd' + f] = true; }); });
+  document.getElementById('cd-add-ligne').addEventListener('click', () => { cdState.lignes.push(cdNewLine()); cdRenderLignes(); });
+  document.getElementById('cd-add-garantie').addEventListener('click', () => { cdState.garanties.push({ garantie:'', montant:'', debut:'', fin:'', commentaire:'' }); cdRenderInputs(); });
+  document.getElementById('cd-add-banque').addEventListener('click', () => { cdState.pool.push({ banque:'', ct:'', mt:'' }); cdRenderInputs(); });
+  ['cd-groupe', 'cd-rct', 'cd-nature'].forEach(idd => { const el = document.getElementById(idd); el.addEventListener(el.tagName === 'SELECT' ? 'change' : 'input', () => { anState.edited['cd' + idd] = true; }); });
+  const rv = document.getElementById('cd-revue'); if (rv && !rv.value) rv.value = new Date().toLocaleDateString('fr-FR');
   document.getElementById('cd-avis').addEventListener('change', () => cdRefreshConclusion(false));
   document.getElementById('cd-conditions').addEventListener('input', () => cdRefreshConclusion(false));
   document.getElementById('cd-conclusion').addEventListener('input', e => { cdState.conclEdited = true; cdFit(e.target); });
-  cdRenderLignes();
+  cdRenderInputs();
 }
 initCredapModule();
 /* @@CREDAP_UI_END */
