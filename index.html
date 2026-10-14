@@ -411,7 +411,6 @@
   .an-src .file-chip{ margin:0; }
   .an-src-none{ font-size:0.8rem; color:var(--muted); }
   .an-drop{ padding:14px; }
-  .pa-deep-count{ font-family:'JetBrains Mono',monospace; font-size:0.7rem; color:var(--muted); font-weight:400; margin-left:6px; }
   .pa-deep-item{ display:flex; gap:10px; align-items:flex-start; padding:10px 12px; border:1px solid var(--paper-line); border-radius:4px; background:#fff; margin-bottom:8px; cursor:pointer; }
   .pa-deep-item input{ margin-top:3px; flex:0 0 auto; accent-color:var(--accent); }
   .pa-deep-item.added{ background:var(--surface-2); cursor:default; }
@@ -423,6 +422,7 @@
   .pa-deep-ok{ font-size:0.72rem; color:var(--ok, #2E7D4F); }
   .pa-deep-text{ font-size:0.85rem; line-height:1.55; color:var(--ink); }
   .pa-deep-src{ font-size:0.76rem; color:var(--muted); overflow-wrap:anywhere; }
+  .modal-sub{ margin:18px 0 6px; font-size:0.9rem; color:var(--ink); }
   .an-extra{ margin-top:18px; padding-top:14px; border-top:1px solid var(--paper-line); }
   .an-extra-head{ font-size:0.8rem; font-weight:600; color:var(--ink); margin-bottom:10px; }
   .an-extra-list{ display:flex; flex-direction:column; gap:6px; margin-bottom:10px; }
@@ -898,7 +898,7 @@
         </div>
       </div>
       <div class="step" id="pa-deep-step">
-        <div class="step-head"><div class="step-title">Questions approfondies <span class="pa-deep-count" id="pa-deep-count"></span></div></div>
+        <div class="step-head"><div class="step-title">Questions approfondies</div></div>
         <div class="step-body">
           <div id="pa-deep"></div>
           <div class="pa-download-bar">
@@ -2940,10 +2940,66 @@ function renderBalanceSummary(checks, restated){
   box.querySelector('.bs-more').addEventListener('click', () => showBalancePopup(checks, restated, true));
 }
 
+// Comparaison avec la Notice Financière : montants déjà saisis dans le modèle (N-1, et N s'il l'est) face aux
+// états financiers, et exercice N tel qu'il sera rempli, avec sa variation sur N-1
+const NF_CMP_ROWS = [['BZ', 'Total actif', 62, 'actif'], ['DZ', 'Total passif', 103], ['CP', 'Capitaux propres et ressources assimilées', 80],
+  ['DD', 'Dettes financières et ressources assimilées', 87], ['XB', 'Chiffre d’affaires', 114], ['XD', 'Excédent brut d’exploitation', 130], ['XI', 'Résultat net', 156]];
+function nfCompareData(){
+  if (!extraction || !extraction.evalWb || !extraction.periodData || typeof makeEvaluator !== 'function') return null;
+  let ev; try { ev = makeEvaluator(extraction.evalWb); } catch (e){ return null; }
+  const sheet = targetSheetName, pd = extraction.periodData, Y = extraction.years;
+  const nfVal = (p, r, sec) => { try { return ev.num(sheet, (sec === 'actif' ? PA_ACTIF_COLS[p].n : PA_PASSIF_COLS[p]) + r); } catch (e){ return null; } };
+  const nfHas = p => [62, 114].some(r => Math.abs(nfVal(p, r, r === 62 ? 'actif' : null) || 0) > 0);
+  const efVal = (p, code) => { const e = pd[p] && pd[p].get(code); return e && e.net != null ? e.net : null; };
+  const efSrc = p => { const e = pd[p] && (pd[p].get('BZ') || pd[p].get('XB')); return e ? e.source : null; };
+  const has = { N1: nfHas('N1'), N: nfHas('N') };
+  const cca = p => has[p] ? (nfVal(p, 84) || 0) : 0;     // CCA bloqués reclassés par l'analyste en dettes financières
+  const rows = NF_CMP_ROWS.map(([code, label, r, sec]) => {
+    const o = { label, code, cca: code === 'DD' ? { N1: cca('N1'), N: cca('N') } : null };
+    for (const p of ['N1', 'N']){ o['nf' + p] = has[p] ? nfVal(p, r, sec) : null; o['ef' + p] = efVal(p, code); }
+    return o;
+  }).filter(o => o.efN != null || o.efN1 != null || o.nfN1 != null);
+  if (!rows.length || (!has.N1 && !has.N)) return null;
+  const cc = extraction.columnChecks || {};
+  const fate = p => { const a = cc[p + ':actif'] || {}, b = cc[p + ':passif'] || {}; return (a.kept || b.kept) ? 'kept' : (a.replace || a.total || b.replace || b.total) ? 'replaced' : 'completed'; };
+  return { rows, has, years: Y, src: { N1: efSrc('N1'), N: efSrc('N') }, fate: { N1: fate('N1'), N: fate('N') } };
+}
+function nfCompareHtml(){
+  const c = nfCompareData(); if (!c) return '';
+  const f = v => v == null ? '-' : Math.round(v).toLocaleString('fr-FR');
+  const gap = (a, b) => a != null && b != null && Math.abs(a - b) > Math.max(1, Math.abs(b) * 0.001);
+  const y1 = c.years.N1, y = c.years.N;
+  const unit = templateUnit ? NF_UNIT_LABELS[templateUnit.divisor] : 'unité de la NF';
+  let nGap = 0;
+  const head = `<th>Poste</th>${c.has.N1 ? `<th>${y1} NF</th>` : ''}<th>${y1} état financier</th>${c.has.N1 ? '<th>Écart</th>' : ''}${c.has.N ? `<th>${y} NF</th>` : ''}<th>${y} rempli</th><th>Var. ${String(y).slice(2)}/${String(y1).slice(2)}</th>`;
+  const explained = [];
+  const body = c.rows.map(o => {
+    // écart égal aux CCA bloqués inscrits dans la NF : reclassement de l'analyste, pas une erreur
+    const isCca = p => o.cca && o.cca[p] && Math.abs((o['nf' + p] - o['ef' + p]) - o.cca[p]) <= Math.max(2, Math.abs(o.cca[p]) * 0.001);
+    const g1 = gap(o.nfN1, o.efN1) && !isCca('N1'), gN = gap(o.nfN, o.efN) && !isCca('N');
+    for (const p of ['N1', 'N']) if (gap(o['nf' + p], o['ef' + p]) && isCca(p)) explained.push(`${c.years[p]} : l’écart sur les dettes financières (${f(o['nf' + p] - o['ef' + p])}) correspond aux CCA bloqués inscrits dans la NF`);
+    if (g1) nGap++; if (gN) nGap++;
+    const ref1 = c.fate.N1 === 'kept' && o.nfN1 != null ? o.nfN1 : (o.efN1 != null ? o.efN1 : o.nfN1);
+    const filled = c.fate.N === 'kept' && o.nfN != null ? o.nfN : (o.efN != null ? o.efN : o.nfN);
+    const v = ref1 && filled != null ? (filled - ref1) / Math.abs(ref1) : null;
+    const red = 'style="color:var(--err);font-weight:600;"';
+    return `<tr><td>${escapeHtml(o.label)}</td>${c.has.N1 ? `<td class="num">${f(o.nfN1)}</td>` : ''}<td class="num">${f(o.efN1)}</td>${c.has.N1 ? `<td class="num" ${g1 ? red : ''}>${o.nfN1 != null && o.efN1 != null && gap(o.nfN1, o.efN1) ? f(o.nfN1 - o.efN1) : (o.nfN1 != null && o.efN1 != null ? '0' : '-')}</td>` : ''}${c.has.N ? `<td class="num" ${gN ? red : ''}>${f(o.nfN)}</td>` : ''}<td class="num">${f(filled)}</td><td class="num">${v == null ? '-' : (v > 0 ? '+' : '') + Math.round(v * 100) + ' %'}</td></tr>`;
+  }).join('');
+  const fateTxt = { kept:'conservé tel quel dans la NF', replaced:'repris des états financiers (saisie précédente remplacée)', completed:'complété par les états financiers' };
+  const notes = [];
+  if (c.has.N1) notes.push(`Exercice ${y1} : ${fateTxt[c.fate.N1]}${c.src.N1 ? `, comparé à ${escapeHtml(c.src.N1)}` : ''}.`);
+  notes.push(`Exercice ${y} : ${c.has.N ? fateTxt[c.fate.N] : 'rempli à partir des états financiers'}${c.src.N ? `, d’après ${escapeHtml(c.src.N)}` : ''}.`);
+  return `<h4 class="modal-sub">Comparaison avec la Notice Financière</h4>
+    <p>${nGap ? `<b>${nGap} écart(s)</b> entre les montants déjà saisis dans la NF et les états financiers.` : c.has.N1 ? 'Les montants déjà saisis dans la NF concordent avec les états financiers.' : ''} ${notes.join(' ')}</p>
+    <div class="pa-table-wrap"><table class="review modal-table"><thead><tr>${head}</tr></thead><tbody>${body}</tbody></table></div>
+    ${explained.length ? `<p class="mm">${explained.join(' ; ')}.</p>` : ''}
+    <p class="mm">Montants en ${unit}.</p>`;
+}
+
 function showBalancePopup(checks, restated, noSummary){
   if (!noSummary) renderBalanceSummary(checks, restated);
   if (!checks.length){
-    showModal('Équilibre du bilan', '<p>Les totaux de l\'actif et du passif n\'ont pas été trouvés dans les documents : vérifiez l\'équilibre à l\'étape de relecture.</p>');
+    showModal('Équilibre du bilan', '<p>Les totaux de l\'actif et du passif n\'ont pas été trouvés dans les documents : vérifiez l\'équilibre à l\'étape de relecture.</p>' + nfCompareHtml());
     return;
   }
   const allOk = checks.every(c => c.status === 'équilibré');
@@ -2959,6 +3015,7 @@ function showBalancePopup(checks, restated, noSummary){
     <p>${allOk ? 'Total actif = total passif pour chaque exercice lu.' : 'Au moins un exercice présente un écart entre le total actif et le total passif imprimés dans le document.'}</p>
     <table class="review modal-table"><thead><tr><th>Exercice</th><th>Total actif (FCFA)</th><th>Total passif (FCFA)</th><th>Écart</th><th>Statut</th></tr></thead><tbody>${rows}</tbody></table>
     ${restatedHtml}
+    ${nfCompareHtml()}
     ${window._nfRolled ? `<p><b>Notice Financière mise à jour :</b> exercices ${window._nfRolled.from.replace(/-/g, ', ')} → ${window._nfRolled.to.replace(/-/g, ', ')}. Les données déjà saisies ont été décalées de ${window._nfRolled.shift} exercice(s) vers la gauche et la colonne ${window._nfRolled.to.split('-').pop()} a été ajoutée.</p>` : ''}
     <p class="mm">Totaux de l'actif et du passif lus dans les états financiers, en francs CFA. Report dans la NF en ${templateUnit ? NF_UNIT_LABELS[templateUnit.divisor] : 'unité de la NF'}, pour chaque exercice.</p>`);
 }
@@ -5728,7 +5785,6 @@ function paRenderDeep(){
   const L = paState.deep || [];
   const pending = L.filter(q => q.checked && !q.added).length, total = paQCount();
   const full = total + pending >= PA_Q_MAX;
-  document.getElementById('pa-deep-count').textContent = `${total + pending} / ${PA_Q_MAX} questions`;
   document.getElementById('pa-deep-add').disabled = !pending || total + pending > PA_Q_MAX;
   host.innerHTML = L.length ? L.map((q, i) => `<label class="pa-deep-item${q.added ? ' added' : ''}${full && !q.checked && !q.added ? ' off' : ''}">
       <input type="checkbox" data-i="${i}" ${q.checked || q.added ? 'checked' : ''} ${q.added || (full && !q.checked) ? 'disabled' : ''}>
