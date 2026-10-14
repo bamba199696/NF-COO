@@ -2470,8 +2470,18 @@ async function runExtraction(){
     if (doc.year == null) log('err', `${doc.name} : exercice non détecté - saisissez l'année dans la liste des documents puis relancez l'analyse.`);
     else if (N && (N - doc.year < 0 || N - doc.year > 2)) log('err', `${doc.name} : exercice ${doc.year} hors des 3 années du modèle (${years.N2}-${years.N}) - non repris.`);
   }
-  const entities = [...new Set(docs.map(d => d.entity).filter(Boolean))];
+  const entities = [];
+  for (const e of docs.map(d => d.entity).filter(Boolean)) if (!entities.some(x => paSameClient({ info:{ client: x } }, e) || paSameClient({ info:{ client: e } }, x))) entities.push(e);
   if (entities.length > 1) log('err', `Les documents chargés ne concernent pas la même entité (${entities.join(', ')}) : vérifiez la sélection. Un exercice n'est jamais complété avec les chiffres d'une autre entité.`);
+  // Entité de la NF (cellule client du modèle) : un document d'une autre entité est signalé
+  try {
+    const nfClient = String(extractNfData(templateWb).info.client || '').trim();
+    if (nfClient && !/^x+$/i.test(nfClient)){
+      const same = (a, b) => paSameClient({ info:{ client: a } }, b) || paSameClient({ info:{ client: b } }, a);
+      const other = docs.filter(d => d.entity && !same(nfClient, d.entity));
+      for (const d of other) log('err', `${d.name} concerne « ${d.entity} » alors que la Notice Financière est au nom de « ${nfClient} » : vérifiez qu'il s'agit du bon dossier avant d'utiliser la NF.`);
+    }
+  } catch (e){ console.warn(e); }
   const sameYear = docs.filter(d => d.year).map(d => d.year).filter((y, i, a) => a.indexOf(y) !== i);
   if (sameYear.length) log('err', `Plusieurs documents pour l'exercice ${[...new Set(sameYear)].join(', ')} : le premier de la liste est prioritaire, les suivants ne complètent que les postes qu'il ne contient pas.`);
 
@@ -3123,7 +3133,14 @@ function nfColumnCheck(items, p, sec){
 }
 // Cases de saisie d'un exercice (hors formules du modèle) pour une section
 function nfInputRows(sec){ const out = []; for (const [a, b] of (sec === 'actif' ? NF_ROLL_ACTIF_ROWS : NF_ROLL_PASSIF_ROWS)) for (let r = a; r <= b; r++) out.push(r); return out; }
-function nfIsInput(ws, addr){ const c = ws[addr]; return !!c && c.v !== undefined && c.v !== null && c.v !== '' && (!c.f || !/\$?[A-Z]{1,3}\$?\d/.test(c.f)); }
+// Case de saisie : valeur tapée, ou formule de l'analyste (constante chiffrée, ex. « 8070920-D84 ») ; une formule
+// du modèle (liens et totaux sans constante) n'en est pas une
+function nfIsInput(ws, addr){
+  const c = ws[addr];
+  if (!c || c.v === undefined || c.v === null || c.v === '') return false;
+  if (!c.f || !/\$?[A-Z]{1,3}\$?\d/.test(c.f)) return true;
+  return /\d{3,}/.test(c.f.replace(/'[^']*'!|\b[A-Za-z_][\w.]*!/g, '').replace(/\$?[A-Z]{1,3}\$?\d+/g, ''));
+}
 function nfInputCells(ws, p, sec){
   const i = { N2:0, N1:1, N:2 }[p], out = [];
   for (const r of nfInputRows(sec)){
@@ -4761,9 +4778,17 @@ function paEfVsNf(byCode, d){
   const mult = d.info.multiplier;
   const pick = (c, i) => { const det = byCode.get(c); if (!det) return null; const vs = det.rawValues || det.values || []; return vs[i] == null ? null : vs[i]; };
   const checks = [['BZ', 2, d.actifNet[62].N, 'Total actif'], ['DZ', 0, d.passif[103].N, 'Total passif'], ['XB', 0, d.cr[114].N, 'Chiffre d’affaires']];
+  // Écart d'un facteur 1 000 ou 1 000 000 sur tous les totaux : unité des montants mal choisie
+  const ratios = checks.map(([c, i, nf]) => { const ef = pick(c, i); return ef && nf ? ef / (nf * mult) : null; }).filter(r => r != null);
+  const UNITS = { 1:'Unités', 1e3:'Milliers', 1e6:'Millions' };
+  if (ratios.length >= 2){
+    const k = [1e-6, 1e-3, 1e3, 1e6].find(f => ratios.every(r => Math.abs(r / f - 1) < 0.02));
+    const want = k ? UNITS[Math.round(mult * k)] : null;
+    if (k) return [`Les montants de la NF sont ${k > 1 ? k.toLocaleString('fr-FR') + ' fois plus petits' : (1 / k).toLocaleString('fr-FR') + ' fois plus grands'} que ceux de l’état financier ${d.years.N} : ${want ? `l’unité des montants est probablement « ${want} » et non « ${d.info.unite} »` : 'vérifiez l’unité des montants'}. Corrigez l’unité puis régénérez.`];
+  }
   for (const [c, i, nf, label] of checks){
     const ef = pick(c, i); if (ef == null || !nf) continue;
-    if (Math.abs(ef - nf * mult) > Math.max(Math.abs(ef) * 0.002, mult)) msgs.push(`${label} ${d.years.N} : ${paXofRaw(ef)} dans l’état financier contre ${paXofRaw(nf * mult)} dans la NF (l’état financier prévaut).`);
+    if (Math.abs(ef - nf * mult) > Math.max(Math.abs(ef) * 0.002, mult)) msgs.push(`${label} ${d.years.N} : ${paXofRaw(ef)} dans l’état financier contre ${paXofRaw(nf * mult)} dans la NF : vérifiez la NF, les analyses reposent sur ses montants.`);
   }
   return msgs;
 }
@@ -5496,10 +5521,15 @@ function paShowStep1Ef(){
 
 // Le texte (nom de fichier, ligne d'un état financier) concerne-t-il le client de la NF ?
 function paSameClient(d, text){
-  const words = String((d && d.info.client) || '').toUpperCase().split(/[^A-Z0-9]+/).filter(w => w.length >= 3 && !/^(SA|SARL|SAS|SUARL|STE|SOCIETE)$/.test(w));
+  const client = String((d && d.info.client) || '');
+  const words = client.toUpperCase().split(/[^A-Z0-9]+/).filter(w => w.length >= 3 && !/^(SA|SARL|SAS|SUARL|STE|SOCIETE)$/.test(w));
   if (!words.length) return true;
   const txt = String(text).toUpperCase();
-  return words.filter(w => txt.includes(w)).length >= Math.min(2, words.length);
+  if (words.filter(w => txt.includes(w)).length >= Math.min(2, words.length)) return true;
+  // sigle : « SIMPA » pour « Société Industrielle Moderne Plastique Africaine » (dans un sens ou dans l'autre)
+  const W = t => String(t).toUpperCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').split(/[^A-Z0-9]+/).filter(w => w && !/^(SA|SARL|SAS|SUARL|DE|DU|DES|LA|LE|LES|ET|D|L)$/.test(w));
+  const acr = (a, b) => { const i = W(a).map(w => w[0]).join(''); return i.length >= 3 && W(b).some(w => w.length >= 3 && (w.startsWith(i) || i.startsWith(w))); };
+  return W(text).length <= 8 && (acr(client, text) || acr(text, client));
 }
 /* ---------- Identification : nom de l'entité et exercice lus dans l'état financier (à défaut, dans la NF) ---------- */
 function paEfIdentity(){
@@ -5707,7 +5737,7 @@ function paRagSearch(){
   const q = document.getElementById('pa-rag-q').value.trim();
   const host = document.getElementById('pa-rag-res');
   if (!q){ host.innerHTML = ''; return; }
-  const R = ragSearch(paState.rag || ragGlobalIndex(), q, 6);
+  const R = ragSearch(ragGlobalIndex(), q, 6);      // tous les documents lus dans l'outil, y compris ceux ajoutés depuis
   host.innerHTML = R.length ? R.map(r => `<div class="pa-rag-hit"><div class="pa-rag-src">${escapeHtml(r.src)}${r.note ? ` · Note ${escapeHtml(r.note.id)} ${escapeHtml(paLc(r.note.title || '').toLowerCase())}` : ''}</div><div class="pa-rag-txt">${r.text.split('\n').map(l => paHighlight(l, q)).join('<br>')}</div></div>`).join('')
     : '<div class="pa-empty">Aucun passage trouvé.</div>';
 }
@@ -6029,7 +6059,7 @@ async function cxBuildDocx(B, footer){
   zip.file('word/_rels/document.xml.rels', '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/styles" Target="styles.xml"/><Relationship Id="rId2" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/numbering" Target="numbering.xml"/><Relationship Id="rId3" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/footer" Target="footer1.xml"/></Relationships>');
   zip.file('word/styles.xml', '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><w:styles xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main"><w:docDefaults><w:rPrDefault><w:rPr><w:rFonts w:ascii="Aptos" w:hAnsi="Aptos" w:cs="Arial" w:eastAsia="Aptos"/><w:sz w:val="20"/><w:szCs w:val="20"/><w:lang w:val="fr-FR"/></w:rPr></w:rPrDefault><w:pPrDefault><w:pPr><w:spacing w:after="100"/></w:pPr></w:pPrDefault></w:docDefaults><w:style w:type="paragraph" w:default="1" w:styleId="Normal"><w:name w:val="Normal"/></w:style><w:style w:type="table" w:default="1" w:styleId="TableNormal"><w:name w:val="Normal Table"/><w:tblPr><w:tblInd w:w="0" w:type="dxa"/><w:tblCellMar><w:top w:w="0" w:type="dxa"/><w:left w:w="108" w:type="dxa"/><w:bottom w:w="0" w:type="dxa"/><w:right w:w="108" w:type="dxa"/></w:tblCellMar></w:tblPr></w:style></w:styles>');
   const lvl = (i, txt, ind, font) => `<w:lvl w:ilvl="${i}"><w:start w:val="1"/><w:numFmt w:val="bullet"/><w:lvlText w:val="${txt}"/><w:lvlJc w:val="left"/><w:pPr><w:ind w:left="${ind}" w:hanging="283"/></w:pPr><w:rPr><w:rFonts w:ascii="${font}" w:hAnsi="${font}"/></w:rPr></w:lvl>`;
-  zip.file('word/numbering.xml', `<?xml version="1.0" encoding="UTF-8" standalone="yes"?><w:numbering xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main"><w:abstractNum w:abstractNumId="0"><w:multiLevelType w:val="multilevel"/>${lvl(0, '-', 567, 'Aptos')}${lvl(1, '–', 1077, 'Aptos')}</w:abstractNum><w:abstractNum w:abstractNumId="1"><w:multiLevelType w:val="singleLevel"/>${lvl(0, '•', 567, 'Aptos')}</w:abstractNum><w:num w:numId="1"><w:abstractNumId w:val="0"/></w:num><w:num w:numId="2"><w:abstractNumId w:val="1"/></w:num></w:numbering>`);
+  zip.file('word/numbering.xml', `<?xml version="1.0" encoding="UTF-8" standalone="yes"?><w:numbering xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main"><w:abstractNum w:abstractNumId="0"><w:multiLevelType w:val="multilevel"/>${lvl(0, '-', 567, 'Aptos')}${lvl(1, 'o', 1077, 'Courier New')}</w:abstractNum><w:abstractNum w:abstractNumId="1"><w:multiLevelType w:val="singleLevel"/>${lvl(0, '•', 567, 'Aptos')}</w:abstractNum><w:num w:numId="1"><w:abstractNumId w:val="0"/></w:num><w:num w:numId="2"><w:abstractNumId w:val="1"/></w:num></w:numbering>`);
   zip.file('word/footer1.xml', cxFooterXml(footer || {}));
   zip.file('word/document.xml', `<?xml version="1.0" encoding="UTF-8" standalone="yes"?><w:document xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"><w:body>${cxBlocksXml(B)}<w:sectPr><w:footerReference w:type="default" r:id="rId3"/><w:pgSz w:w="11906" w:h="16838"/><w:pgMar w:top="720" w:right="720" w:bottom="720" w:left="720" w:header="709" w:footer="400" w:gutter="0"/></w:sectPr></w:body></w:document>`);
   return zip.generateAsync({ type:'blob', mimeType:'application/vnd.openxmlformats-officedocument.wordprocessingml.document', compression:'DEFLATE' });
@@ -6048,7 +6078,7 @@ const CX_PRINT_CSS = `@page{ size:A4; margin:12.7mm; }
   .cx-p{ text-align:justify; margin:0 0 6pt; line-height:1.6; }
   .cx-p.nb{ font-weight:700; font-style:italic; }
   .cx-ul{ margin:0 0 6pt; padding-left:22pt; list-style:'-  '; line-height:1.6; }
-  .cx-ul li{ text-align:justify; } .cx-ul li.l1{ margin-left:20pt; list-style:'–  '; }
+  .cx-ul li{ text-align:justify; } .cx-ul li.l1{ margin-left:20pt; list-style:'o  '; }
   .cx-note{ font-style:italic; font-size:8pt; margin:0 0 8pt; }
   .cx-t{ border-collapse:collapse; width:100%; margin:3pt 0 8pt; table-layout:fixed; }
   .cx-t td{ border:0.75pt solid #000; padding:1pt 3pt; vertical-align:middle; word-wrap:break-word; }
@@ -6746,8 +6776,8 @@ function anBlocks(out){
 }
 /* ---------- 8. Réponses du client au questionnaire et documents complémentaires ---------- */
 const AN_STOP = new Set('avec dans pour cette votre vous nous quel quelle quels quelles sont etre entre plus comment pouvez pourriez preciser expliquer indiquer justifier detailler nature quoi elle elles leur leurs aussi ainsi alors donc mais comme dont tout tous toute toutes etait sera avez avons faire fait cela ceci celle celui ceux exercice exercices relation societe entreprise montant montants niveau egalement notamment raison raisons merci'.split(' '));
-function anNorm(s){ return String(s || '').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/[’']/g, ' ').replace(/[^a-z0-9%]+/g, ' ').trim(); }
-function anWords(s){ return new Set(anNorm(s).split(' ').filter(w => (w.length >= 4 || /^\d{2,}$/.test(w)) && !AN_STOP.has(w))); }
+function anNormW(s){ return String(s || '').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/[’']/g, ' ').replace(/[^a-z0-9%]+/g, ' ').trim(); }
+function anWords(s){ return new Set(anNormW(s).split(' ').filter(w => (w.length >= 4 || /^\d{2,}$/.test(w)) && !AN_STOP.has(w))); }
 const AN_HEADINGS = /^(activite et compte de resultat|actif|passif financement et tresorerie|coherences|questions generales|documents complementaires|analyse financiere des chiffres|identification de la contrepartie|preanalyse|maquette de renouvellement|dossier|reponses? (du client|de la relation)|nom de l entite|preciser si)\b/;
 
 // Rattache les réponses d'un document aux questions du questionnaire (même ordre, numéros « n- », recouvrement des mots)
@@ -6772,9 +6802,9 @@ function anMatchAnswers(text, questions){
     }
     if (best && best.score >= 0.55){
       // fin de question coupée sur les lignes suivantes (mots tous présents dans la question)
-      const all = new Set(anNorm(q.text).split(' ').filter(Boolean));
+      const all = new Set(anNormW(q.text).split(' ').filter(Boolean));
       while (best.end + 1 < lines.length && best.end - best.start < 6 && !/\?\s*$/.test(lines[best.end])){
-        const ws = anNorm(lines[best.end + 1]).split(' ').filter(Boolean);
+        const ws = anNormW(lines[best.end + 1]).split(' ').filter(Boolean);
         if (!ws.length || ws.filter(w => all.has(w)).length < 0.8 * ws.length) break;
         best.end++;
       }
@@ -6792,7 +6822,7 @@ function anMatchAnswers(text, questions){
   if (nums.length >= 2 && nums.length > kept.length + 1){
     return nums.map((x, i) => {
       const q = questions[x.n - 1], stop = i + 1 < nums.length ? nums[i + 1].j : lines.length;
-      const parts = [x.rest, ...lines.slice(x.j + 1, stop).filter(l => !(AN_HEADINGS.test(anNorm(l)) && l.length < 70) && !/^dossier\s*-/i.test(l))];
+      const parts = [x.rest, ...lines.slice(x.j + 1, stop).filter(l => !(AN_HEADINGS.test(anNormW(l)) && l.length < 70) && !/^dossier\s*-/i.test(l))];
       let a = parts.join(' ').replace(/^r[ée]ponse\s*:?\s*/i, '').replace(/\s+/g, ' ').trim();
       if (/^(n[ée]ant|ras|r\.a\.s\.?|-|\.)$/i.test(a)) a = '';
       if (a.length > 700) a = a.slice(0, 700).replace(/\s+\S*$/, '') + '…';
@@ -6809,7 +6839,7 @@ function anMatchAnswers(text, questions){
     // suite de la question (lignes coupées)
     while (k < stop && LW[k].size && [...LW[k]].filter(w => W.has(w)).length >= 0.7 * LW[k].size && !out.length) k++;
     for (; k < stop; k++){
-      const n = anNorm(lines[k]);
+      const n = anNormW(lines[k]);
       if (AN_HEADINGS.test(n) && lines[k].length < 70) continue;
       if (/^dossier\s*-/i.test(lines[k])) continue;
       out.push(lines[k].replace(/^r[ée]ponse\s*(du client|de la relation)?\s*:?\s*/i, ''));
@@ -6841,7 +6871,7 @@ const AN_THEMES = [
   [/autres creances|autres dettes|etat|fiscales et sociales/, 'Autres créances et dettes'], [/hao|cession/, 'Éléments HAO'],
 ];
 function anTheme(q){
-  const n = anNorm(q);
+  const n = anNormW(q);
   // thème : celui cité en premier dans la question (le sujet de la phrase)
   let best = null;
   for (const [re, t] of AN_THEMES){ const m = n.match(re); if (m && (!best || m.index < best.i)) best = { i: m.index, t }; }
@@ -6887,7 +6917,7 @@ function anSentences(text){
     .filter(x => x.length >= 30 && x.length <= 450 && /[a-zà-ÿ]{3,}\s+[a-zà-ÿ]{2,}\s+[a-zà-ÿ]{2,}/i.test(x) && !/\?\s*$/.test(x));
 }
 // Tableau lu dans un document (Excel ou Word) : grille de chaînes, première ligne = en-têtes
-function anTableHead(t){ return (t.rows[0] || []).map(c => anNorm(c)); }
+function anTableHead(t){ return (t.rows[0] || []).map(c => anNormW(c)); }
 function anGridFromTable(t, cols){
   const H = anTableHead(t), idx = cols.map(re => re ? H.findIndex(h => re.test(h)) : -1);
   if (idx[0] < 0 && idx[1] < 0) return null;
@@ -7197,7 +7227,7 @@ function anRenderSources(){
     ['Dossier', id && (id.entite || id.exercice) ? `${id.entite || 'Entité non renseignée'} · exercice ${id.exercice}` : null],
     ['Notice Financière', d ? `${anState.nfName} · exercices ${yrs} · ${tabs ? `${tabs} onglets de calcul` : 'feuille de saisie seule'}` : null],
     ['État financier', ef ? `${ef.name} · ${(ef.ef.notes || []).length} notes annexes${ef.ef.tft ? ' · tableau des flux' : ''}` : null],
-    ['Questionnaire', qs ? `${qs.from === 'pre' ? 'Questionnaire de pré-analyse' : 'Questions établies depuis la NF'} · ${anCountQ(qs.q)} questions` : null],
+    ['Questionnaire', qs ? `${qs.from === 'pre' ? 'Questionnaire de pré-analyse' : 'Questions établies depuis la NF'} · ${qs.from === 'pre' && typeof paQCount === 'function' ? paQCount() : anCountQ(qs.q)} questions` : null],
   ];
   const xc = anExtraCtx();
   if (xc.answerDocs.length) rows.push(['Réponses du client', `${xc.answerDocs.join(', ')} · ${xc.answers.length} réponse${xc.answers.length > 1 ? 's' : ''} sur ${xc.total} questions`]);
@@ -7245,6 +7275,7 @@ async function anGenerate(k){
   anState.out[k] = { ...r, sources: anJoin(src), dRef: anState.d, unite };
   const gaps = PA_PERIODS.filter(p => d.hasData[p] && Math.abs(d.balance[p].actif - d.balance[p].passif) > 1).map(p => d.years[p]);
   if (gaps.length) anAlert(k, `Bilan déséquilibré dans la NF (${gaps.join(', ')}) : vérifiez la NF avant d’utiliser l’analyse.`, 'warn');
+  if (ef && ef.ef.byCode) for (const m of paEfVsNf(ef.ef.byCode, d).filter(m => /unité/.test(m))) anAlert(k, escapeHtml(m.replace('Corrigez l’unité', 'Corrigez l’unité dans l’onglet Pré-analyse')), 'warn');
   const caXof = Math.abs(data.M.N.ca || 0) * d.info.multiplier;
   if (caXof > 0 && caXof < 5e7) anAlert(k, `Chiffre d’affaires ${d.years.N} = ${paXof(data.M.N.ca, d.info.multiplier)} avec l’unité « ${unite} » : vérifiez l’unité des montants dans l’onglet Pré-analyse puis régénérez.`, 'warn');
   else if (caXof > 5e13) anAlert(k, `Chiffre d’affaires ${d.years.N} = ${paXof(data.M.N.ca, d.info.multiplier)} avec l’unité « ${unite} » : montant improbable, vérifiez l’unité des montants de la NF.`, 'warn');
@@ -7428,7 +7459,7 @@ function cdScore(d, data, ctx){
   const audite = /^oui|^yes/i.test(String(d.info.audite || '').trim());
   const gaps = PA_PERIODS.filter(p => d.hasData[p] && Math.abs(d.balance[p].actif - d.balance[p].passif) > 1);
   const nq = ctx.questions ? anCountQ(ctx.questions) : 0;
-  add('info', 'Qualité de l’information financière', `${audite ? 'États financiers audités' : 'États financiers non audités'}${nq ? `, ${nq} question(s) en attente de réponse` : ''}${gaps.length ? ', bilan déséquilibré dans la NF' : ''}`,
+  add('info', 'Qualité de l’information financière', `${audite ? 'États financiers audités' : 'États financiers non audités'}${nq ? (() => { const na = Math.min(nq, (ctx.answers || []).length); return na ? `, ${na} réponse${na > 1 ? 's' : ''} du client sur ${nq} question${nq > 1 ? 's' : ''}` : `, ${nq} question${nq > 1 ? 's' : ''} en attente de réponse`; })() : ''}${gaps.length ? ', bilan déséquilibré dans la NF' : ''}`,
     gaps.length ? -1 : audite ? 1 : 0, 'États financiers audités', gaps.length ? 'Bilan déséquilibré dans la NF' : '');
   return out;
 }
@@ -7576,7 +7607,7 @@ function cdBlocks(doc){
   const segs = ['S1', 'S2', 'S3'].map(s => `${s}${s === 'S2' ? ' (WL/sensible)' : ''} ${cdBox(req.segment === s)}`).join('   ');
   B.push({ t:'table', widths:[1900, 6166, 2400], sz:18, rows:[
     [{ text:`[${cxMonthYear()}]\n\n**Filiale : ${req.filiale || 'SGSN'}**\n**Clientèle : ${req.clientele || ''}**`, vmerge:'start', rowspan:2 },
-     { text:`**Emprunteur** : ${anUp(req.entite)}\n**N°RCT** : ${req.rct || ''}        Prospect ${cdBox(req.prospect)}\n${segs}\nPour S2 ou S3, précisez la date d’entrée : ${req.dateS || ''}\n**NAER** : ${req.naer || ''}\nKYC – risque LAB : **${req.kyc || ''}**\nValidité : **${req.validiteKyc || ''}**\nValidation LoD1 (DCE) ${cdBox(req.lod1)}        Validation LoD2 (CPLE) ${cdBox(req.lod2)}\nClient Leverage Lending ou HLT ? ${cdBox(req.hlt)}`, vmerge:'start', rowspan:2 },
+     { text:`**Emprunteur** : ${anUp(req.entite)}\n**N°RCT** : ${req.rct || ''}        Prospect ${cdBox(req.prospect)}\n${segs}\nPour S2 ou S3, précisez la date d’entrée : ${req.dateS || ''}\n**NAER** : ${req.naer || ''}\nKYC - risque LAB : **${req.kyc || ''}**\nValidité : **${req.validiteKyc || ''}**\nValidation LoD1 (DCE) ${cdBox(req.lod1)}        Validation LoD2 (CPLE) ${cdBox(req.lod2)}\nClient Leverage Lending ou HLT ? ${cdBox(req.hlt)}`, vmerge:'start', rowspan:2 },
      { text: req.note || '', align:'c', sz:44 }],
     [{ text:'', vmerge:'cont' }, { text:'', vmerge:'cont' }, { text:`Revue le : ${req.revue || ''}\nValidité : ${req.validite || ''}` }],
   ]});
@@ -7713,8 +7744,8 @@ function cdBlocks(doc){
     ['Non-respect des critères d’exclusion client des politiques sectorielles du Groupe SG', { text:'NON', b:true, align:'c' }, ''],
     ['Controverses matérielles environnementales, sociales, gouvernance (sécurité financière) ?', { text:'NON', b:true, align:'c' }, ''],
     ['Origination guidelines NZBA', { text:'NON', b:true, align:'c' }, ''],
-    ['Risque de transition – climat – CCVI transition', { text: rg.ccviT || '', b:true, align:'c' }, ''],
-    ['Risques physiques – climat – CCVI physique', { text: rg.ccviP || '', b:true, align:'c' }, ''],
+    ['Risque de transition - climat - CCVI transition', { text: rg.ccviT || '', b:true, align:'c' }, ''],
+    ['Risques physiques - climat - CCVI physique', { text: rg.ccviP || '', b:true, align:'c' }, ''],
     ['Risque de crédit d’origine ESG', { text:'NON', b:true, align:'c' }, ''],
   ]});
   // Conclusions des valideurs
@@ -7886,6 +7917,7 @@ async function cdGenerateUi(){
   const ef = anEf(d), qs = anQuestions(d, ef);
   const data = anBuildData(anState.wb, d);
   const xc = anExtraCtx();
+  if (ef && ef.ef.byCode) for (const m of paEfVsNf(ef.ef.byCode, d).filter(m => /unité/.test(m))) anAlert('credap', escapeHtml(m.replace('Corrigez l’unité', 'Corrigez l’unité dans l’onglet Pré-analyse')), 'warn');
   const ctx0 = { ef: ef ? ef.ef : null, questions: qs.q, entite: anIdent().entite, answers: xc.answers, complements: xc.complements, docs: xc.docs };
   const eco = cdAnalysis('eco', d, data, ctx0), fin = cdAnalysis('fin', d, data, ctx0);
   const docs = qs.from === 'pre' ? (paState.sections.docs || []).map(t => String(t).trim()).filter(Boolean)
@@ -8272,9 +8304,9 @@ async function answerQuestion(raw){
     if (typeof cdState !== 'undefined' && cdState.out){
       const sel = document.getElementById('cd-avis');
       const vig = cdState.out.crit.filter(c => c.s <= -1).map(c => c.label.toLowerCase());
-      return { text: `L’outil propose un avis ${cdState.out.prop.avis.toLowerCase()}${sel && sel.value !== cdState.out.prop.avis ? ` ; l’avis retenu dans le CREDAP est ${sel.value.toLowerCase()}` : ''}.${vig.length ? ` Les points de vigilance portent sur ${vig.length > 1 ? vig.slice(0, -1).join(', ') + ' et ' + vig[vig.length - 1] : vig[0]}.` : ' Aucun point de vigilance n’est relevé.'}` };
+      return { text: `L’outil propose un avis ${cdState.out.prop.avis.toLowerCase()}${sel && sel.value !== cdState.out.prop.avis ? ` ; l’avis retenu dans la CREDAPP est ${sel.value.toLowerCase()}` : ''}.${vig.length ? ` Les points de vigilance portent sur ${vig.length > 1 ? vig.slice(0, -1).join(', ') + ' et ' + vig[vig.length - 1] : vig[0]}.` : ' Aucun point de vigilance n’est relevé.'}` };
     }
-    return { text: 'L’appréciation du dossier n’est pas encore établie : ouvrez l’onglet CREDAP et cliquez sur « Générer la synthèse et le CREDAP ».' };
+    return { text: 'L’appréciation du dossier n’est pas encore établie : ouvrez l’onglet CREDAPP et cliquez sur « Générer la CREDAPP ».' };
   }
   if (!hasExtraction && !nf){
     return { text: "Aucun document n’a encore été analysé. Chargez le modèle et les états financiers dans l’onglet Notice Financière, puis cliquez sur « Analyser les documents »." };
