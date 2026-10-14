@@ -423,14 +423,6 @@
   .pa-deep-ok{ font-size:0.72rem; color:var(--ok, #2E7D4F); }
   .pa-deep-text{ font-size:0.85rem; line-height:1.55; color:var(--ink); }
   .pa-deep-src{ font-size:0.76rem; color:var(--muted); overflow-wrap:anywhere; }
-  .pa-rag{ margin-top:20px; }
-  .pa-rag-bar{ display:flex; gap:8px; flex-wrap:wrap; }
-  .pa-rag-bar input{ flex:1 1 220px; min-width:0; border:1px solid var(--line-strong); border-radius:4px; padding:8px 10px; font-family:'Inter',sans-serif; font-size:0.86rem; background:#fff; }
-  .pa-rag-bar input:focus{ outline:none; border-color:var(--accent); box-shadow:0 0 0 3px var(--accent-ring); }
-  .pa-rag-hit{ border-left:2px solid var(--accent); padding:6px 10px; margin-top:10px; background:#fff; }
-  .pa-rag-src{ font-size:0.74rem; color:var(--muted); margin-bottom:3px; }
-  .pa-rag-txt{ font-family:'JetBrains Mono',monospace; font-size:0.74rem; line-height:1.55; color:var(--ink); overflow-wrap:anywhere; }
-  .pa-rag-txt mark{ background:var(--accent-ring); color:inherit; padding:0 1px; }
   .an-extra{ margin-top:18px; padding-top:14px; border-top:1px solid var(--paper-line); }
   .an-extra-head{ font-size:0.8rem; font-weight:600; color:var(--ink); margin-bottom:10px; }
   .an-extra-list{ display:flex; flex-direction:column; gap:6px; margin-bottom:10px; }
@@ -911,11 +903,6 @@
           <div id="pa-deep"></div>
           <div class="pa-download-bar">
             <button type="button" class="action primary" id="pa-deep-add" disabled>Ajouter la sélection au questionnaire</button>
-          </div>
-          <div class="pa-rag">
-            <label class="pa-label" for="pa-rag-q">Rechercher dans les documents du dossier</label>
-            <div class="pa-rag-bar"><input type="search" id="pa-rag-q" placeholder="caution, créances douteuses, litiges"><button type="button" class="action pa-secondary" id="pa-rag-go">Rechercher</button></div>
-            <div id="pa-rag-res"></div>
           </div>
         </div>
       </div>
@@ -5392,6 +5379,40 @@ function ragSourcesFrom(ef, efName, extra){
   for (const x of (extra || [])) if (x.text) S.push({ name: x.name, kind: x.kind || 'doc', lines: x.text.split('\n') });
   return S;
 }
+// Passages pour l'assistant : lignes lisibles qui contiennent les termes cherchés (fragments de lecture écartés)
+const RAG_VERB = /(^|\s)(sont|est|ont|a été|ont été|sera|seront|garantis?|garanties|consentie?s?|survenus?|intervenus?|pr[ée]vue?s?|s'élève|s’élève|représente)(\s|$)/i;
+function ragLineOk(t){
+  const words = t.split(/\s+/).filter(w => /^[A-Za-zÀ-ÿ'’\-]{3,}[,.;:]?$/.test(w));
+  const letters = t.replace(/[^A-Za-zÀ-ÿ]/g, '').length;
+  return words.length >= 2 && letters >= 0.45 * t.replace(/\s/g, '').length && !/^[\W\d]/.test(t.replace(/^[|«"(]/, 'x'));
+}
+function ragAnswer(idx, query, k = 3){
+  if (!idx || !idx.N) return [];
+  const terms = ragQueryTerms(query);
+  const main = new Set([...terms].filter(([, w]) => w === 1).map(([t]) => t));
+  const hits = ragSearch(idx, query, 12);
+  const out = [], seen = new Set();
+  for (const h of hits){
+    const lines = h.text.split('\n').map(l => l.replace(/^[|\s]+/, '').trim()).filter(l => l && ragLineOk(l));
+    // ligne informative : une phrase, ou un libellé suivi d'un montant non nul (les en-têtes de tableau sont écartés)
+    const informative = l => RAG_VERB.test(l) && l.length >= 35 || ragAmounts(l).some(a => a.v > 0);
+    // couverture de la question pondérée par la rareté des termes (« hors » seul ne suffit pas pour « engagements hors bilan »)
+    const idf = t => Math.log(1 + (idx.N - (idx.df.get(t) || 0) + 0.5) / ((idx.df.get(t) || 0) + 0.5));
+    const den = [...main].reduce((a, t) => a + idf(t), 0) || 1;
+    const cover = l => { const T = new Set(ragTokens(l)); let c = 0; for (const [t, w] of terms) if (T.has(t)) c += w * idf(t); return c / den; };
+    const keep = lines.filter(l => !RAG_NOTE_RE.test(l) && !/^[^a-zà-ÿ]*$/.test(l) && informative(l) && cover(l) >= 0.34);
+    if (!keep.length) continue;
+    const key = keep.join('|');
+    if (seen.has(key)) continue; seen.add(key);
+    const direct = keep.some(l => ragTokens(l).some(t => main.has(t)));
+    const sentence = keep.some(l => l.length >= 35 && RAG_VERB.test(l));
+    const amount = keep.some(l => /\d{1,3}(?:[  .]\d{3})+/.test(l));
+    out.push({ ...h, lines: keep, rank: h.score * (direct ? 1 : 0.6) + (sentence ? 2 : 0) + (amount ? 0.8 : 0) });
+  }
+  out.sort((a, b) => b.rank - a.rank);
+  const top = out.length ? out[0].rank : 0;
+  return out.filter(x => x.rank >= Math.max(2, top * 0.45)).slice(0, k);
+}
 /* @@RAG_ENGINE_END */
 
 /* Maquette de renouvellement des dossiers de crédit (modèle Word par défaut) */
@@ -5639,7 +5660,6 @@ function paGenerate(){
   paRenderSynthesis();
   paRenderSections();
   paRenderDeep();
-  document.getElementById('pa-rag-res').innerHTML = '';
   document.getElementById('pa-result').scrollIntoView({ behavior:'smooth', block:'start' });
 }
 
@@ -5728,18 +5748,6 @@ function paAddDeep(){
   }
   if (!n) return;
   paRenderSections(); paRenderDeep();
-}
-function paHighlight(text, query){
-  const stems = new Set([...ragQueryTerms(query).keys()]);
-  return text.split(/(\s+)/).map(w => { const t = ragTokens(w); return t.length && t.some(x => stems.has(x)) ? `<mark>${escapeHtml(w)}</mark>` : escapeHtml(w); }).join('');
-}
-function paRagSearch(){
-  const q = document.getElementById('pa-rag-q').value.trim();
-  const host = document.getElementById('pa-rag-res');
-  if (!q){ host.innerHTML = ''; return; }
-  const R = ragSearch(ragGlobalIndex(), q, 6);      // tous les documents lus dans l'outil, y compris ceux ajoutés depuis
-  host.innerHTML = R.length ? R.map(r => `<div class="pa-rag-hit"><div class="pa-rag-src">${escapeHtml(r.src)}${r.note ? ` · Note ${escapeHtml(r.note.id)} ${escapeHtml(paLc(r.note.title || '').toLowerCase())}` : ''}</div><div class="pa-rag-txt">${r.text.split('\n').map(l => paHighlight(l, q)).join('<br>')}</div></div>`).join('')
-    : '<div class="pa-empty">Aucun passage trouvé.</div>';
 }
 // Index de tous les documents lus dans l'outil (assistant, recherche hors pré-analyse)
 let paRagCache = { sig:'', idx:null };
@@ -5946,8 +5954,6 @@ function initPreanalyseModule(){
   document.getElementById('pa-mail').addEventListener('click', paMail);
   document.getElementById('pa-print').addEventListener('click', paPrint);
   document.getElementById('pa-deep-add').addEventListener('click', paAddDeep);
-  document.getElementById('pa-rag-go').addEventListener('click', paRagSearch);
-  document.getElementById('pa-rag-q').addEventListener('keydown', e => { if (e.key === 'Enter'){ e.preventDefault(); paRagSearch(); } });
   document.getElementById('pa-activite').addEventListener('change', () => {
     if (!paState.data || document.getElementById('pa-result').style.display === 'none') return;
     const tpl = PA_GENERAL_TEMPLATES[document.getElementById('pa-activite').value];
@@ -8220,7 +8226,12 @@ function searchNotes(q){
   for (const h of keep){ const k = h.d.name + '|' + h.n.id; if (!groups.has(k)) groups.set(k, { n:h.n, d:h.d, rows:[] }); groups.get(k).rows.push(h.r); }
   return [...groups.values()].map(g => {
     const y = g.n.year || g.d.year;
-    const one = r => `« ${r.label} » pour ${chatAmount(r.n)}${y ? ` en ${y}` : ''}${Number.isFinite(r.n1) && r.n1 ? ` (${chatAmount(r.n1)} l’exercice précédent${chatEvo(r.n1, r.n) && chatEvo(r.n1, r.n) !== 'stable' ? `, ${chatEvo(r.n1, r.n)}` : ''})` : Number.isFinite(r.n1) ? ' (nul l’exercice précédent)' : ''}`;
+    // libellé lu dans un tableau : en-têtes de colonnes accolés retirés (« ACQUISITION acquisition Provisions pour litiges »)
+    const lab = l => { const x = String(l).replace(/^([A-ZÀ-Ý'’]{3,}\s+)+/, '').replace(/^([a-zà-ÿ'’]+\s+)+(?=[A-ZÀ-Ý])/, ''); return x.length >= 4 ? x : l; };
+    // effectifs, nombres, quantités : pas des montants en FCFA
+    const count = l => /effectif|nombre|personnes|salari[ée]s|travailleurs|tonnes|quantit/i.test(l);
+    const amt = (r, v) => count(r.label) ? paNum(Math.round(v), 0) : chatAmount(v);
+    const one = r => `« ${lab(r.label)} »${count(r.label) ? ' :' : ' pour'} ${amt(r, r.n)}${y ? ` en ${y}` : ''}${Number.isFinite(r.n1) && r.n1 ? ` (${amt(r, r.n1)} l’exercice précédent${chatEvo(r.n1, r.n) && chatEvo(r.n1, r.n) !== 'stable' ? `, ${chatEvo(r.n1, r.n)}` : ''})` : Number.isFinite(r.n1) ? ' (nul l’exercice précédent)' : ''}`;
     const list = g.rows.map(one);
     return { text: `D’après la note ${g.n.id} (${g.n.title.toLowerCase()}), ${g.rows.length > 1 ? 'les lignes correspondantes sont' : 'la ligne correspondante est'} ${list.length > 1 ? list.slice(0, -1).join(', ') + ' et ' + list[list.length - 1] : list[0]}.${g.rows.length > 1 && new Set(g.rows.map(r => normalizeQuery(r.label))).size < g.rows.length ? ' Un même libellé apparaît dans plusieurs rubriques de la note.' : ''}`, source: g.d.name };
   });
@@ -8371,15 +8382,18 @@ async function answerQuestion(raw){
   }
 
   // Texte des documents (dernier recours)
-  // Recherche dans les documents (RAG local) : passages les plus pertinents, avec la note annexe
+  // Recherche dans les documents (RAG local) : passages lisibles les plus pertinents, avec la note annexe
   if (typeof ragGlobalIndex === 'function'){
-    const hits = ragSearch(ragGlobalIndex(), q, 3).filter((h, k, a) => h.score >= Math.max(2, a[0].score * 0.5));
+    const hits = ragAnswer(ragGlobalIndex(), q, 3);
     if (hits.length){
       const cite = h => `${h.note ? `la note ${h.note.id}${/[a-z]{3}/i.test(h.note.title || '') ? ` (${String(h.note.title).toLowerCase()})` : ''} de ` : ''}${h.src}`;
-      const clip = t => { const x = stripPostCodes(t.replace(/\n/g, ' / ').replace(/\s+/g, ' ')); return x.length > 260 ? x.slice(0, 257).replace(/\s+\S*$/, '') + '…' : x; };
-      return { text: hits.length === 1 ? `Je n’ai pas trouvé de poste correspondant, mais ${cite(hits[0])} indique : « ${clip(hits[0].text)} ».`
-        : `Je n’ai pas trouvé de poste correspondant, mais voici les passages les plus pertinents des documents :\n${hits.map(h => `- ${cite(h)} : « ${clip(h.text)} »`).join('\n')}` };
+      const clip = h => { const x = stripPostCodes(h.lines.join(' ; ').replace(/\s+/g, ' ')); return x.length > 260 ? x.slice(0, 257).replace(/\s+\S*$/, '') + '…' : x; };
+      return { text: hits.length === 1 ? `D’après ${cite(hits[0])} : « ${clip(hits[0])} ».`
+        : `Voici ce que contiennent les documents du dossier :\n${hits.map(h => `- D’après ${cite(h)} : « ${clip(h)} »`).join('\n')}` };
     }
+    // sujet cité dans les documents, sans montant ni commentaire exploitable (en-têtes de tableau, cases vides)
+    const any = ragSearch(ragGlobalIndex(), q, 1)[0];
+    if (any && any.score >= 4) return { text: `Les documents du dossier évoquent ce sujet${any.note ? ` dans la note ${any.note.id}${/[a-z]{3}/i.test(any.note.title || '') ? ` (${String(any.note.title).toLowerCase()})` : ''}` : ''} de ${any.src}, mais sans montant ni commentaire exploitable.` };
   }
   const allLines = [...(window._allExtractedLines || []), ...(window._extraDocLines || [])];
   if (allLines.length){
